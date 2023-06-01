@@ -6,7 +6,7 @@
  */
 
 import type { RequestBaseOptions } from 'hapic';
-import { Client } from 'hapic';
+import { Client, HookName, isClientError } from 'hapic';
 import {
     MasterImageAPI,
     MasterImageGroupAPI,
@@ -66,5 +66,18 @@ export class APIClient extends Client {
         this.trainStation = new TrainStationAPI({ client: this });
         this.service = new ServiceAPI({ client: this });
         this.userSecret = new UserSecretAPI({ client: this });
+
+        this.on(HookName.RESPONSE_ERROR, ((error) => {
+            if (
+                isClientError(error) &&
+                error.response &&
+                error.response.data &&
+                typeof error.response.data.message === 'string'
+            ) {
+                error.message = error.response.data.message;
+            }
+
+            throw error;
+        }));
     }
 }

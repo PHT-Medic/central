@@ -1,120 +1,98 @@
-<!--
-  Copyright (c) 2021-2021.
-  Author Peter Placzek (tada5hi)
-  For the full copyright and license information,
-  view the LICENSE file that was distributed with this source code.
-  -->
-<script>
-import { PermissionID } from '@personalhealthtrain/central-common';
-import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
+<script lang="ts">
 
-export default {
-    meta: {
-        meta: {
-            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
-            [LayoutKey.REQUIRED_LOGGED_IN]: true,
-            [LayoutKey.REQUIRED_PERMISSIONS]: [
-                PermissionID.ROLE_ADD,
-                PermissionID.ROLE_DROP,
-                PermissionID.ROLE_EDIT,
-            ],
-        },
-    },
-    data() {
+import { BTable } from 'bootstrap-vue-next';
+import type { Role } from '@authup/core';
+import { PermissionName, isRealmResourceWritable } from '@authup/core';
+import { EntityDelete, RoleList } from '@authup/client-vue';
+import { storeToRefs } from 'pinia';
+import type { BuildInput } from 'rapiq';
+import { defineNuxtComponent } from '#app';
+import { resolveComponent } from '#imports';
+import { useAuthStore } from '../../../../store/auth';
+
+export default defineNuxtComponent({
+    components: { BTable, RoleList, EntityDelete },
+    emits: ['deleted'],
+    setup(props, { emit }) {
+        const handleDeleted = (e: Role) => {
+            emit('deleted', e);
+        };
+
+        const store = useAuthStore();
+        const { realm, realmManagementId } = storeToRefs(store);
+
+        const query : BuildInput<Role> = {
+            filter: {
+                realm_id: [realmManagementId.value, null],
+            },
+        };
+
+        const isResourceWritable = (
+            resource: Role,
+        ) => isRealmResourceWritable(realm.value, resource.realm_id);
+
+        const hasEditPermission = store.has(PermissionName.ROLE_EDIT);
+        const hasDropPermission = store.has(PermissionName.ROLE_DROP);
+
+        const fields = [
+            {
+                key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left',
+            },
+            {
+                key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
+            },
+            {
+                key: 'created_at', label: 'Created at', thClass: 'text-center', tdClass: 'text-center',
+            },
+            {
+                key: 'updated_at', label: 'Updated at', thClass: 'text-left', tdClass: 'text-left',
+            },
+            { key: 'options', label: '', tdClass: 'text-left' },
+        ];
+
         return {
-            busy: false,
-            fields: [
-                {
-                    key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left',
-                },
-                {
-                    key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
-                },
-                {
-                    key: 'created_at', label: 'Created at', thClass: 'text-center', tdClass: 'text-center',
-                },
-                {
-                    key: 'updated_at', label: 'Updated at', thClass: 'text-left', tdClass: 'text-left',
-                },
-                { key: 'options', label: '', tdClass: 'text-left' },
-            ],
+            fields,
+            isResourceWritable,
+            hasEditPermission,
+            hasDropPermission,
+            handleDeleted,
+            query,
         };
     },
-    computed: {
-        canView() {
-            return this.$auth.has(PermissionID.ROLE_EDIT) ||
-                this.$auth.has(PermissionID.ROLE_PERMISSION_ADD) ||
-                this.$auth.has(PermissionID.ROLE_PERMISSION_DROP) ||
-                this.$auth.has(PermissionID.USER_ROLE_ADD) ||
-                this.$auth.has(PermissionID.USER_ROLE_DROP);
-        },
-        canDrop() {
-            return this.$auth.has(PermissionID.ROLE_DROP);
-        },
-        query() {
-            return {
-                sort: {
-                    updated_at: 'DESC',
-                },
-            };
-        },
-    },
-    methods: {
-        async handleDeleted(item) {
-            this.$emit('deleted', item);
-
-            this.$refs.itemsList.handleDeleted(item);
-        },
-    },
-};
+});
 </script>
 <template>
-    <role-list
-        ref="itemsList"
-        :load-on-init="true"
+    <RoleList
+        :header-title="{ icon: 'fa-solid fa-list pe-1', content: 'Overview' }"
         :query="query"
+        @deleted="handleDeleted"
     >
-        <template #header-title>
-            <h6><i class="fa-solid fa-list pr-1" /> Overview</h6>
-        </template>
         <template #items="props">
-            <b-table
-                :items="props.items"
+            <BTable
+                :items="props.data"
                 :fields="fields"
                 :busy="props.busy"
                 head-variant="'dark'"
                 outlined
             >
                 <template #cell(options)="data">
-                    <nuxt-link
-                        v-if="canView"
-                        class="btn btn-xs btn-outline-primary"
-                        :to="'/admin/roles/'+data.item.id"
+                    <NuxtLink
+                        :to="'/admin/roles/'+ data.item.id"
+                        class="btn btn-xs btn-outline-primary me-1"
+                        :disabled="!hasEditPermission || !isResourceWritable(data.item)"
                     >
-                        <i class="fa fa-bars" />
-                    </nuxt-link>
-                    <auth-entity-delete
-                        v-if="canDrop"
+                        <i class="fa-solid fa-bars" />
+                    </NuxtLink>
+                    <EntityDelete
                         class="btn btn-xs btn-outline-danger"
                         :entity-id="data.item.id"
-                        :entity-type="'role'"
+                        entity-type="role"
                         :with-text="false"
-                        @deleted="handleDeleted"
+                        :disabled="!hasDropPermission || !isResourceWritable(data.item)"
+                        @deleted="props.deleted"
                     />
                 </template>
-                <template #cell(created_at)="data">
-                    <timeago :datetime="data.item.created_at" />
-                </template>
-                <template #cell(updated_at)="data">
-                    <timeago :datetime="data.item.updated_at" />
-                </template>
-                <template #table-busy>
-                    <div class="text-center text-danger my-2">
-                        <b-spinner class="align-middle" />
-                        <strong>Loading...</strong>
-                    </div>
-                </template>
-            </b-table>
+            </BTable>
         </template>
-    </role-list>
+    </RoleList>
 </template>

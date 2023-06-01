@@ -6,43 +6,53 @@
   -->
 <script>
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
-import { ProposalList } from '../../../components/domains/proposal/ProposalList';
-import { ProposalItem } from '../../../components/domains/proposal/ProposalItem';
+import { computed } from 'vue';
+import { storeToRefs } from 'pinia';
+import { LayoutKey, LayoutNavigationID } from '~/config/layout';
+import ProposalList from '../../../components/domains/proposal/ProposalList';
+import ProposalItem from '../../../components/domains/proposal/ProposalItem';
+import { defineNuxtComponent, definePageMeta } from '#imports';
+import { useAuthStore } from '~/store/auth';
 
-export default {
+export default defineNuxtComponent({
     components: { ProposalList, ProposalItem },
-    meta: {
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
-        [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.PROPOSAL_ADD,
-            PermissionID.PROPOSAL_DROP,
-            PermissionID.PROPOSAL_EDIT,
+    setup() {
+        definePageMeta({
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+            [LayoutKey.REQUIRED_PERMISSIONS]: [
+                PermissionID.PROPOSAL_ADD,
+                PermissionID.PROPOSAL_DROP,
+                PermissionID.PROPOSAL_EDIT,
 
-            PermissionID.TRAIN_ADD,
-            PermissionID.TRAIN_EDIT,
-            PermissionID.TRAIN_DROP,
+                PermissionID.TRAIN_ADD,
+                PermissionID.TRAIN_EDIT,
+                PermissionID.TRAIN_DROP,
 
-            PermissionID.TRAIN_RESULT_READ,
+                PermissionID.TRAIN_RESULT_READ,
 
-            PermissionID.TRAIN_EXECUTION_START,
-            PermissionID.TRAIN_EXECUTION_STOP,
-        ],
+                PermissionID.TRAIN_EXECUTION_START,
+                PermissionID.TRAIN_EXECUTION_STOP,
+            ],
+        });
+
+        const store = useAuthStore();
+        const { realmId } = storeToRefs(store);
+
+        const query = computed(() => ({
+            filter: {
+                realm_id: realmId.value,
+            },
+            sort: {
+                updated_at: 'DESC',
+            },
+        }));
+
+        return {
+            query,
+        };
     },
-    computed: {
-        query() {
-            return {
-                filter: {
-                    realm_id: this.$store.getters['auth/realmId'],
-                },
-                sort: {
-                    updated_at: 'DESC',
-                },
-            };
-        },
-    },
-};
+});
 </script>
 <template>
     <div>
@@ -50,20 +60,22 @@ export default {
             This is a slight overview of all proposals, which are created by you or one of your co workers.
         </div>
         <div class="m-t-10">
-            <proposal-list
+            <ProposalList
                 :query="query"
             >
                 <template #header-title>
                     <h6><i class="fa-solid fa-list pr-1" /> Overview</h6>
                 </template>
                 <template #item="props">
-                    <proposal-item
-                        :entity="props.item"
-                        @updated="props.handleUpdated"
-                        @deleted="props.handleDeleted"
-                    />
+                    <div class="list-item">
+                        <proposal-item
+                            :entity="props.data"
+                            @updated="props.handleUpdated"
+                            @deleted="props.handleDeleted"
+                        />
+                    </div>
                 </template>
-            </proposal-list>
+            </ProposalList>
         </div>
     </div>
 </template>

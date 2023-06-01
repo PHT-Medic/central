@@ -4,56 +4,56 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
+<script lang="ts">
 import { PermissionID, ServiceID } from '@personalhealthtrain/central-common';
-import { LayoutKey, LayoutNavigationID } from '../../../config/layout/contants';
+import { definePageMeta } from '#imports';
+import { defineNuxtComponent } from '#app';
+import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 
-export default {
-    meta: {
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
-        [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.SERVICE_MANAGE,
-        ],
-    },
-    data() {
+export default defineNuxtComponent({
+    setup() {
+        definePageMeta({
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+            [LayoutKey.REQUIRED_PERMISSIONS]: [
+                PermissionID.SERVICE_MANAGE,
+            ],
+        });
+
+        const items = [
+            {
+                id: ServiceID.SYSTEM, name: 'System', icon: 'fa-solid fa-atom', version: 'v1.0.0-alpha.0',
+            },
+            {
+                id: ServiceID.EMAIL_SERVICE, name: 'E-Mail Service', icon: 'fas fa-envelope', version: 'v1.0.0-alpha.0',
+            },
+            {
+                id: ServiceID.STATION_REGISTRY, name: 'Station Registry', icon: 'fa-solid fa-box-archive', version: 'v1.0.0-alpha.0',
+            },
+        ];
+
+        const thirdPartyItems = [
+            {
+                id: ServiceID.REGISTRY, name: 'Image Registry', icon: 'fab fa-docker', version: 'v2.4.0',
+            },
+            {
+                id: ServiceID.SECRET_STORAGE, name: 'Secret Storage', icon: 'fas fa-key', version: 'v1.8.4',
+            },
+            {
+                id: ServiceID.GITHUB, name: 'Github', icon: 'fab fa-github', version: 'v1.0.0',
+            },
+        ];
+
+        const goTo = async (id: string) => {
+            await navigateTo(`/admin/services/${id}`);
+        };
+
         return {
-            busy: false,
-            fields: [
-                {
-                    key: 'id', label: 'ID', thClass: 'text-left', tdClass: 'text-left',
-                },
-                { key: 'options', label: '', tdClass: 'text-left' },
-            ],
-            items: [
-                {
-                    id: ServiceID.SYSTEM, name: 'System', icon: 'fa-solid fa-atom', version: 'v1.0.0-alpha.0',
-                },
-                {
-                    id: ServiceID.EMAIL_SERVICE, name: 'E-Mail Service', icon: 'fas fa-envelope', version: 'v1.0.0-alpha.0',
-                },
-                {
-                    id: ServiceID.STATION_REGISTRY, name: 'Station Registry', icon: 'fa-solid fa-box-archive', version: 'v1.0.0-alpha.0',
-                },
-            ],
-            thirdPartyItems: [
-                {
-                    id: ServiceID.REGISTRY, name: 'Image Registry', icon: 'fab fa-docker', version: 'v2.4.0',
-                },
-                {
-                    id: ServiceID.SECRET_STORAGE, name: 'Secret Storage', icon: 'fas fa-key', version: 'v1.8.4',
-                },
-                {
-                    id: ServiceID.GITHUB, name: 'Github', icon: 'fab fa-github', version: 'v1.0.0',
-                },
-            ],
+            goTo,
+            items,
+            thirdPartyItems,
         };
     },
-    methods: {
-        async goTo(id) {
-            await this.$nuxt.$router.push(`/admin/services/${id}`);
-        },
-    },
-};
+});
 </script>
 <template>
     <div class="container">

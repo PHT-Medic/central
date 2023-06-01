@@ -5,104 +5,77 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { CreateElement, PropType, VNode } from 'vue';
-import Vue from 'vue';
+import { DomainEventName } from '@authup/core';
 import type {
     RegistryProject,
-    SocketClientToServerEvents,
+    RegistryProjectEventContext,
     SocketServerToClientEventContext,
-    SocketServerToClientEvents,
 } from '@personalhealthtrain/central-common';
 import {
+    DomainEventSubscriptionName,
+    DomainType,
     RegistryAPICommand,
-    RegistryProjectSocketClientToServerEventName,
-    RegistryProjectSocketServerToClientEventName,
     ServiceID,
+    buildDomainEventFullName,
+    buildDomainEventSubscriptionFullName,
 } from '@personalhealthtrain/central-common';
-import type { Socket } from 'socket.io-client';
+import { merge } from 'smob';
+import type { PropType } from 'vue';
+import { computed } from 'vue';
+import { realmIdForSocket } from '../../../composables/domain/realm';
+import { useSocket } from '../../../composables/socket';
+import { wrapFnWithBusyState } from '../../../core/busy';
 
-type Properties = {
-    entityId: RegistryProject['id']
-};
-
-type Data = {
-    entity: null | RegistryProject,
-    busy: boolean
-};
-
-export default Vue.extend<Data, any, any, Properties>({
+export default defineComponent({
     name: 'RegistryProjectDetails',
     props: {
-        entityId: String as PropType<RegistryProject['id']>,
-    },
-    data() {
-        return {
-            busy: false,
-            entity: null,
-        };
-    },
-    computed: {
-        name() {
-            return this.entity ?
-                this.entity.external_name :
-                undefined;
-        },
-        accountId() {
-            return this.entity ?
-                this.entity.account_id :
-                undefined;
-        },
-        accountName() {
-            return this.entity ?
-                this.entity.account_name :
-                undefined;
-        },
-        accountSecret() {
-            return this.entity ?
-                this.entity.account_secret :
-                undefined;
-        },
-        webhookExists() {
-            return this.entity ?
-                this.entity.webhook_exists :
-                undefined;
-        },
-        updatedAt() {
-            return this.entity ?
-                this.entity.updated_at :
-                undefined;
+        entityId: {
+            type: String as PropType<RegistryProject['id']>,
+            required: true,
         },
     },
-    created() {
-        Promise.resolve()
-            .then(this.resolve);
-    },
-    mounted() {
-        const socket : Socket<
-        SocketServerToClientEvents,
-        SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace();
+    emits: ['resolved', 'failed', 'updated'],
+    async setup(props, { emit }) {
+        const refs = toRefs(props);
 
-        socket.emit(RegistryProjectSocketClientToServerEventName.SUBSCRIBE, { data: { id: this.entityId } });
-        socket.on(RegistryProjectSocketServerToClientEventName.UPDATED, this.handleSocketUpdated);
-    },
-    beforeDestroy() {
-        const socket : Socket<
-        SocketServerToClientEvents,
-        SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace();
+        const busy = ref(false);
+        const entity = ref<null | RegistryProject>(null);
 
-        socket.emit(RegistryProjectSocketClientToServerEventName.UNSUBSCRIBE, { data: { id: this.entityId } });
-        socket.off(RegistryProjectSocketServerToClientEventName.UPDATED, this.handleSocketUpdated);
-    },
-    methods: {
-        async resolve() {
-            if (this.busy) return;
+        const name = computed(() => {
+            if (!entity.value) {
+                return '';
+            }
 
-            this.busy = true;
+            return entity.value.external_name;
+        });
 
+        const accountName = computed(() => {
+            if (!entity.value) {
+                return '';
+            }
+
+            return entity.value.account_name;
+        });
+
+        const accountSecret = computed(() => {
+            if (!entity.value) {
+                return '';
+            }
+
+            return entity.value.account_secret;
+        });
+
+        const webhookExists = computed(() => {
+            if (!entity.value) {
+                return false;
+            }
+
+            return !!entity.value.webhook_exists;
+        });
+
+        const resolve = wrapFnWithBusyState(busy, async () => {
             try {
-                this.entity = await this.$api.registryProject.getOne(this.entityId, {
+                entity.value = await useAPI().registryProject.getOne(refs.entityId.value, {
                     fields: [
                         '+account_id',
                         '+account_name',
@@ -110,163 +83,177 @@ export default Vue.extend<Data, any, any, Properties>({
                     ],
                 });
 
-                this.$emit('resolved', this.entity);
+                emit('resolved', entity.value);
             } catch (e) {
                 if (e instanceof Error) {
-                    this.$emit('failed', e);
+                    emit('failed', e);
                 }
             }
+        });
 
-            this.busy = false;
-        },
+        await resolve();
 
-        handleSocketUpdated(context: SocketServerToClientEventContext<RegistryProject>) {
+        const handleUpdated = (item: RegistryProject) => {
+            if (entity.value) {
+                entity.value = merge({}, item, entity.value);
+            }
+
+            entity.value = item;
+
+            // todo: we might need to resolve here to load account_secret
+
+            emit('updated', entity.value);
+        };
+
+        const handleSocketUpdated = (context: SocketServerToClientEventContext<RegistryProjectEventContext>) => {
             if (
-                context.data.id !== this.entityId
+                context.data.id !== refs.entityId.value
             ) return;
 
-            this.handleUpdated(context.data);
-        },
+            handleUpdated(context.data);
+        };
 
-        handleUpdated(item: RegistryProject) {
-            const keys = Object.keys(item) as (keyof RegistryProject)[];
-            for (let i = 0; i < keys.length; i++) {
-                Vue.set(this.entity, keys[i], item[keys[i]]);
-            }
+        const socketRealmId = realmIdForSocket(entity.value ? entity.value.realm_id : undefined);
+        const socket = useSocket().useRealmWorkspace(socketRealmId.value);
 
-            Promise.resolve()
-                .then(this.resolve)
-                .then(() => this.$emit('updated', this.entity));
-        },
+        onMounted(() => {
+            socket.emit(buildDomainEventSubscriptionFullName(
+                DomainType.REGISTRY_PROJECT,
+                DomainEventSubscriptionName.SUBSCRIBE,
+            ), refs.entityId.value);
 
-        async linkProject() {
-            await this.run(RegistryAPICommand.PROJECT_LINK);
-        },
-        async unlinkProject() {
-            await this.run(RegistryAPICommand.PROJECT_UNLINK);
-        },
-        async run(command) {
-            if (this.busy) return;
+            socket.on(buildDomainEventFullName(
+                DomainType.REGISTRY_PROJECT,
+                DomainEventName.UPDATED,
+            ), handleSocketUpdated);
+        });
 
-            this.busy = true;
+        onUnmounted(() => {
+            socket.emit(buildDomainEventSubscriptionFullName(
+                DomainType.REGISTRY_PROJECT,
+                DomainEventSubscriptionName.UNSUBSCRIBE,
+            ), refs.entityId.value);
+
+            socket.off(buildDomainEventFullName(
+                DomainType.REGISTRY_PROJECT,
+                DomainEventName.UPDATED,
+            ), handleSocketUpdated);
+        });
+
+        const execute = async (command: RegistryAPICommand) => wrapFnWithBusyState(busy, async () => {
+            if (!entity.value) return;
 
             try {
-                await this.$api.service.runCommand(ServiceID.REGISTRY, command, {
-                    id: this.entity.id,
+                await useAPI().service.runCommand(ServiceID.REGISTRY, command, {
+                    id: entity.value.id,
                 });
 
-                this.$emit('updated');
+                emit('updated', entity.value);
             } catch (e) {
                 if (e instanceof Error) {
-                    this.$emit('failed', e);
+                    emit('failed', e);
                 }
             }
+        })();
 
-            this.busy = false;
-        },
-    },
-    render(h: CreateElement): VNode {
-        const vm = this;
-
-        if (!vm.entity) {
-            return h(
+        if (!entity.value) {
+            return () => h(
                 'div',
-                { staticClass: 'alert alert-sm alert-warning' },
+                { class: 'alert alert-sm alert-warning' },
                 [
                     'The registry-project details can not be displayed.',
                 ],
             );
         }
 
-        return h('div', [
+        return () => h('div', [
             h('div', {
-                staticClass: 'mb-2 d-flex flex-column',
+                class: 'mb-2 d-flex flex-column',
             }, [
-                h('div', { staticClass: 'form-group' }, [
-                    h('label', { staticClass: 'pr-1' }, 'Namespace'),
+                h('div', { class: 'form-group' }, [
+                    h('label', { class: 'pr-1' }, 'Namespace'),
                     h('input', {
-                        staticClass: 'form-control',
-                        attrs: { type: 'text', value: vm.name, disabled: true },
+                        class: 'form-control',
+                        type: 'text',
+                        value: name.value,
+                        disabled: true,
                     }),
                 ]),
 
                 h('div', [
-                    h('div', { staticClass: 'form-group' }, [
-                        h('label', { staticClass: 'pr-1' }, 'ID'),
+                    h('div', { class: 'form-group' }, [
+                        h('label', { class: 'pr-1' }, 'ID'),
                         h('input', {
-                            staticClass: 'form-control',
-                            attrs: { type: 'text', value: vm.accountName || 'xxx', disabled: true },
+                            class: 'form-control',
+                            type: 'text',
+                            value: accountName.value,
+                            placeholder: '...',
+                            disabled: true,
                         }),
                     ]),
-                    h('div', { staticClass: 'form-group' }, [
-                        h('label', { staticClass: 'pr-1' }, 'Secret'),
+                    h('div', { class: 'form-group' }, [
+                        h('label', { class: 'pr-1' }, 'Secret'),
                         h('input', {
-                            staticClass: 'form-control',
-                            attrs: { type: 'text', value: vm.accountSecret || 'xxx', disabled: true },
+                            class: 'form-control',
+                            type: 'text',
+                            value: accountSecret.value,
+                            disabled: true,
+                            placeholder: '...',
                         }),
                     ]),
                 ]),
 
                 h('div', [
-                    h('strong', { staticClass: 'pr-1' }, 'Webhook:'),
+                    h('strong', { class: 'pe-1' }, 'Webhook:'),
                     h('i', {
                         class: {
-                            'fa fa-check text-success': vm.webhookExists,
-                            'fa fa-times text-danger': !vm.webhookExists,
+                            'fa fa-check text-success': webhookExists.value,
+                            'fa fa-times text-danger': !webhookExists.value,
                         },
                     }),
                 ]),
             ]),
             h('hr'),
-            h('div', { staticClass: 'row' }, [
-                h('div', { staticClass: 'col' }, [
+            h('div', { class: 'row' }, [
+                h('div', { class: 'col' }, [
                     h('div', {
-                        staticClass: 'alert alert-sm alert-info',
+                        class: 'alert alert-sm alert-info',
                     }, [
                         'The link trigger will spin up the remote registry representation.',
                     ]),
-                    h('div', { staticClass: 'text-center' }, [
+                    h('div', { class: 'text-center' }, [
                         h('button', {
                             class: 'btn btn-xs btn-primary',
-                            attrs: {
-                                disabled: vm.busy,
-                                type: 'button',
-                            },
-                            on: {
-                                click($event) {
-                                    $event.preventDefault();
+                            disabled: busy.value,
+                            type: 'button',
+                            onClick($event: any) {
+                                $event.preventDefault();
 
-                                    vm.linkProject.call(null);
-                                },
+                                return execute(RegistryAPICommand.PROJECT_LINK);
                             },
                         }, [
-                            h('i', { staticClass: 'fa-solid fa-link pr-1' }),
+                            h('i', { class: 'fa-solid fa-link pr-1' }),
                             'Link',
                         ]),
                     ]),
                 ]),
-                h('div', { staticClass: 'col' }, [
+                h('div', { class: 'col' }, [
                     h('div', {
-                        staticClass: 'alert alert-sm alert-warning',
+                        class: 'alert alert-sm alert-warning',
                     }, [
                         'The unlink trigger will remove the remote registry representation.',
                     ]),
-                    h('div', { staticClass: 'text-center' }, [
+                    h('div', { class: 'text-center' }, [
                         h('button', {
                             class: 'btn btn-xs btn-danger',
-                            attrs: {
-                                disabled: vm.busy,
-                                type: 'button',
-                            },
-                            on: {
-                                click($event) {
-                                    $event.preventDefault();
-
-                                    vm.unlinkProject.call(null);
-                                },
+                            disabled: busy.value,
+                            type: 'button',
+                            onClick($event: any) {
+                                $event.preventDefault();
+                                return execute(RegistryAPICommand.PROJECT_UNLINK);
                             },
                         }, [
-                            h('i', { staticClass: 'fa-solid fa-link-slash pr-1' }),
+                            h('i', { class: 'fa-solid fa-link-slash pr-1' }),
                             'Unlink',
                         ]),
                     ]),

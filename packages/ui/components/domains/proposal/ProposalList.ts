@@ -5,40 +5,33 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import type {
-    Proposal,
-    SocketClientToServerEvents,
+    Proposal, ProposalEventContext,
     SocketServerToClientEventContext,
-    SocketServerToClientEvents,
 } from '@personalhealthtrain/central-common';
 import {
-    ProposalSocketClientToServerEventName,
-    ProposalSocketServerToClientEventName, buildSocketProposalRoomName, mergeDeep,
+    DomainEventSubscriptionName,
+    DomainType,
+    buildDomainChannelName,
+    buildDomainEventFullName,
+    buildDomainEventSubscriptionFullName,
 } from '@personalhealthtrain/central-common';
-import type { CreateElement, PropType, VNode } from 'vue';
-import Vue from 'vue';
-import type {
-    ComponentListData, ComponentListHandlerMethodOptions, ComponentListMethods, ComponentListProperties,
-    PaginationMeta,
-} from '@vue-layout/utils';
-import {
-    buildListHeader,
-    buildListItems,
-    buildListNoMore, buildListPagination, buildListSearch,
-} from '@vue-layout/utils';
+import type { PropType } from 'vue';
+import { defineComponent } from 'vue';
 import type { BuildInput } from 'rapiq';
-import type { Socket } from 'socket.io-client';
-import { REALM_MASTER_NAME } from '@authup/core';
+import { DomainEventName } from '@authup/core';
+import { realmIdForSocket } from '../../../composables/domain/realm';
+import { useSocket } from '../../../composables/socket';
+import type {
+    DomainListHeaderSearchOptionsInput,
+    DomainListHeaderTitleOptionsInput,
+} from '../../../core';
+import {
+    createDomainListBuilder, isQuerySortedDescByDate,
+} from '../../../core';
 
-export const ProposalList = Vue.extend<
-ComponentListData<Proposal>,
-ComponentListMethods<Proposal>,
-any,
-ComponentListProperties<BuildInput<Proposal>> & {
-    realmId?: string
-}
->({
+export default defineComponent({
     props: {
-        loadOnInit: {
+        loadOnSetup: {
             type: Boolean,
             default: true,
         },
@@ -48,20 +41,20 @@ ComponentListProperties<BuildInput<Proposal>> & {
                 return {};
             },
         },
-        withHeader: {
+        noMore: {
             type: Boolean,
             default: true,
         },
-        withNoMore: {
+        footerPagination: {
             type: Boolean,
             default: true,
         },
-        withPagination: {
-            type: Boolean,
+        headerTitle: {
+            type: [Boolean, Object] as PropType<boolean | DomainListHeaderTitleOptionsInput>,
             default: true,
         },
-        withSearch: {
-            type: Boolean,
+        headerSearch: {
+            type: [Boolean, Object] as PropType<boolean | DomainListHeaderSearchOptionsInput>,
             default: true,
         },
         realmId: {
@@ -69,179 +62,76 @@ ComponentListProperties<BuildInput<Proposal>> & {
             default: undefined,
         },
     },
-    data() {
-        return {
-            busy: false,
-            items: [],
-            q: '',
-            meta: {
-                limit: 10,
-                offset: 0,
-                total: 0,
+    setup(props, ctx) {
+        const refs = toRefs(props);
+
+        const socketRealmId = realmIdForSocket(refs.realmId.value);
+
+        const { build, meta, handleCreated } = createDomainListBuilder<Proposal>({
+            props: refs,
+            setup: ctx,
+            load: (buildInput) => useAPI().proposal.getMany(buildInput),
+            queryFilter: (q) => ({
+                title: q.length > 0 ? `~${q}` : q,
+            }),
+            defaults: {
+                footerPagination: true,
+
+                headerSearch: true,
+                headerTitle: {
+                    content: 'Proposals',
+                    icon: 'fa fa-scroll',
+                },
+
+                noMore: {
+                    textContent: 'No more proposals available...',
+                },
             },
-            itemBusy: false,
+        });
+
+        const handleSocketCreated = (context: SocketServerToClientEventContext<ProposalEventContext>) => {
+            if (context.meta.roomName !== buildDomainChannelName(DomainType.PROPOSAL)) return;
+
+            if (
+                refs.query.value.sort &&
+                isQuerySortedDescByDate(refs.query.value.sort) &&
+                meta.value.offset === 0
+            ) {
+                handleCreated(context.data);
+                return;
+            }
+
+            if (meta.value.total < meta.value.limit) {
+                handleCreated(context.data);
+            }
         };
-    },
-    computed: {
-        socketRealmId() {
-            if (this.realmId) {
-                return this.realmId;
-            }
 
-            if (this.$store.getters['auth/realmName'] === REALM_MASTER_NAME) {
-                return undefined;
-            }
+        const socket = useSocket().useRealmWorkspace(socketRealmId.value);
 
-            return this.$store.getters['auth/realmId'];
-        },
-    },
-    watch: {
-        q(val, oldVal) {
-            if (val === oldVal) return;
+        onMounted(() => {
+            socket.emit(buildDomainEventSubscriptionFullName(
+                DomainType.PROPOSAL,
+                DomainEventSubscriptionName.SUBSCRIBE,
+            ));
 
-            if (val.length === 1 && val.length > oldVal.length) {
-                return;
-            }
-
-            this.meta.offset = 0;
-
-            this.load();
-        },
-    },
-    created() {
-        if (this.loadOnInit) {
-            this.load();
-        }
-    },
-
-    mounted() {
-        const socket : Socket<
-        SocketServerToClientEvents,
-        SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.socketRealmId);
-
-        socket.emit(ProposalSocketClientToServerEventName.SUBSCRIBE);
-        socket.on(ProposalSocketServerToClientEventName.CREATED, this.handleSocketCreated);
-    },
-    beforeDestroy() {
-        const socket : Socket<
-        SocketServerToClientEvents,
-        SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.socketRealmId);
-
-        socket.emit(ProposalSocketClientToServerEventName.UNSUBSCRIBE);
-        socket.off(ProposalSocketServerToClientEventName.CREATED, this.handleSocketCreated);
-    },
-    methods: {
-        handleSocketCreated(context: SocketServerToClientEventContext<Proposal>) {
-            if (context.meta.roomName !== buildSocketProposalRoomName()) return;
-
-            // todo: append item at beginning as well end of list... ^^
-            if (
-                (this.query.sort.created_at === 'DESC' || this.query.sort.updated_at === 'DESC') &&
-                this.meta.offset === 0
-            ) {
-                this.handleCreated(context.data, { unshift: true });
-                return;
-            }
-
-            if (
-                this.meta.total < this.meta.limit
-            ) {
-                this.handleCreated(context.data);
-            }
-        },
-        async load(options?: PaginationMeta) {
-            if (this.busy) return;
-
-            if (options) {
-                this.meta.offset = options.offset;
-            }
-
-            this.busy = true;
-
-            try {
-                const response = await this.$api.proposal.getMany(mergeDeep({
-                    page: {
-                        limit: this.meta.limit,
-                        offset: this.meta.offset,
-                    },
-                    filter: {
-                        title: this.q.length > 0 ? `~${this.q}` : this.q,
-                    },
-                }, this.query));
-
-                this.items = response.data;
-                const { total } = response.meta;
-
-                this.meta.total = total;
-            } catch (e) {
-                // ...
-            }
-
-            this.busy = false;
-        },
-
-        handleCreated(
-            item: Proposal,
-            options?: ComponentListHandlerMethodOptions<Proposal>,
-        ) {
-            options = options || {};
-
-            const index = this.items.findIndex((el: Proposal) => el.id === item.id);
-            if (index === -1) {
-                if (options.unshift) {
-                    this.items.unshift(item);
-                } else {
-                    this.items.push(item);
-                }
-            }
-        },
-        handleUpdated(item: Proposal) {
-            const index = this.items.findIndex((el: Proposal) => el.id === item.id);
-            if (index !== -1) {
-                const keys : (keyof Proposal)[] = Object.keys(item) as (keyof Proposal)[];
-                for (let i = 0; i < keys.length; i++) {
-                    Vue.set(this.items[index], keys[i], item[keys[i]]);
-                }
-            }
-        },
-        handleDeleted(item: Proposal) {
-            const index = this.items.findIndex((el: Proposal) => el.id === item.id);
-            if (index !== -1) {
-                this.items.splice(index, 1);
-                this.meta.total--;
-            }
-        },
-    },
-    render(createElement: CreateElement): VNode {
-        const vm = this;
-        const header = buildListHeader(this, createElement, { titleText: 'Proposals', iconClass: 'fa-solid fa-scroll' });
-        const search = buildListSearch(this, createElement);
-        const items = buildListItems(this, createElement, {
-            itemIconClass: 'fa-solid fa-scroll',
-            itemSlots: {
-                handleUpdated: vm.handleUpdated,
-                handleDeleted: vm.handleDeleted,
-            },
+            socket.on(buildDomainEventFullName(
+                DomainType.PROPOSAL,
+                DomainEventName.CREATED,
+            ), handleSocketCreated);
         });
-        const noMore = buildListNoMore(this, createElement, {
-            text: 'There are no more proposals available...',
-        });
-        const pagination = buildListPagination(this, createElement);
 
-        return createElement(
-            'div',
-            { staticClass: 'list' },
-            [
-                header,
-                search,
-                items,
-                noMore,
-                pagination,
-            ],
-        );
+        onUnmounted(() => {
+            socket.emit(buildDomainEventSubscriptionFullName(
+                DomainType.PROPOSAL,
+                DomainEventSubscriptionName.UNSUBSCRIBE,
+            ));
+
+            socket.off(buildDomainEventFullName(
+                DomainType.PROPOSAL,
+                DomainEventName.CREATED,
+            ), handleSocketCreated);
+        });
+
+        return () => build();
     },
 });
-
-export default ProposalList;

@@ -4,92 +4,95 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
+<script lang="ts">
+import type { Train } from '@personalhealthtrain/central-common';
 import { TrainType } from '@personalhealthtrain/central-common';
-import { maxLength, minLength, required } from 'vuelidate/lib/validators';
-import { ProposalList } from '../proposal/ProposalList';
-import { ProposalItem } from '../proposal/ProposalItem';
+import { maxLength, minLength, required } from '@vuelidate/validators';
+import type { BuildInput } from 'rapiq';
+import useVuelidate from '@vuelidate/core';
+import {
+    computed, reactive, ref, toRefs,
+} from 'vue';
+import { wrapFnWithBusyState } from '../../../core/busy';
+import ProposalList from '../proposal/ProposalList';
+import ProposalItem from '../proposal/ProposalItem';
 
 export default {
     components: { ProposalList, ProposalItem },
     props: {
         proposalId: {
             type: String,
-            default: undefined,
         },
         realmId: {
             type: String,
-            default: undefined,
         },
     },
-    data() {
-        return {
-            busy: false,
-            formData: {
-                type: TrainType.DISCOVERY,
-                proposal_id: '',
-                name: '',
+    setup(props, { emit }) {
+        const refs = toRefs(props);
+
+        const busy = ref(false);
+        const form = reactive({
+            type: TrainType.DISCOVERY,
+            proposal_id: '',
+            name: '',
+        });
+
+        const $v = useVuelidate({
+            type: {
+                required,
             },
-            types: [
-                { id: TrainType.ANALYSE, name: 'Analysis' },
-                { id: TrainType.DISCOVERY, name: 'Discovery' },
-            ],
-        };
-    },
-    computed: {
-        proposalQuery() {
-            return {
-                filter: {
-                    ...(this.realmId ? { realm_id: this.realmId } : {}),
-                },
-            };
-        },
-    },
-    created() {
-        if (this.proposalId) {
-            this.formData.proposal_id = this.proposalId;
+            proposal_id: {
+                required,
+            },
+            name: {
+                minLength: minLength(3),
+                maxLength: maxLength(128),
+            },
+        }, form);
+
+        const proposalQuery = computed<BuildInput<Train>>(() => ({
+            filter: {
+                ...(refs.realmId.value ? { realm_id: refs.realmId.value } : {}),
+            },
+        }));
+
+        if (refs.proposalId.value) {
+            form.proposal_id = refs.proposalId.value as string;
         }
-    },
-    validations() {
-        return {
-            formData: {
-                type: {
-                    required,
-                },
-                proposal_id: {
-                    required,
-                },
-                name: {
-                    minLength: minLength(3),
-                    maxLength: maxLength(128),
-                },
-            },
-        };
-    },
-    methods: {
-        async add() {
-            if (this.busy) return;
 
-            this.busy = true;
-
+        const add = wrapFnWithBusyState(busy, async () => {
             try {
-                const train = await this.$api.train.create({
-                    ...this.formData,
-                });
-                this.$emit('created', train);
+                const train = await this.$api.train.create(form);
+                emit('created', train);
             } catch (e) {
-                // ...
+                if (e instanceof Error) {
+                    emit('failed', e);
+                }
             }
+        });
 
-            this.busy = false;
-        },
-        async toggleFormData(key, id) {
-            if (this.formData[key] === id) {
-                this.formData[key] = null;
+        const toggle = (key: keyof typeof form, id: any) => {
+            if (form[key] === id) {
+                form[key] = null as any;
             } else {
-                this.formData[key] = id;
+                form[key] = id;
             }
-        },
+        };
+
+        const types = [
+            { id: TrainType.ANALYSE, name: 'Analysis' },
+            { id: TrainType.DISCOVERY, name: 'Discovery' },
+        ];
+
+        return {
+            v$: $v,
+            form,
+            add,
+            toggle,
+            proposalQuery,
+            types,
+            busy,
+        };
     },
 };
 </script>
@@ -99,27 +102,27 @@ export default {
             <div class="col">
                 <div
                     class="form-group"
-                    :class="{ 'form-group-error': $v.formData.name.$error }"
+                    :class="{ 'form-group-error': v$.name.$error }"
                 >
                     <label>Name <small class="text-muted">(optional)</small></label>
                     <input
-                        v-model="$v.formData.name.$model"
+                        v-model="v$.name.$model"
                         type="text"
                         class="form-control"
                         placeholder="..."
                     >
 
                     <div
-                        v-if="!$v.formData.name.minLength"
+                        v-if="!v$.name.minLength"
                         class="form-group-hint group-required"
                     >
-                        The length of the name must be greater than <strong>{{ $v.formData.name.$params.minLength.min }}</strong> characters.
+                        The length of the name must be greater than <strong>{{ v$.name.$params.minLength.min }}</strong> characters.
                     </div>
                     <div
-                        v-if="!$v.formData.name.maxLength"
+                        v-if="!v$.name.maxLength"
                         class="form-group-hint group-required"
                     >
-                        The length of the name must be less than <strong>{{ $v.formData.name.$params.maxLength.max }}</strong> characters.
+                        The length of the name must be less than <strong>{{ v$.name.$params.maxLength.max }}</strong> characters.
                     </div>
                 </div>
 
@@ -128,7 +131,7 @@ export default {
                 <div class="form-group">
                     <label>Type</label>
                     <select
-                        v-model="$v.formData.type.$model"
+                        v-model="v$.type.$model"
                         class="form-control"
                     >
                         <option
@@ -141,17 +144,17 @@ export default {
                     </select>
 
                     <div
-                        v-if="!$v.formData.type.required && !$v.formData.type.$model"
+                        v-if="!v$.type.required && !v$.type.$model"
                         class="form-group-hint group-required"
                     >
                         Choose one of the available train types...
                     </div>
                 </div>
                 <div
-                    v-if="$v.formData.type.$model"
+                    v-if="v$.type.$model"
                     class="alert alert-secondary alert-sm"
                 >
-                    <template v-if="$v.formData.type.$model === 'analyse'">
+                    <template v-if="v$.type.$model === 'analyse'">
                         An analyse train should be created on base of the knowledge achieved during the discovery phase.
                     </template>
                     <template v-else>
@@ -163,7 +166,7 @@ export default {
                     <button
                         type="submit"
                         class="btn btn-xs btn-primary"
-                        :disabled="$v.formData.$invalid || busy"
+                        :disabled="v$.$invalid || busy"
                         @click.prevent="add"
                     >
                         <i class="fa fa-plus" /> create
@@ -175,40 +178,42 @@ export default {
                 class="col"
             >
                 <proposal-list :query="proposalQuery">
-                    <template #header>
+                    <template #header-title>
                         <label>Proposals</label>
                     </template>
                     <template #item="props">
-                        <proposal-item
-                            :entity="props.item"
-                            @updated="props.handleUpdated"
-                            @deleted="props.handleDeleted"
-                        >
-                            <template #item-actions="itemActionProps">
-                                <button
-                                    :disabled="itemActionProps.busy"
-                                    type="button"
-                                    class="btn btn-xs"
-                                    :class="{
-                                        'btn-dark': formData.proposal_id !== itemActionProps.item.id,
-                                        'btn-warning': formData.proposal_id === itemActionProps.item.id
-                                    }"
-                                    @click.prevent="toggleFormData('proposal_id', itemActionProps.item.id)"
-                                >
-                                    <i
+                        <div class="list-item">
+                            <proposal-item
+                                :entity="props.data"
+                                @updated="props.handleUpdated"
+                                @deleted="props.handleDeleted"
+                            >
+                                <template #item-actions="itemActionProps">
+                                    <button
+                                        :disabled="itemActionProps.busy"
+                                        type="button"
+                                        class="btn btn-xs"
                                         :class="{
-                                            'fa fa-plus': formData.proposal_id !== itemActionProps.item.id,
-                                            'fa fa-minus': formData.proposal_id === itemActionProps.item.id
+                                            'btn-dark': form.proposal_id !== itemActionProps.data.id,
+                                            'btn-warning': form.proposal_id === itemActionProps.data.id
                                         }"
-                                    />
-                                </button>
-                            </template>
-                        </proposal-item>
+                                        @click.prevent="toggle('proposal_id', itemActionProps.data.id)"
+                                    >
+                                        <i
+                                            :class="{
+                                                'fa fa-plus': form.proposal_id !== itemActionProps.data.id,
+                                                'fa fa-minus': form.proposal_id === itemActionProps.data.id
+                                            }"
+                                        />
+                                    </button>
+                                </template>
+                            </proposal-item>
+                        </div>
                     </template>
                 </proposal-list>
 
                 <div
-                    v-if="!$v.formData.proposal_id.required && !$v.formData.proposal_id.$model"
+                    v-if="!v$.proposal_id.required && !v$.proposal_id.$model"
                     class="alert alert-sm alert-warning"
                 >
                     Choose a proposal as base of your train

@@ -5,49 +5,55 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import type { Station } from '@personalhealthtrain/central-common';
 import { PermissionID } from '@personalhealthtrain/central-common';
+import { useToast } from 'bootstrap-vue-next';
+import { storeToRefs } from 'pinia';
+import { defineNuxtComponent, navigateTo } from '#app';
+import { definePageMeta } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
-import { StationForm } from '../../../../components/domains/station/StationForm';
+import StationForm from '../../../../components/domains/station/StationForm';
+import { useAuthStore } from '../../../../store/auth';
 
-export default {
+export default defineNuxtComponent({
     components: { StationForm },
-    meta: {
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.USER_ADD,
-        ],
-    },
-    computed: {
-        managementRealmId() {
-            return this.$store.getters['auth/managementRealmId'];
-        },
-        managementRealmName() {
-            return this.$store.getters['auth/managementRealmName'];
-        },
-    },
-    methods: {
-        handleCreated(e) {
-            this.$bvToast.toast('The station was successfully created.', {
-                toaster: 'b-toaster-top-center',
-                variant: 'success',
-            });
+    setup() {
+        definePageMeta({
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.REQUIRED_PERMISSIONS]: [
+                PermissionID.USER_ADD,
+            ],
+        });
 
-            this.$nuxt.$router.push(`/admin/stations/${e.id}`);
-        },
-        handleFailed(e) {
-            this.$bvToast.toast(e.message, {
-                toaster: 'b-toaster-top-center',
-                variant: 'warning',
-            });
-        },
+        const toast = useToast();
+
+        const store = useAuthStore();
+        const { realmManagementId, realmManagementName } = storeToRefs(store);
+
+        const handleCreated = async (e: Station) => {
+            toast.success({ body: 'The station was successfully created.' });
+
+            await navigateTo(`/admin/stations/${e.id}`);
+        };
+
+        const handleFailed = (e: Error) => {
+            toast.danger({ body: e.message });
+        };
+
+        return {
+            realmManagementName,
+            realmManagementId,
+            handleCreated,
+            handleFailed,
+        };
     },
-};
+});
 </script>
 <template>
-    <station-form
-        :realm-id="managementRealmId"
-        :realm-name="managementRealmName"
+    <StationForm
+        :realm-id="realmManagementId"
+        :realm-name="realmManagementName"
         @created="handleCreated"
         @failed="handleFailed"
     />

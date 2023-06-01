@@ -10,23 +10,25 @@ import {
     ProposalStationApprovalStatus,
 } from '@personalhealthtrain/central-common';
 import type { PropType } from 'vue';
-import Vue from 'vue';
-import { renderActionCommand } from '../../render/utils';
-import type { ActionCommandMethods, ActionCommandProperties } from '../../render/type';
+import { computed, defineComponent } from 'vue';
+import { wrapFnWithBusyState } from '../../../core/busy';
+import { renderActionCommand } from '../../../core/render/action-command/utils';
+import type { ActionCommandProperties } from '../../../core/render/action-command/type';
+import { useAuthStore } from '../../../store/auth';
 
-type ProposalStationActionProperties = {
-    entityId: string,
-    approvalStatus: ProposalStationApprovalStatus
-    command: `${ProposalStationApprovalCommand}`
-} & ActionCommandProperties;
-
-export default Vue.extend<any, ActionCommandMethods, any, ProposalStationActionProperties>({
-    name: 'ProposalStationApprovalCommand',
+export default defineComponent({
+    name: 'ProposalStationCommand',
     props: {
-        entityId: String,
+        entityId: {
+            type: String,
+            required: true,
+        },
         approvalStatus: String as PropType<ProposalStationApprovalStatus>,
 
-        command: String as PropType<ProposalStationApprovalCommand>,
+        command: {
+            type: String as PropType<ProposalStationApprovalCommand>,
+            required: true,
+        },
         elementType: {
             type: String as PropType<ActionCommandProperties['elementType']>,
             default: 'button',
@@ -40,14 +42,13 @@ export default Vue.extend<any, ActionCommandMethods, any, ProposalStationActionP
             default: true,
         },
     },
-    data() {
-        return {
-            busy: false,
-        };
-    },
-    computed: {
-        commandText() {
-            switch (this.command) {
+    emits: ['failed', 'updated'],
+    setup(props, { emit, slots }) {
+        const refs = toRefs(props);
+        const busy = ref(false);
+
+        const commandText = computed(() => {
+            switch (refs.command.value) {
                 case ProposalStationApprovalCommand.APPROVE:
                     return 'approve';
                 case ProposalStationApprovalCommand.REJECT:
@@ -55,9 +56,10 @@ export default Vue.extend<any, ActionCommandMethods, any, ProposalStationActionP
                 default:
                     return '';
             }
-        },
-        iconClass() {
-            switch (this.command) {
+        });
+
+        const iconClass = computed(() => {
+            switch (refs.command.value) {
                 case ProposalStationApprovalCommand.APPROVE:
                     return 'fa fa-check';
                 case ProposalStationApprovalCommand.REJECT:
@@ -65,9 +67,10 @@ export default Vue.extend<any, ActionCommandMethods, any, ProposalStationActionP
                 default:
                     return 'fa fa-sync-alt';
             }
-        },
-        classSuffix() {
-            switch (this.command) {
+        });
+
+        const classSuffix = computed(() => {
+            switch (refs.command.value) {
                 case ProposalStationApprovalCommand.APPROVE:
                     return 'success';
                 case ProposalStationApprovalCommand.REJECT:
@@ -75,33 +78,28 @@ export default Vue.extend<any, ActionCommandMethods, any, ProposalStationActionP
                 default:
                     return 'info';
             }
-        },
-        isAllowed() {
-            return this.$auth.has(PermissionID.PROPOSAL_APPROVE);
-        },
-        isDisabled() {
+        });
+
+        const store = useAuthStore();
+
+        const isDisabled = computed(() => {
             if (
-                this.approvalStatus &&
-                this.approvalStatus === ProposalStationApprovalStatus.APPROVED &&
-                this.command === ProposalStationApprovalCommand.APPROVE
+                refs.approvalStatus.value &&
+                refs.approvalStatus.value === ProposalStationApprovalStatus.APPROVED &&
+                refs.command.value === ProposalStationApprovalCommand.APPROVE
             ) {
                 return true;
             }
 
-            return this.approvalStatus &&
-                this.approvalStatus === ProposalStationApprovalStatus.REJECTED &&
-                this.command === ProposalStationApprovalCommand.REJECT;
-        },
-    },
-    methods: {
-        async do() {
-            if (this.busy) return;
+            return !!refs.approvalStatus.value &&
+                refs.approvalStatus.value === ProposalStationApprovalStatus.REJECTED &&
+                refs.command.value === ProposalStationApprovalCommand.REJECT;
+        });
 
-            this.busy = true;
-
+        const execute = wrapFnWithBusyState(busy, async () => {
             let status;
 
-            switch (this.command) {
+            switch (refs.command.value) {
                 case ProposalStationApprovalCommand.APPROVE:
                     status = ProposalStationApprovalStatus.APPROVED;
                     break;
@@ -114,19 +112,27 @@ export default Vue.extend<any, ActionCommandMethods, any, ProposalStationActionP
             }
 
             try {
-                const item = await this.$api.proposalStation.update(this.entityId, {
+                const item = await useAPI().proposalStation.update(refs.entityId.value, {
                     approval_status: status,
                 });
 
-                this.$emit('updated', item);
+                emit('updated', item);
             } catch (e) {
-                this.$emit('failed', e);
+                emit('failed', e);
             }
+        });
 
-            this.busy = false;
-        },
-    },
-    render(createElement) {
-        return renderActionCommand(this, createElement);
+        return () => renderActionCommand({
+            execute,
+            elementType: refs.elementType.value,
+            withIcon: refs.withIcon.value,
+            withText: refs.withText.value,
+            isDisabled: isDisabled.value,
+            iconClass: iconClass.value,
+            isAllowed: store.has(PermissionID.PROPOSAL_APPROVE),
+            commandText: commandText.value,
+            classSuffix: classSuffix.value,
+            slots,
+        });
     },
 });

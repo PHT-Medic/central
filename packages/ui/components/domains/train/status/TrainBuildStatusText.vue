@@ -14,11 +14,12 @@
         </slot>
     </span>
 </template>
-<script>
+<script lang="ts">
 
 import { TrainBuildStatus } from '@personalhealthtrain/central-common';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
     props: {
         status: {
             type: String,
@@ -63,5 +64,5 @@ export default {
             }
         },
     },
-};
+});
 </script>

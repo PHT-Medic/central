@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { DomainEventContext } from '@personalhealthtrain/central-common';
+import type { DomainsEventContext } from '@personalhealthtrain/central-common';
 import { DomainEventName, buildDomainEventFullName } from '@personalhealthtrain/central-common';
 import { hasClient, hasConfig } from 'redis-extension';
 import type { DomainEventDestinations } from '../type';
@@ -13,7 +13,7 @@ import { buildDomainEventChannelName, transformDomainEventData } from '../utils'
 import { useSocketEmitter } from './singleton';
 
 export function publishDomainSocketEvent(
-    context: DomainEventContext,
+    context: DomainsEventContext,
     destinations: DomainEventDestinations,
 ) {
     if (!hasClient() && !hasConfig()) {
@@ -34,6 +34,8 @@ export function publishDomainSocketEvent(
 
         emitter
             .in(roomName)
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             .emit(fullEventName, {
                 ...context,
                 meta: {
@@ -48,6 +50,8 @@ export function publishDomainSocketEvent(
             roomName = buildDomainEventChannelName(destinations[i].channel, context.data.id);
             emitter
                 .in(roomName)
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
                 .emit(fullEventName, {
                     ...context,
                     meta: {

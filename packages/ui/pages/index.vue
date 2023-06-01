@@ -5,16 +5,20 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { defineNuxtComponent } from '#app';
+import { definePageMeta } from '#imports';
 import WorldSvg from '../components/svg/World';
 import { LayoutKey, LayoutNavigationID } from '../config/layout';
 
-export default {
+export default defineNuxtComponent({
     components: { WorldSvg },
-    meta: {
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+    setup() {
+        definePageMeta({
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+        });
     },
-};
+});
 </script>
 <template>
     <div class="">
@@ -24,7 +28,7 @@ export default {
 
         <div class="row">
             <div class="col-lg-6 col-12">
-                <world-svg width="100%" />
+                <WorldSvg width="100%" />
                 <div class="text-center">
                     <p>
                         The DIFUTURE implementation of the <strong>Personal Health Train (PHT)</strong>

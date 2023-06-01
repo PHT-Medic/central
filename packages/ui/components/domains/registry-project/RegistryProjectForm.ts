@@ -5,40 +5,28 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type {
-    Registry,
-    RegistryProject,
-} from '@personalhealthtrain/central-common';
-import {
-    RegistryProjectType,
-    createNanoID,
-} from '@personalhealthtrain/central-common';
-import type {
-    CreateElement, PropType, VNode, VNodeChildren,
-} from 'vue';
-import Vue from 'vue';
-import type { ComponentFormData } from '@vue-layout/utils';
-import {
-    SlotName,
-    buildFormInput,
-    buildFormSelect,
-    buildFormSubmit,
-    initPropertiesFromSource,
-} from '@vue-layout/utils';
+import { initFormAttributesFromSource } from '@authup/client-vue';
+import type { Registry, RegistryProject } from '@personalhealthtrain/central-common';
+import { RegistryProjectType, createNanoID } from '@personalhealthtrain/central-common';
+import { buildFormInput, buildFormSelect, buildFormSubmit } from '@vue-layout/form-controls';
+import type { ListItemSlotProps } from '@vue-layout/list-controls';
+import { SlotName } from '@vue-layout/list-controls';
+import useVuelidate from '@vuelidate/core';
 import {
     helpers, maxLength, minLength, required,
-} from 'vuelidate/lib/validators';
-import { buildVuelidateTranslator } from '../../../config/ilingo/utils';
-import { RegistryList } from '../registry/RegistryList';
+} from '@vuelidate/validators';
+import type { PropType, VNodeArrayChildren } from 'vue';
+import { computed } from 'vue';
+import { buildValidationTranslator } from '../../../composables/ilingo';
+import { wrapFnWithBusyState } from '../../../core/busy';
+import RegistryList from '../registry/RegistryList';
 
-type Properties = {
-    entity: RegistryProject,
-    registryId?: Registry['id']
-};
+const alphaNumHyphenUnderscore = helpers.regex(
+    /^[a-z0-9-_]*$/,
+);
 
-const alphaWithUpperNumHyphenUnderscore = helpers.regex('alphaWithUpperNumHyphenUnderscore', /^[a-z0-9-_]*$/);
-
-export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>, any, any, Properties>({
+export default defineComponent({
+    name: 'RegistryProjectForm',
     props: {
         entity: {
             type: Object as PropType<RegistryProject>,
@@ -49,266 +37,250 @@ export const RegistryProjectForm = Vue.extend<ComponentFormData<RegistryProject>
             default: undefined,
         },
     },
-    data() {
-        return {
-            form: {
-                external_name: '',
-                name: '',
-                type: RegistryProjectType.DEFAULT,
-                registry_id: '',
+    emit: ['created', 'updated', 'failed'],
+    setup(props, { emit }) {
+        const refs = toRefs(props);
+
+        const busy = ref(false);
+        const form = reactive({
+            external_name: '',
+            name: '',
+            type: RegistryProjectType.DEFAULT,
+            registry_id: '',
+        });
+
+        const $v = useVuelidate({
+            name: {
+                required,
+                minLength: minLength(3),
+                maxLength: maxLength(128),
             },
+            external_name: {
+                required,
+                alphaNumHyphenUnderscore,
+                minLength: minLength(3),
+                maxLength: maxLength(64),
+            },
+            type: {
+                required,
+            },
+            registry_id: {
+                required,
+            },
+        }, form);
 
-            types: [
-                { id: RegistryProjectType.DEFAULT, value: 'DEFAULT' },
-                { id: RegistryProjectType.AGGREGATOR, value: 'Aggregator' },
-                { id: RegistryProjectType.INCOMING, value: 'Incoming' },
-                { id: RegistryProjectType.OUTGOING, value: 'Outgoing' },
-                { id: RegistryProjectType.MASTER_IMAGES, value: 'Master-Images' },
-            ],
+        const types = [
+            { id: RegistryProjectType.DEFAULT, value: 'DEFAULT' },
+            { id: RegistryProjectType.STATION, value: 'Station' },
+            { id: RegistryProjectType.AGGREGATOR, value: 'Aggregator' },
+            { id: RegistryProjectType.INCOMING, value: 'Incoming' },
+            { id: RegistryProjectType.OUTGOING, value: 'Outgoing' },
+            { id: RegistryProjectType.MASTER_IMAGES, value: 'Master-Images' },
+        ];
 
-            busy: false,
-        };
-    },
-    computed: {
-        isEditing() {
-            return this.entity &&
-                Object.prototype.hasOwnProperty.call(this.entity, 'id');
-        },
-        isRegistryLocked() {
-            return this.registryId;
-        },
-        isExternalNameUnchanged() {
-            if (!this.entity || !this.entity.external_name) {
+        const isRegistryLocked = computed(
+            () => !!refs.registryId.value,
+        );
+
+        const isExternalNameUnchanged = computed(() => {
+            if (!refs.entity.value || !refs.entity.value.external_name) {
                 return true;
             }
 
-            return this.entity.external_name !== this.form.external_name;
-        },
-        updatedAt() {
-            return this.entity ?
-                this.entity.updated_at :
-                undefined;
-        },
-    },
-    watch: {
-        updatedAt(val, oldVal) {
-            if (val && val !== oldVal) {
-                this.initFromProperties();
+            return refs.entity.value.external_name !== form.external_name;
+        });
+
+        const toggleForm = (key: keyof typeof form, id: any) => {
+            if (form[key] === id) {
+                form[key] = null as any;
+            } else {
+                form[key] = id;
             }
-        },
-    },
-    created() {
-        this.initFromProperties();
-    },
-    validations() {
-        return {
-            form: {
-                name: {
-                    required,
-                    minLength: minLength(3),
-                    maxLength: maxLength(128),
-                },
-                external_name: {
-                    required,
-                    alphaWithUpperNumHyphenUnderscore,
-                    minLength: minLength(3),
-                    maxLength: maxLength(64),
-                },
-                type: {
-                    required,
-                },
-                registry_id: {
-                    required,
-                },
-            },
         };
-    },
-    methods: {
-        initFromProperties() {
-            if (this.registryId) {
-                this.form.registry_id = this.registryId;
+
+        const generateAlias = () => {
+            form.external_name = createNanoID();
+        };
+
+        const resetAlias = () => {
+            if (!refs.entity.value) return;
+
+            form.external_name = refs.entity.value.external_name;
+        };
+
+        const initFromProperties = () => {
+            if (refs.registryId.value) {
+                form.registry_id = refs.registryId.value;
             }
 
-            if (typeof this.entity === 'undefined') {
-                this.generateAlias();
+            if (typeof refs.entity.value === 'undefined') {
+                generateAlias();
             }
 
-            initPropertiesFromSource(this.entity, this.form);
-        },
-        async submit() {
-            if (this.busy || this.$v.$invalid) {
-                return;
+            initFormAttributesFromSource(form, refs.entity.value);
+        };
+
+        const updatedAt = computed(() => (refs.entity.value ?
+            refs.entity.value.updated_at :
+            undefined));
+
+        initFromProperties();
+
+        watch(updatedAt, (val, oldValue) => {
+            if (val && val !== oldValue) {
+                initFromProperties();
             }
+        });
 
-            this.busy = true;
-
+        const submit = wrapFnWithBusyState(busy, async () => {
             try {
                 let response;
 
-                if (this.isEditing) {
-                    response = await this.$api.registryProject.update(this.entity.id, this.form);
+                if (refs.entity.value) {
+                    response = await useAPI().registryProject.update(refs.entity.value.id, form);
 
-                    this.$emit('updated', response);
+                    emit('updated', response);
                 } else {
-                    response = await this.$api.registryProject.create(this.form);
+                    response = await useAPI().registryProject.create(form);
 
-                    this.$emit('created', response);
+                    emit('created', response);
                 }
             } catch (e) {
                 if (e instanceof Error) {
-                    this.$emit('failed', e);
+                    emit('failed', e);
                 }
             }
-
-            this.busy = false;
-        },
-        toggleForm(key, id) {
-            if (this.form[key] === id) {
-                this.form[key] = null;
-            } else {
-                this.form[key] = id;
-            }
-        },
-
-        generateAlias() {
-            this.form.external_name = createNanoID();
-        },
-        resetAlias() {
-            this.form.external_name = this.entity.external_name;
-        },
-    },
-    render(createElement: CreateElement): VNode {
-        const vm = this;
-        const h = createElement;
-
-        const name = buildFormInput<RegistryProject>(vm, h, {
-            validationTranslator: buildVuelidateTranslator(this.$ilingo),
-            title: 'Name',
-            propName: 'name',
-        });
-        const externalName = buildFormInput<RegistryProject>(vm, h, {
-            validationTranslator: buildVuelidateTranslator(vm.$ilingo),
-            title: 'External Name',
-            propName: 'external_name',
         });
 
-        const externalNameHint = h('div', {
-            staticClass: 'alert alert-sm',
-            class: {
-                'alert-danger': !vm.isExternalNameUnchanged,
-                'alert-info': vm.isExternalNameUnchanged,
-            },
-        }, [
-            h('div', { staticClass: 'mb-1' }, [
-                (!vm.isExternalNameUnchanged ?
-                    'If you change the external_name, a new representation will be created in the Registry.' :
-                    'If you don\'t want to chose a external_name by your own, you can generate one.'
-                ),
-            ]),
-            h('button', {
-                class: 'btn btn-xs btn-dark',
-                attrs: {
-                    type: 'button',
+        return () => {
+            const name = buildFormInput({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.name,
+                label: true,
+                labelContent: 'Name',
+                value: form.name,
+                onChange(input) {
+                    form.name = input;
                 },
-                on: {
-                    click($event) {
+            });
+            const externalName = buildFormInput({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.external_name,
+                label: true,
+                labelContent: 'External Name',
+                value: form.external_name,
+                onChange(input) {
+                    form.external_name = input;
+                },
+            });
+
+            const externalNameHint = h('div', {
+                class: ['alert alert-sm', {
+                    'alert-danger': !isExternalNameUnchanged.value,
+                    'alert-info': isExternalNameUnchanged.value,
+                }],
+            }, [
+                h('div', { class: 'mb-1' }, [
+                    (!isExternalNameUnchanged.value ?
+                        'If you change the external_name, a new representation will be created in the Registry.' :
+                        'If you don\'t want to chose a external_name by your own, you can generate one.'
+                    ),
+                ]),
+                h('button', {
+                    class: 'btn btn-xs btn-dark',
+                    type: 'button',
+                    onClick($event: any) {
                         $event.preventDefault();
 
-                        vm.generateAlias.call(null);
+                        generateAlias();
                     },
-                },
-            }, [
-                h('i', { staticClass: 'fa fa-wrench pr-1' }),
-                'Generate',
-            ]),
-            h('button', {
-                class: 'btn btn-xs btn-dark ml-1',
-                attrs: {
+                }, [
+                    h('i', { class: 'fa fa-wrench pe-1' }),
+                    'Generate',
+                ]),
+                h('button', {
+                    class: 'btn btn-xs btn-dark ms-1',
                     type: 'button',
-                    disabled: vm.isExternalNameUnchanged,
-                },
-                on: {
-                    click($event) {
+                    disabled: isExternalNameUnchanged.value,
+                    onClick($event: any) {
                         $event.preventDefault();
 
-                        vm.resetAlias.call(null);
+                        resetAlias();
                     },
+                }, [
+                    h('i', { class: 'fa fa-undo pe-1' }),
+                    'Reset',
+                ]),
+            ]);
+
+            const type = buildFormSelect({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.type,
+                label: true,
+                labelContent: 'Type',
+                value: form.type,
+                options: types,
+                onChange(input) {
+                    form.type = input;
                 },
-            }, [
-                h('i', { staticClass: 'fa fa-undo pr-1' }),
-                'Reset',
-            ]),
-        ]);
+            });
 
-        const type = buildFormSelect<RegistryProject>(vm, h, {
-            validationTranslator: buildVuelidateTranslator(this.$ilingo),
-            title: 'Type',
-            propName: 'type',
-            options: vm.types,
-            attrs: {
-                disabled: vm.isEditing,
-            },
-        });
+            let registry : VNodeArrayChildren = [];
 
-        let registry : VNodeChildren = [];
-
-        if (!vm.isRegistryLocked) {
-            registry = [
-                h('hr'),
-                h(RegistryList, {
-                    scopedSlots: {
-                        [SlotName.ITEM_ACTIONS]: (props) => h('button', {
+            if (!isRegistryLocked.value) {
+                registry = [
+                    h('hr'),
+                    h(RegistryList, {
+                        [SlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Registry>) => h('button', {
                             attrs: {
                                 disabled: props.busy,
                             },
-                            class: {
-                                'btn-dark': vm.form.registry_id !== props.item.id,
-                                'btn-warning': vm.form.registry_id === props.item.id,
-                            },
-                            staticClass: 'btn btn-xs',
-                            on: {
-                                click($event) {
-                                    $event.preventDefault();
+                            class: ['btn btn-xs', {
+                                'btn-dark': form.registry_id !== props.data.id,
+                                'btn-warning': form.registry_id === props.data.id,
+                            }],
+                            onClick($event: any) {
+                                $event.preventDefault();
 
-                                    vm.toggleForm.call(null, 'registry_id', props.item.id);
-                                },
+                                toggleForm('registry_id', props.data.id);
                             },
                         }, [
                             h('i', {
                                 class: {
-                                    'fa fa-plus': vm.form.registry_id !== props.item.id,
-                                    'fa fa-minus': vm.form.registry_id === props.item.id,
+                                    'fa fa-plus': form.registry_id !== props.data.id,
+                                    'fa fa-minus': form.registry_id === props.data.id,
                                 },
                             }),
                         ]),
-                    },
-                }),
-            ];
-        }
+                    }),
+                ];
+            }
 
-        const submit = buildFormSubmit(vm, h, {
-            createText: 'Create',
-            updateText: 'Update',
-        });
+            const submitForm = buildFormSubmit({
+                submit,
+                busy: busy.value,
+                createText: 'Create',
+                updateText: 'Update',
+                isEditing: !!refs.entity.value,
+            });
 
-        return h('form', {
-            on: {
-                submit($event) {
+            return h('form', {
+                onSubmit($event: any) {
                     $event.preventDefault();
+
+                    return submit();
                 },
-            },
-        }, [
-            type,
-            h('hr'),
-            name,
-            h('hr'),
-            externalName,
-            externalNameHint,
-            registry,
-            h('hr'),
-            submit,
-        ]);
+            }, [
+                type,
+                h('hr'),
+                name,
+                h('hr'),
+                externalName,
+                externalNameHint,
+                registry,
+                h('hr'),
+                submitForm,
+            ]);
+        };
     },
 });
-
-export default RegistryProjectForm;

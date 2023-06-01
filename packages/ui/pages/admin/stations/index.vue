@@ -7,38 +7,40 @@
 
 <script lang="ts">
 import { PermissionID } from '@personalhealthtrain/central-common';
+import { definePageMeta } from '#imports';
+import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
-export default {
-    meta: {
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.STATION_EDIT,
-            PermissionID.STATION_DROP,
-            PermissionID.STATION_ADD,
-        ],
-    },
-    data() {
-        return {
-            sidebar: {
-                hide: false,
-                items: [
-                    {
-                        name: 'overview',
-                        urlSuffix: '',
-                        icon: 'fa fa-bars',
-                    },
-                    {
-                        name: 'add',
-                        urlSuffix: '/add',
-                        icon: 'fa fa-plus',
-                    },
-                ],
+export default defineNuxtComponent({
+    setup() {
+        definePageMeta({
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.REQUIRED_PERMISSIONS]: [
+                PermissionID.STATION_EDIT,
+                PermissionID.STATION_DROP,
+                PermissionID.STATION_ADD,
+            ],
+        });
+
+        const tabs = [
+            {
+                name: 'overview',
+                urlSuffix: '',
+                icon: 'fa fa-bars',
             },
+            {
+                name: 'add',
+                urlSuffix: '/add',
+                icon: 'fa fa-plus',
+            },
+        ];
+
+        return {
+            tabs,
         };
     },
-};
+});
 </script>
 <template>
     <div class="container">
@@ -47,24 +49,14 @@ export default {
         </h1>
         <div class="content-wrapper">
             <div class="content-sidebar flex-column">
-                <b-nav
-                    pills
-                    vertical
-                >
-                    <b-nav-item
-                        v-for="(item,key) in sidebar.items"
-                        :key="key"
-                        :to="'/admin/stations' + item.urlSuffix"
-                        exact
-                        exact-active-class="active"
-                    >
-                        <i :class="item.icon" />
-                        {{ item.name }}
-                    </b-nav-item>
-                </b-nav>
+                <DomainEntityNav
+                    :direction="'vertical'"
+                    :items="tabs"
+                    :path="'/admin/stations'"
+                />
             </div>
             <div class="content-container">
-                <nuxt-child />
+                <NuxtPage />
             </div>
         </div>
     </div>

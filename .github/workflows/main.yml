@@ -10,7 +10,7 @@ on:
         branches: [ master, dev ]
 
 env:
-    PRIMARY_NODE_VERSION: 16
+    PRIMARY_NODE_VERSION: 18
 
 jobs:
     build:

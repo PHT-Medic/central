@@ -6,7 +6,7 @@
  */
 
 import type { Train, TrainAPICommand } from '@personalhealthtrain/central-common';
-import type { ActionCommandProperties } from '../../../render/type';
+import type { ActionCommandProperties } from '../../../../core/render/action-command/type';
 
 export type TrainCommandProperties = {
     entity: Train,

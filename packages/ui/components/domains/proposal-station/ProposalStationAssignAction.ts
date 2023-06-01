@@ -5,214 +5,173 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { CreateElement, VNode } from 'vue';
-import Vue from 'vue';
-import type { ComponentListItemData } from '@vue-layout/utils';
+import { DomainEventName } from '@authup/core';
+import { defineComponent } from 'vue';
 import type {
     ProposalStation,
-    SocketClientToServerEvents,
+    ProposalStationEventContext,
     SocketServerToClientEventContext,
-    SocketServerToClientEvents,
 } from '@personalhealthtrain/central-common';
 import {
-    ProposalStationSocketClientToServerEventName,
-    ProposalStationSocketServerToClientEventName,
-    buildProposalStationChannelNameForIncoming,
-    buildProposalStationChannelNameForOutgoing,
+    DomainEventSubscriptionName,
+    DomainType,
+    buildDomainEventFullName,
+    buildDomainEventSubscriptionFullName,
 } from '@personalhealthtrain/central-common';
-import type { Socket } from 'socket.io-client';
+import { useSocket } from '../../../composables/socket';
 
-export type ProposalStationAssignActionProperties = {
-    proposalId: string,
-    stationId: string,
-    realmId: string,
-};
-
-export const ProposalStationAssignAction = Vue.extend<
-ComponentListItemData<ProposalStation>,
-any,
-any,
-ProposalStationAssignActionProperties>({
+export default defineComponent({
     name: 'ProposalStationAssignAction',
     props: {
-        proposalId: String,
-        stationId: String,
+        proposalId: {
+            type: String,
+            required: true,
+        },
+        stationId: {
+            type: String,
+            required: true,
+        },
         realmId: String,
     },
-    data() {
-        return {
-            busy: false,
-            item: null,
+    emits: ['created', 'deleted', 'failed'],
+    async setup(props, { emit }) {
+        const busy = ref(false);
+        const item = ref<null | ProposalStation>(null);
 
-            loaded: false,
-
-            socket: null,
-        };
-    },
-    created() {
-        Promise.resolve()
-            .then(() => this.init())
-            .then(() => {
-                this.loaded = true;
+        try {
+            const response = await useAPI().proposalStation.getMany({
+                filters: {
+                    proposal_id: props.proposalId,
+                    station_id: props.stationId,
+                },
+                page: {
+                    limit: 1,
+                },
             });
-    },
-    beforeDestroy() {
-        const socket : Socket<
-        SocketServerToClientEvents,
-        SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.realmId);
 
-        socket.emit(ProposalStationSocketClientToServerEventName.OUT_UNSUBSCRIBE);
-        socket.off(ProposalStationSocketServerToClientEventName.CREATED, this.handleSocketCreated);
-        socket.off(ProposalStationSocketServerToClientEventName.DELETED, this.handleSocketDeleted);
-    },
-    mounted() {
-        const socket : Socket<
-        SocketServerToClientEvents,
-        SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.realmId);
-        socket.emit(ProposalStationSocketClientToServerEventName.OUT_SUBSCRIBE);
-        socket.on(ProposalStationSocketServerToClientEventName.CREATED, this.handleSocketCreated);
-        socket.on(ProposalStationSocketServerToClientEventName.DELETED, this.handleSocketDeleted);
-    },
-    methods: {
-        async init() {
-            try {
-                const response = await this.$api.proposalStation.getMany({
-                    filters: {
-                        proposal_id: this.proposalId,
-                        station_id: this.stationId,
-                    },
-                    page: {
-                        limit: 1,
-                    },
-                });
-
-                if (response.meta.total === 1) {
-                    const { 0: item } = response.data;
-
-                    this.item = item;
-                }
-            } catch (e) {
-                // ...
+            if (response.meta.total === 1) {
+                // eslint-disable-next-line prefer-destructuring
+                item.value = response.data[0];
             }
-        },
-        async add() {
-            if (this.busy || this.item) return;
-
-            this.busy = true;
-
-            try {
-                const response = await this.$api.proposalStation.create({
-                    proposal_id: this.proposalId,
-                    station_id: this.stationId,
-                });
-
-                this.item = response;
-
-                this.$emit('created', response);
-            } catch (e) {
-                if (e instanceof Error) {
-                    this.$emit('failed', e);
-                }
-            }
-
-            this.busy = false;
-        },
-        async drop() {
-            if (this.busy || !this.item) return;
-
-            this.busy = true;
-
-            try {
-                const userRole = await this.$api.proposalStation.delete(this.item.id);
-
-                this.item = null;
-
-                this.$emit('deleted', userRole);
-            } catch (e) {
-                if (e instanceof Error) {
-                    this.$emit('failed', e);
-                }
-            }
-
-            this.busy = false;
-        },
-
-        isSameSocketRoom(room) {
-            switch (this.direction) {
-                case 'in':
-                    return room === buildSocketProposalStationInRoomName();
-                case 'out':
-                    return room === buildSocketProposalStationOutRoomName();
-            }
-
-            return false;
-        },
-        async handleSocketCreated(context: SocketServerToClientEventContext<ProposalStation>) {
-            if (
-                !this.isSameSocketRoom(context.meta.roomName) ||
-                context.data.proposal_id !== this.proposalId
-            ) return;
-
-            if (!this.item) {
-                this.item = context.data;
-            }
-
-            this.$emit('created', context.data);
-        },
-        handleSocketDeleted(context: SocketServerToClientEventContext<ProposalStation>) {
-            if (
-                !this.isSameSocketRoom(context.meta.roomName) ||
-                context.data.proposal_id !== this.proposalId
-            ) return;
-
-            if (
-                this.item && this.item.id === context.data.id
-            ) {
-                this.item = null;
-            }
-
-            this.$emit('deleted', context.data);
-        },
-    },
-    render(createElement: CreateElement): VNode {
-        const vm = this;
-        const h = createElement;
-
-        let button = h();
-
-        if (vm.loaded) {
-            button = h('button', {
-                class: {
-                    'btn-success': !vm.item,
-                    'btn-danger': vm.item,
-                },
-                staticClass: 'btn btn-xs',
-                on: {
-                    click($event: any) {
-                        $event.preventDefault();
-
-                        if (vm.item) {
-                            return vm.drop.call(null);
-                        }
-
-                        return vm.add.call(null);
-                    },
-                },
-            }, [
-                h('i', {
-                    staticClass: 'fa',
-                    class: {
-                        'fa-plus': !vm.item,
-                        'fa-trash': vm.item,
-                    },
-                }),
-            ]);
+        } catch (e) {
+            // ...
         }
 
-        return h('div', [button]);
+        const socket = useSocket().useRealmWorkspace(props.realmId);
+
+        const handleSocketCreated = (context: SocketServerToClientEventContext<ProposalStationEventContext>) => {
+            if (context.data.proposal_id === props.proposalId) {
+                item.value = context.data;
+                emit('created', context.data);
+            }
+        };
+
+        const handleSocketDeleted = (context: SocketServerToClientEventContext<ProposalStationEventContext>) => {
+            if (item.value && item.value.id === context.data.id) {
+                item.value = null;
+
+                emit('deleted', context.data);
+            }
+        };
+
+        onMounted(() => {
+            socket.emit(buildDomainEventSubscriptionFullName(
+                DomainType.PROPOSAL_STATION,
+                DomainEventSubscriptionName.SUBSCRIBE,
+            ));
+
+            socket.on(buildDomainEventFullName(
+                DomainType.PROPOSAL_STATION,
+                DomainEventName.CREATED,
+            ), handleSocketCreated);
+
+            socket.on(buildDomainEventFullName(
+                DomainType.PROPOSAL_STATION,
+                DomainEventName.DELETED,
+            ), handleSocketDeleted);
+        });
+
+        onUnmounted(() => {
+            socket.emit(buildDomainEventSubscriptionFullName(
+                DomainType.PROPOSAL_STATION,
+                DomainEventSubscriptionName.UNSUBSCRIBE,
+            ));
+
+            socket.off(buildDomainEventFullName(
+                DomainType.PROPOSAL_STATION,
+                DomainEventName.CREATED,
+            ), handleSocketCreated);
+
+            socket.off(buildDomainEventFullName(
+                DomainType.PROPOSAL_STATION,
+                DomainEventName.DELETED,
+            ), handleSocketDeleted);
+        });
+
+        const add = async () => {
+            if (busy.value || item.value) return;
+
+            busy.value = true;
+
+            try {
+                const response = await useAPI().proposalStation.create({
+                    proposal_id: props.proposalId,
+                    station_id: props.stationId,
+                });
+
+                item.value = response;
+
+                emit('created', response);
+            } catch (e) {
+                if (e instanceof Error) {
+                    emit('failed', e);
+                }
+            }
+
+            busy.value = false;
+        };
+
+        const drop = async () => {
+            if (busy.value || !item.value) return;
+
+            busy.value = true;
+
+            try {
+                const userRole = await useAPI().proposalStation.delete(item.value.id);
+
+                item.value = null;
+
+                emit('deleted', userRole);
+            } catch (e) {
+                if (e instanceof Error) {
+                    emit('failed', e);
+                }
+            }
+
+            busy.value = false;
+        };
+
+        return () => h('button', {
+            class: ['btn btn-xs', {
+                'btn-success': !item.value,
+                'btn-danger': item.value,
+            }],
+            onClick($event: any) {
+                $event.preventDefault();
+
+                if (item.value) {
+                    return drop();
+                }
+
+                return add();
+            },
+        }, [
+            h('i', {
+                class: ['fa', {
+                    'fa-plus': !item.value,
+                    'fa-trash': item.value,
+                }],
+            }),
+        ]);
     },
 });
-
-export default ProposalStationAssignAction;

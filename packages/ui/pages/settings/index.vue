@@ -12,51 +12,45 @@
 
         <div class="content-wrapper">
             <div class="content-sidebar flex-column">
-                <b-nav
-                    pills
-                    vertical
-                >
-                    <b-nav-item
-                        v-for="(item,key) in sidebarItems"
-                        :key="key"
-                        :disabled="item.active"
-                        :to="'/settings' + item.urlSuffix"
-                        exact
-                        exact-active-class="active"
-                    >
-                        <i :class="item.icon" />
-                        {{ item.name }}
-                    </b-nav-item>
-                </b-nav>
+                <DomainEntityNav
+                    :items="items"
+                    :path="'/settings'"
+                    :direction="'vertical'"
+                />
             </div>
             <div class="content-container">
-                <nuxt-child />
+                <NuxtPage />
             </div>
         </div>
     </div>
 </template>
-<script>
-import { LayoutKey, LayoutNavigationID } from '../../config/layout';
+<script lang="ts">
+import { defineNuxtComponent, definePageMeta } from '#imports';
+import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 
-export default {
-    meta: {
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
-    },
-    data() {
+export default defineNuxtComponent({
+    setup() {
+        definePageMeta({
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
+
+        });
+
+        const items = [
+            {
+                name: 'Account', icon: 'fas fa-bars', urlSuffix: '',
+            },
+            {
+                name: 'Security', icon: 'fa fa-lock', urlSuffix: '/security',
+            },
+            {
+                name: 'Secrets', icon: 'fa fa-key', urlSuffix: '/secrets',
+            },
+        ];
+
         return {
-            sidebarItems: [
-                {
-                    name: 'Account', icon: 'fas fa-bars', urlSuffix: '',
-                },
-                {
-                    name: 'Security', icon: 'fa fa-lock', urlSuffix: '/security',
-                },
-                {
-                    name: 'Secrets', icon: 'fa fa-key', urlSuffix: '/secrets',
-                },
-            ],
+            items,
         };
     },
-};
+});
 </script>

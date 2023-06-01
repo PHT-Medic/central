@@ -4,24 +4,27 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
+import { useToast } from 'bootstrap-vue-next';
+import { computed } from 'vue';
 import type { PropType } from 'vue';
-import Vue from 'vue';
 import type { Train } from '@personalhealthtrain/central-common';
 import {
     PermissionID,
     TrainAPICommand,
-    TrainBuildStatus,
     TrainResultStatus,
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
+import { useAPI } from '#imports';
+import { wrapFnWithBusyState } from '../../../../core/busy';
+import { useAuthStore } from '../../../../store/auth';
 import type { TrainCommandProperties } from './type';
-import { renderActionCommand } from '../../../render/utils';
-import type { ActionCommandMethods } from '../../../render/type';
+import { renderActionCommand } from '../../../../core/render/action-command/utils';
 
-export const TrainResultCommand = Vue.extend<any, ActionCommandMethods, any, TrainCommandProperties>({
+export default defineNuxtComponent({
     props: {
         entity: {
             type: Object as PropType<Train>,
+            required: true,
         },
         command: {
             type: String as PropType<TrainAPICommand | 'resultDownload'>,
@@ -41,44 +44,41 @@ export const TrainResultCommand = Vue.extend<any, ActionCommandMethods, any, Tra
             default: true,
         },
     },
-    data() {
-        return {
-            busy: false,
-        };
-    },
-    computed: {
-        isAllowed() {
-            return this.$auth.has(PermissionID.TRAIN_RESULT_READ);
-        },
-        isDisabled() {
-            if (this.entity.run_status !== TrainRunStatus.FINISHED) {
+    emits: ['failed', 'done'],
+    setup(props, { emit, slots }) {
+        const refs = toRefs(props);
+        const busy = ref(false);
+
+        const toast = useToast();
+
+        const store = useAuthStore();
+        const isAllowed = computed(() => store.has(PermissionID.TRAIN_RESULT_READ));
+
+        const isDisabled = computed(() => {
+            if (refs.entity.value.run_status !== TrainRunStatus.FINISHED) {
                 return true;
             }
 
-            if (
-                this.command === 'resultDownload'
-            ) {
-                return !this.entity.result_status ||
+            if (refs.command.value === 'resultDownload') {
+                return !refs.entity.value.result_status ||
                     (
-                        this.entity.result_status !== TrainResultStatus.FINISHED &&
-                        this.entity.result_status !== TrainResultStatus.DOWNLOADED
+                        refs.entity.value.result_status !== TrainResultStatus.FINISHED &&
+                        refs.entity.value.result_status !== TrainResultStatus.DOWNLOADED
                     );
             }
 
-            if (
-                this.command === TrainAPICommand.RESULT_START
-            ) {
-                return this.entity.result_status &&
+            if (refs.command.value === TrainAPICommand.RESULT_START) {
+                return !!refs.entity.value.result_status &&
                     [
-                        TrainBuildStatus.STOPPED,
-                        TrainBuildStatus.FAILED,
-                    ].indexOf(this.entity.result_status) === -1;
+                        TrainResultStatus.FAILED,
+                    ].indexOf(refs.entity.value.result_status) === -1;
             }
 
             return false;
-        },
-        commandText() {
-            switch (this.command) {
+        });
+
+        const commandText = computed(() => {
+            switch (refs.command.value) {
                 case 'resultDownload':
                     return 'download';
                 case TrainAPICommand.RESULT_START:
@@ -88,9 +88,10 @@ export const TrainResultCommand = Vue.extend<any, ActionCommandMethods, any, Tra
                 default:
                     return '';
             }
-        },
-        iconClass() {
-            switch (this.command) {
+        });
+
+        const iconClass = computed(() => {
+            switch (refs.command.value) {
                 case 'resultDownload':
                     return 'fa fa-download';
                 case TrainAPICommand.RESULT_START:
@@ -100,9 +101,10 @@ export const TrainResultCommand = Vue.extend<any, ActionCommandMethods, any, Tra
                 default:
                     return '';
             }
-        },
-        classSuffix() {
-            switch (this.command) {
+        });
+
+        const classSuffix = computed(() => {
+            switch (refs.command.value) {
                 case 'resultDownload':
                     return 'dark';
                 case TrainAPICommand.RESULT_START:
@@ -112,38 +114,50 @@ export const TrainResultCommand = Vue.extend<any, ActionCommandMethods, any, Tra
                 default:
                     return 'info';
             }
-        },
-    },
-    methods: {
-        async do() {
-            if (this.busy || !this.isAllowed || !this.isAllowed) return;
+        });
 
-            this.busy = true;
-
-            try {
-                switch (this.command) {
-                    case 'resultDownload':
-                        window.open(new URL(this.$api.train.getResultDownloadPath(this.entity.id), this.$config.apiUrl).href, '_blank');
-                        break;
-                    default: {
-                        const train = await this.$api.train.runCommand(this.entity.id, this.command);
-                        this.$emit('done', train);
-                        break;
-                    }
-                }
-
-                const message = `Successfully executed result command ${this.commandText}`;
-                this.$bvToast.toast(message, { toaster: 'b-toaster-top-center', variant: 'success' });
-            } catch (e) {
-                this.$bvToast.toast(e.message, { toaster: 'b-toaster-top-center', variant: 'danger' });
-
-                this.$emit('failed', e);
+        const execute = wrapFnWithBusyState(busy, async () => {
+            if (refs.command.value === 'resultDownload') {
+                const app = useRuntimeConfig();
+                window.open(
+                    new URL(
+                        useAPI().train.getResultDownloadPath(refs.entity.value.id),
+                        app.$config.public.apiUrl,
+                    ).href,
+                    '_blank',
+                );
+                return;
             }
 
-            this.busy = false;
-        },
-    },
-    render(createElement) {
-        return renderActionCommand(this, createElement);
+            try {
+                const train = await useAPI().train.runCommand(refs.entity.value.id, refs.command.value);
+                emit('done', train);
+
+                const message = `Successfully executed result command ${commandText.value}`;
+                if (toast) {
+                    toast.success({ body: message });
+                }
+            } catch (e) {
+                if (e instanceof Error) {
+                    if (toast) {
+                        toast.success({ body: e.message });
+                    }
+                    emit('failed', e);
+                }
+            }
+        });
+
+        return () => renderActionCommand({
+            execute,
+            elementType: refs.elementType.value,
+            withIcon: refs.withIcon.value,
+            withText: refs.withText.value,
+            isDisabled: isDisabled.value,
+            iconClass: iconClass.value,
+            isAllowed: isAllowed.value,
+            commandText: commandText.value,
+            classSuffix: classSuffix.value,
+            slots,
+        });
     },
 });

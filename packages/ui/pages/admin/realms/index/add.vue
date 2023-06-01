@@ -1,32 +1,43 @@
-<!--
-  Copyright (c) 2021.
-  Author Peter Placzek (tada5hi)
-  For the full copyright and license information,
-  view the LICENSE file that was distributed with this source code.
-  -->
+<script lang="ts">
 
-<script>
-import { PermissionID } from '@personalhealthtrain/central-common';
-import { LayoutKey } from '../../../../config/layout';
+import { RealmForm } from '@authup/client-vue';
+import type { Realm } from '@authup/core';
+import { PermissionName } from '@authup/core';
+import { defineNuxtComponent, navigateTo } from '#app';
+import { definePageMeta } from '#imports';
+import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 
-export default {
-    meta: {
-        [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.REALM_ADD,
-        ],
+export default defineNuxtComponent({
+    components: {
+        RealmForm,
     },
-    methods: {
-        handleCreated(realm) {
-            this.$router.push(`/admin/realms/${realm.id}`);
-        },
-        handleFailed(e) {
-            this.$emit('failed', e);
-        },
+    emits: ['failed', 'created'],
+    setup(props, { emit }) {
+        definePageMeta({
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.REQUIRED_PERMISSIONS]: [
+                PermissionName.REALM_ADD,
+            ],
+        });
+
+        const handleCreated = (e: Realm) => {
+            navigateTo({ path: `/admin/realms/${e.id}` });
+        };
+
+        const handleFailed = (e: Error) => {
+            emit('failed', e);
+        };
+
+        return {
+            handleCreated,
+            handleFailed,
+        };
     },
-};
+});
 </script>
 <template>
-    <realm-form
+    <RealmForm
         @created="handleCreated"
         @failed="handleFailed"
     />

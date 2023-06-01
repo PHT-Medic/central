@@ -1,32 +1,50 @@
-<!--
-  - Copyright (c) 2021-2021.
-  - Author Peter Placzek (tada5hi)
-  - For the full copyright and license information,
-  - view the LICENSE file that was distributed with this source code.
-  -->
-<script>
-import { PermissionID } from '@personalhealthtrain/central-common';
+<script lang="ts">
+import { PermissionForm } from '@authup/client-vue';
+import type { Permission } from '@authup/core';
+import { PermissionName, isRealmResourceWritable } from '@authup/core';
+import { storeToRefs } from 'pinia';
+import { defineNuxtComponent, navigateTo } from '#app';
+import { definePageMeta, resolveComponent } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
+import { useAuthStore } from '../../../../store/auth';
 
-export default {
-    meta: {
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.REQUIRED_PERMISSIONS]: [PermissionID.PERMISSION_ADD],
+export default defineNuxtComponent({
+    components: {
+        PermissionForm,
     },
-    methods: {
-        handleCreated() {
-            this.$router.push('/admin/permissions');
-        },
-        handleFailed(e) {
-            this.$emit('failed', e);
-        },
+    emits: ['failed', 'created'],
+    setup(props, { emit }) {
+        definePageMeta({
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.REQUIRED_PERMISSIONS]: [
+                PermissionName.PERMISSION_ADD,
+            ],
+        });
+
+        const handleCreated = (e: Permission) => {
+            navigateTo({ path: `/admin/permissions/${e.id}` });
+        };
+
+        const handleFailed = (e: Error) => {
+            emit('failed', e);
+        };
+
+        const store = useAuthStore();
+        const { realmManagementId } = storeToRefs(store);
+
+        return {
+            realmManagementId,
+            handleCreated,
+            handleFailed,
+        };
     },
-};
+});
 </script>
 <template>
-    <permission-form
-        @created="handleCreated"
+    <PermissionForm
+        :realm-id="realmManagementId"
         @failed="handleFailed"
+        @created="handleCreated"
     />
 </template>

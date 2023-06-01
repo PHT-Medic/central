@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Component } from '@vue-layout/navigation';
+import type { NavigationElement } from '@vue-layout/navigation';
 import { PermissionID } from '@personalhealthtrain/central-common';
 
 export enum LayoutKey {
@@ -14,7 +14,6 @@ export enum LayoutKey {
     REQUIRED_LOGGED_OUT = 'requireLoggedOut',
 
     REQUIRED_PERMISSIONS = 'requirePermissions',
-    REQUIRED_ABILITIES = 'requireAbilities',
 }
 
 export enum LayoutNavigationID {
@@ -22,7 +21,7 @@ export enum LayoutNavigationID {
     DEFAULT = 'default',
 }
 
-export const LayoutTopNavigation: Component[] = [
+export const LayoutTopNavigation: NavigationElement[] = [
     {
         id: LayoutNavigationID.DEFAULT,
         name: 'Home',
@@ -34,11 +33,11 @@ export const LayoutTopNavigation: Component[] = [
         icon: 'fas fa-cog',
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
         [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.ADMIN_UI_USE,
+
         ],
     },
 ];
-export const LayoutSideDefaultNavigation: Component[] = [
+export const LayoutSideDefaultNavigation: NavigationElement[] = [
     {
         name: 'Info',
         type: 'link',
@@ -104,7 +103,7 @@ export const LayoutSideDefaultNavigation: Component[] = [
         [LayoutKey.REQUIRED_LOGGED_IN]: true,
     },
 ];
-export const LayoutSideAdminNavigation: Component[] = [
+export const LayoutSideAdminNavigation: NavigationElement[] = [
     {
         name: 'Auth',
         type: 'link',
@@ -133,7 +132,7 @@ export const LayoutSideAdminNavigation: Component[] = [
             PermissionID.PERMISSION_EDIT,
             PermissionID.PERMISSION_DROP,
         ],
-        components: [
+        children: [
             {
                 name: 'Realms',
                 type: 'link',
@@ -227,7 +226,7 @@ export const LayoutSideAdminNavigation: Component[] = [
 
             PermissionID.SERVICE_MANAGE,
         ],
-        components: [
+        children: [
             {
                 name: 'Stations',
                 type: 'link',

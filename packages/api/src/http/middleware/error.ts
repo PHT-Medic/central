@@ -28,6 +28,8 @@ export function errorMiddleware(
         error.code :
         undefined;
 
+    console.log(error);
+
     // catch and decorate some mysql errors :)
     switch (code) {
         case 'ER_DUP_ENTRY':

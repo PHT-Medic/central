@@ -5,63 +5,38 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { DomainEventName } from '@authup/core';
 import type {
     ProposalStation,
-    SocketClientToServerEvents,
+    ProposalStationEventContext,
     SocketServerToClientEventContext,
-    SocketServerToClientEvents,
-    Station,
-    Train,
 } from '@personalhealthtrain/central-common';
 import {
-    ProposalStationSocketClientToServerEventName,
-    ProposalStationSocketServerToClientEventName,
-    buildProposalStationChannelNameForIncoming,
-    buildProposalStationChannelNameForOutgoing,
-    buildSocketProposalStationRoomName, mergeDeep,
+    DomainEventSubscriptionName,
+    DomainSubType,
+    DomainType,
+    buildDomainChannelName,
+    buildDomainEventFullName,
+    buildDomainEventSubscriptionFullName,
 } from '@personalhealthtrain/central-common';
+import type { BuildInput, FiltersBuildInput } from 'rapiq';
 
-import type { CreateElement, PropType, VNode } from 'vue';
-import Vue from 'vue';
-import type { Socket } from 'socket.io-client';
-import type {
-    ComponentListData,
-    ComponentListHandlerMethodOptions,
-    ComponentListMethods,
-    ComponentListProperties,
-    PaginationMeta,
-} from '@vue-layout/utils';
-import {
-    buildListHeader, buildListItems, buildListNoMore, buildListPagination, buildListSearch,
-} from '@vue-layout/utils';
-import type { Realm } from '@authup/core';
-import { REALM_MASTER_NAME } from '@authup/core';
-import type { BuildInput } from 'rapiq';
-
-enum DomainType {
-    Proposal = 'proposal',
-    Station = 'station',
-}
+import type { PropType } from 'vue';
+import { computed, defineComponent } from 'vue';
+import { realmIdForSocket } from '../../../composables/domain/realm';
+import { useSocket } from '../../../composables/socket';
+import type { DomainListHeaderSearchOptionsInput, DomainListHeaderTitleOptionsInput } from '../../../core';
+import { createDomainListBuilder } from '../../../core';
 
 enum Direction {
     IN = 'in',
     OUT = 'out',
 }
 
-export const ProposalStationList = Vue.extend<
-ComponentListData<ProposalStation>,
-ComponentListMethods<ProposalStation>,
-any,
-ComponentListProperties<BuildInput<ProposalStation>> & {
-    realmId?: Realm['id'],
-    sourceId: Train['id'] | Station['id'],
-    target: `${DomainType}`,
-    direction: Direction
-}
->({
+export default defineComponent({
     name: 'ProposalStationList',
     props: {
-        loadOnInit: {
+        loadOnSetup: {
             type: Boolean,
             default: true,
         },
@@ -71,338 +46,257 @@ ComponentListProperties<BuildInput<ProposalStation>> & {
                 return {};
             },
         },
-        withHeader: {
+        noMore: {
             type: Boolean,
             default: true,
         },
-        withNoMore: {
+        footerPagination: {
             type: Boolean,
             default: true,
         },
-        withPagination: {
-            type: Boolean,
+        headerTitle: {
+            type: [Boolean, Object] as PropType<boolean | DomainListHeaderTitleOptionsInput>,
             default: true,
         },
-        withSearch: {
-            type: Boolean,
+        headerSearch: {
+            type: [Boolean, Object] as PropType<boolean | DomainListHeaderSearchOptionsInput>,
             default: true,
         },
 
         realmId: {
             type: String,
-            default: undefined,
         },
         sourceId: {
             type: String,
+            default: undefined,
         },
         target: {
             type: String as PropType<DomainType>,
-            default: DomainType.Station,
+            default: DomainType.STATION,
         },
         direction: {
-            type: String as PropType<Direction>,
+            type: String as PropType<'in' | 'out'>,
             default: Direction.OUT,
         },
     },
-    data() {
-        return {
-            busy: false,
-            items: [],
-            q: '',
-            meta: {
-                limit: 10,
-                offset: 0,
-                total: 0,
+    async setup(props, ctx) {
+        const refs = toRefs(props);
+
+        const source = computed(() => (refs.target.value === DomainType.STATION ?
+            DomainType.PROPOSAL :
+            DomainType.STATION));
+
+        const realmId = realmIdForSocket(refs.realmId);
+
+        const {
+            build,
+            handleCreated,
+            handleUpdated,
+            handleDeleted,
+        } = createDomainListBuilder<ProposalStation>({
+            props: refs,
+            setup: ctx,
+            load: (buildInput) => useAPI().proposalStation.getMany(buildInput),
+            queryFilter: (q) => {
+                let filter : FiltersBuildInput<ProposalStation>;
+
+                if (refs.target.value === DomainType.STATION) {
+                    filter = {
+                        'station.name': q.length > 0 ? `~${q}` : q,
+                    };
+                } else {
+                    filter = {
+                        'proposal.title': q.length > 0 ? `~${q}` : q,
+                    };
+                }
+
+                if (realmId.value) {
+                    if (refs.direction.value === Direction.IN) {
+                        filter.station_realm_id = realmId.value;
+                    } else {
+                        filter.proposal_realm_id = realmId.value;
+                    }
+                }
+
+                return filter;
             },
-            itemBusy: false,
+            query: () => {
+                if (refs.target.value === DomainType.STATION) {
+                    return {
+                        include: ['station'],
+                    };
+                }
 
-            socketLockedId: null,
-            socketLockedStationId: null,
-        };
-    },
-    computed: {
-        source() {
-            return this.target === DomainType.Station ?
-                DomainType.Proposal :
-                DomainType.Station;
-        },
-        socketRealmId() {
-            if (this.realmId) {
-                return this.realmId;
-            }
+                return {
+                    include: ['proposal'],
+                };
+            },
+            defaults: {
+                footerPagination: true,
 
-            if (this.$store.getters['auth/realmName'] === REALM_MASTER_NAME) {
-                return undefined;
-            }
+                headerSearch: true,
+                headerTitle: {
+                    content: refs.target.value === DomainType.STATION ?
+                        'Stations' :
+                        'Trains',
+                    icon: refs.target.value === DomainType.STATION ?
+                        'fa fa-hospital' :
+                        'fa-solid fa-file',
+                },
 
-            return this.$store.getters['auth/realmId'];
-        },
-    },
-    watch: {
-        q(val, oldVal) {
-            if (val === oldVal) return;
+                items: {
+                    item: {
+                        textFn(item) {
+                            return h('span', [
+                                refs.target.value === DomainType.STATION ?
+                                    item.station.name :
+                                    item.proposal.title,
+                            ]);
+                        },
+                    },
+                },
 
-            if (val.length === 1 && val.length > oldVal.length) {
-                return;
-            }
+                noMore: {
+                    textContent: `No more ${refs.target.value} available...`,
+                },
+            },
+        });
 
-            this.meta.offset = 0;
-
-            this.load();
-        },
-    },
-    created() {
-        this.load();
-    },
-    mounted() {
-        const socket : Socket<
-        SocketServerToClientEvents,
-        SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.socketRealmId);
-
-        if (this.socketRealmId) {
-            switch (this.direction) {
-                case Direction.IN:
-                    socket.emit(ProposalStationSocketClientToServerEventName.IN_SUBSCRIBE);
-                    break;
-                case Direction.OUT:
-                    socket.emit(ProposalStationSocketClientToServerEventName.OUT_SUBSCRIBE);
-                    break;
-            }
-        } else {
-            socket.emit(ProposalStationSocketClientToServerEventName.SUBSCRIBE);
-        }
-
-        socket.on(ProposalStationSocketServerToClientEventName.CREATED, this.handleSocketCreated);
-        socket.on(ProposalStationSocketServerToClientEventName.DELETED, this.handleSocketDeleted);
-    },
-    beforeDestroy() {
-        const socket : Socket<
-        SocketServerToClientEvents,
-        SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.socketRealmId);
-
-        if (this.socketRealmId) {
-            switch (this.direction) {
-                case Direction.IN:
-                    socket.emit(ProposalStationSocketClientToServerEventName.IN_UNSUBSCRIBE);
-                    break;
-                case Direction.OUT:
-                    socket.emit(ProposalStationSocketClientToServerEventName.OUT_UNSUBSCRIBE);
-                    break;
-            }
-        } else {
-            socket.emit(ProposalStationSocketClientToServerEventName.UNSUBSCRIBE);
-        }
-
-        socket.off(ProposalStationSocketServerToClientEventName.CREATED, this.handleSocketCreated);
-        socket.off(ProposalStationSocketServerToClientEventName.DELETED, this.handleSocketDeleted);
-    },
-    methods: {
-        isSameSocketRoom(room) {
-            if (this.socketRealmId) {
-                switch (this.direction) {
+        const isSameSocketRoom = (room?: string) => {
+            if (realmId.value) {
+                switch (refs.direction.value) {
                     case Direction.IN:
-                        return room === buildSocketProposalStationInRoomName();
+                        return room === buildDomainChannelName(DomainSubType.PROPOSAL_STATION_IN);
                     case Direction.OUT:
-                        return room === buildSocketProposalStationOutRoomName();
+                        return room === buildDomainChannelName(DomainSubType.PROPOSAL_STATION_OUT);
                 }
             } else {
-                return room === buildSocketProposalStationRoomName();
+                return room === buildDomainChannelName(DomainType.PROPOSAL_STATION);
             }
 
             return false;
-        },
-        isSocketEventForSource(item: ProposalStation) {
-            switch (this.source) {
-                case DomainType.Station:
-                    return this.sourceId === item.station_id;
-                case DomainType.Proposal:
-                    return this.sourceId === item.proposal_id;
+        };
+
+        const isSocketEventForSource = (item: ProposalStation) => {
+            switch (source.value) {
+                case DomainType.STATION:
+                    if (typeof refs.sourceId.value === 'undefined') {
+                        return refs.realmId.value === item.station_realm_id;
+                    }
+
+                    return refs.sourceId.value === item.station_id;
+                case DomainType.PROPOSAL:
+                    if (typeof refs.sourceId.value === 'undefined') {
+                        return refs.realmId.value === item.proposal_realm_id;
+                    }
+
+                    return refs.sourceId.value === item.proposal_id;
             }
 
             return false;
-        },
-        async handleSocketCreated(context: SocketServerToClientEventContext<ProposalStation>) {
+        };
+
+        const handleSocketCreated = (context: SocketServerToClientEventContext<ProposalStationEventContext>) => {
             if (
-                !this.isSameSocketRoom(context.meta.roomName) ||
-                !this.isSocketEventForSource(context.data)
+                !isSameSocketRoom(context.meta.roomName) ||
+                !isSocketEventForSource(context.data)
             ) return;
 
-            this.handleCreated(context.data);
-        },
-        handleSocketDeleted(context : SocketServerToClientEventContext<ProposalStation>) {
+            handleCreated(context.data);
+        };
+
+        const handleSocketUpdated = (context: SocketServerToClientEventContext<ProposalStationEventContext>) => {
             if (
-                !this.isSameSocketRoom(context.meta.roomName) ||
-                context.data.id === this.socketLockedId
+                !isSameSocketRoom(context.meta.roomName) ||
+                !isSocketEventForSource(context.data)
             ) return;
 
-            this.handleDeleted(context.data);
-        },
-        async loadTargetForItem(item: ProposalStation) {
-            switch (this.target) {
-                case DomainType.Proposal: {
-                    if (!item.proposal) {
-                        item.proposal = await this.$api.train.getOne(item.proposal_id);
-                    }
-                    break;
-                }
-                default: {
-                    if (!item.station) {
-                        item.station = await this.$api.station.getOne(item.station_id);
-                    }
-                    break;
-                }
-            }
+            handleUpdated(context.data);
+        };
 
-            return item;
-        },
-        async load(options?: PaginationMeta) {
-            if (this.busy) return;
+        const handleSocketDeleted = (context: SocketServerToClientEventContext<ProposalStationEventContext>) => {
+            if (
+                !isSameSocketRoom(context.meta.roomName) ||
+                !isSocketEventForSource(context.data)
+            ) return;
 
-            if (options) {
-                this.meta.offset = options.offset;
-            }
+            handleDeleted(context.data);
+        };
 
-            this.busy = true;
+        const socket = useSocket().useRealmWorkspace(realmId.value);
 
-            const { query } = this;
-
-            switch (this.target) {
-                case DomainType.Station:
-                    query.filter = query.filter || {};
-                    query.filter.station = {
-                        name: this.q.length > 0 ? `~${this.q}` : this.q,
-                    };
-                    query.include = query.include || {};
-                    query.include.station = true;
-                    break;
-                case DomainType.Proposal:
-                    query.filter = query.filter || {};
-                    query.filter.proposal = {
-                        name: this.q.length > 0 ? `~${this.q}` : this.q,
-                    };
-                    query.include = query.include || {};
-                    query.include.proposal = true;
-                    break;
-            }
-
-            if (this.realmId) {
-                if (this.direction === Direction.IN) {
-                    query.filter.station_realm_id = this.realmId;
+        onMounted(() => {
+            if (realmId.value) {
+                if (refs.direction.value === Direction.IN) {
+                    socket.emit(buildDomainEventSubscriptionFullName(
+                        DomainSubType.PROPOSAL_STATION_IN,
+                        DomainEventSubscriptionName.SUBSCRIBE,
+                    ));
                 } else {
-                    query.filter.proposal_realm_id = this.realmId;
+                    socket.emit(buildDomainEventSubscriptionFullName(
+                        DomainSubType.PROPOSAL_STATION_OUT,
+                        DomainEventSubscriptionName.SUBSCRIBE,
+                    ));
                 }
+            } else {
+                socket.emit(buildDomainEventSubscriptionFullName(
+                    DomainType.PROPOSAL_STATION,
+                    DomainEventSubscriptionName.SUBSCRIBE,
+                ));
             }
 
-            try {
-                const response = await this.$api.proposalStation.getMany(mergeDeep({
-                    page: {
-                        limit: this.meta.limit,
-                        offset: this.meta.offset,
-                    },
-                }, query));
+            socket.on(buildDomainEventFullName(
+                DomainType.PROPOSAL_STATION,
+                DomainEventName.CREATED,
+            ), handleSocketCreated);
 
-                this.items = response.data;
-                const { total } = response.meta;
+            socket.on(buildDomainEventFullName(
+                DomainType.PROPOSAL_STATION,
+                DomainEventName.DELETED,
+            ), handleSocketDeleted);
 
-                this.meta.total = total;
-            } catch (e) {
-                // ...
-            }
+            socket.on(buildDomainEventFullName(
+                DomainType.PROPOSAL_STATION,
+                DomainEventName.UPDATED,
+            ), handleSocketUpdated);
+        });
 
-            this.busy = false;
-        },
-
-        handleCreated(
-            data: ProposalStation,
-            options?: ComponentListHandlerMethodOptions<ProposalStation>,
-        ) {
-            options = options || {};
-
-            Promise.resolve()
-                .then(() => this.loadTargetForItem(data))
-                .then((item) => {
-                    const index = this.items.findIndex((el: ProposalStation) => el.id === item.id);
-                    if (index === -1) {
-                        if (options.unshift) {
-                            this.items.unshift(item);
-                        } else {
-                            this.items.push(item);
-                        }
-
-                        this.$emit('created', item);
-                    }
-                });
-        },
-        handleUpdated(item: ProposalStation) {
-            const index = this.items.findIndex((el: ProposalStation) => el.id === item.id);
-            if (index !== -1) {
-                const keys : (keyof ProposalStation)[] = Object.keys(item) as (keyof ProposalStation)[];
-                for (let i = 0; i < keys.length; i++) {
-                    Vue.set(this.items[index], keys[i], item[keys[i]]);
+        onUnmounted(() => {
+            if (realmId.value) {
+                if (refs.direction.value === Direction.IN) {
+                    socket.emit(buildDomainEventSubscriptionFullName(
+                        DomainSubType.PROPOSAL_STATION_IN,
+                        DomainEventSubscriptionName.UNSUBSCRIBE,
+                    ));
+                } else {
+                    socket.emit(buildDomainEventSubscriptionFullName(
+                        DomainSubType.PROPOSAL_STATION_OUT,
+                        DomainEventSubscriptionName.UNSUBSCRIBE,
+                    ));
                 }
-
-                this.$emit('updated', item);
+            } else {
+                socket.emit(buildDomainEventSubscriptionFullName(
+                    DomainType.PROPOSAL_STATION,
+                    DomainEventSubscriptionName.UNSUBSCRIBE,
+                ));
             }
-        },
-        handleDeleted(item: ProposalStation) {
-            const index = this.items.findIndex((el: ProposalStation) => el.id === item.id);
-            if (index !== -1) {
-                this.items.splice(index, 1);
-                this.meta.total--;
 
-                this.$emit('deleted', {
-                    ...this.items[index],
-                    ...item,
-                });
-            }
-        },
-    },
+            socket.off(buildDomainEventFullName(
+                DomainType.PROPOSAL_STATION,
+                DomainEventName.CREATED,
+            ), handleSocketCreated);
 
-    render(createElement: CreateElement): VNode {
-        const vm = this;
+            socket.off(buildDomainEventFullName(
+                DomainType.PROPOSAL_STATION,
+                DomainEventName.DELETED,
+            ), handleSocketDeleted);
 
-        const header = buildListHeader(this, createElement, {
-            titleText: vm.target === DomainType.Station ? 'Stations' : 'Proposals',
-            iconClass: vm.target === DomainType.Station ?
-                'fa fa-hospital' :
-                'fa fa-file',
+            socket.off(buildDomainEventFullName(
+                DomainType.PROPOSAL_STATION,
+                DomainEventName.UPDATED,
+            ), handleSocketUpdated);
         });
 
-        const search = buildListSearch(this, createElement);
-        const items = buildListItems<ProposalStation>(this, createElement, {
-            itemIconClass: vm.target === DomainType.Station ? 'fa fa-hospital' : 'fa fa-file',
-            itemTextFn(item) {
-                return createElement('span', [
-                    vm.target === DomainType.Station ?
-                        item.station.name :
-                        item.proposal.title,
-                ]);
-            },
-            itemSlots: {
-                handleUpdated: vm.handleUpdated,
-                handleDeleted: vm.handleDeleted,
-                handleCreated: vm.handleCreated,
-            },
-        });
-
-        const noMore = buildListNoMore(this, createElement, {
-            text: `There are no more ${vm.target}s available...`,
-        });
-        const pagination = buildListPagination(this, createElement);
-
-        return createElement(
-            'div',
-            { staticClass: 'list' },
-            [
-                header,
-                search,
-                items,
-                noMore,
-                pagination,
-            ],
-        );
+        return () => build();
     },
 });
-export default ProposalStationList;

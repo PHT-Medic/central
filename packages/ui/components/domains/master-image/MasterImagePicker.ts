@@ -5,14 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { CreateElement, VNode } from 'vue';
-import Vue from 'vue';
-import { required } from 'vuelidate/lib/validators';
-import { SlotName, buildFormSelect } from '@vue-layout/utils';
-import { MasterImageList } from './MasterImageList';
-import { buildVuelidateTranslator } from '../../../config/ilingo/utils';
+import type { MasterImage, MasterImageGroup } from '@personalhealthtrain/central-common';
+import type { FormSelectOption } from '@vue-layout/form-controls';
+import { buildFormSelect } from '@vue-layout/form-controls';
+import type { ListItemsSlotProps } from '@vue-layout/list-controls';
+import { SlotName } from '@vue-layout/list-controls';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
+import type { VNodeArrayChildren } from 'vue';
+import { defineComponent } from 'vue';
+import { buildValidationTranslator } from '../../../composables/ilingo';
+import { wrapFnWithBusyState } from '../../../core/busy';
+import MasterImageGroupList from '../master-image-group/MasterImageGroupList';
+import MasterImageList from './MasterImageList';
 
-export const MasterImagePicker = Vue.extend({
+export default defineComponent({
     name: 'MasterImagePicker',
     components: { MasterImageList },
     props: {
@@ -21,253 +28,221 @@ export const MasterImagePicker = Vue.extend({
             default: undefined,
         },
     },
-    data() {
-        return {
-            form: {
-                group_virtual_path: '',
-                master_image_id: '',
+    emits: ['selected'],
+    async setup(props, { emit }) {
+        const refs = toRefs(props);
+
+        const busy = ref(false);
+        const form = reactive({
+            group_virtual_path: '',
+            master_image_id: '',
+        });
+
+        const $v = useVuelidate({
+            group_virtual_path: {
+                required,
             },
-
-            item: null,
-            busy: false,
-
-            group: {
-                items: [],
-                busy: false,
-                item: null,
+            master_image_id: {
+                required,
             },
-        };
-    },
-    validations() {
-        return {
-            form: {
-                group_virtual_path: {
-                    required,
-                },
-                master_image_id: {
-                    required,
-                },
+        }, form);
+
+        const masterImageEntity = ref<MasterImage | null>(null);
+        const masterImageGroupEntity = ref<MasterImageGroup | null>(null);
+
+        const isVirtualGroupPathDefined = computed(() => !!form.group_virtual_path &&
+                form.group_virtual_path.length > 0);
+
+        const imageQuery = computed(() => ({
+            filters: {
+                ...(form.group_virtual_path !== '' ? {
+                    group_virtual_path: form.group_virtual_path,
+                } : {}),
             },
-        };
-    },
-    computed: {
-        isVirtualGroupPathDefined() {
-            return !!this.form.group_virtual_path &&
-                this.form.group_virtual_path.length > 0;
-        },
-        imageQuery() {
-            return {
-                filters: {
-                    ...(this.form.group_virtual_path !== '' ? {
-                        group_virtual_path: this.form.group_virtual_path,
-                    } : {}),
-                },
-            };
-        },
-        isInImageList() {
-            if (!this.$refs.itemList || !this.form.master_image_id) {
-                return false;
-            }
-
-            const index = this.$refs.itemList.items.findIndex((el) => el.id === this.form.master_image_id);
-            return index !== -1;
-        },
-    },
-    watch: {
-        async entityId(val, oldVal) {
-            if (this.loading) return;
-
-            if (val && val !== oldVal) {
-                this.initProperties();
-                await this.loadImage();
-            }
-        },
-    },
-    created() {
-        Promise.resolve()
-            .then(this.initProperties)
-            .then(this.loadGroups)
-            .then(this.loadImage);
-    },
-    methods: {
-        initProperties() {
-            if (this.entityId) {
-                this.form.master_image_id = this.entityId;
-            }
-        },
-        async loadImage() {
-            if (!this.form.master_image_id) return;
-
-            if (
-                this.item &&
-                this.item === this.form.master_image_id
-            ) {
-                this.form.group_virtual_path = this.item.group_virtual_path;
-                return;
-            }
-
-            this.busy = true;
-
-            try {
-                this.item = await this.$api.masterImage.getOne(this.form.master_image_id);
-                this.form.group_virtual_path = this.item.group_virtual_path;
-
-                await this.setGroup(this.item.group_virtual_path);
-            } catch (e) {
-                // ...
-            }
-
-            this.busy = false;
-        },
-        async loadGroups() {
-            if (this.group.busy) return;
-
-            this.group.busy = true;
-
-            try {
-                const { data } = await this.$api.masterImageGroup.getMany();
-
-                this.group.items = data;
-            } catch (e) {
-                // ...
-            }
-
-            this.group.busy = false;
-        },
-
-        async setGroup(virtualPath: string) {
-            if (!virtualPath) {
-                this.form.group_virtual_path = '';
-                this.group.item = null;
-
-                return;
-            }
-
-            const index = this.group.items.findIndex((item) => item.virtual_path === virtualPath);
-            if (index !== -1) {
-                this.form.group_virtual_path = this.group.items[index].virtual_path;
-
-                if (
-                    this.group.item &&
-                    this.group.item.virtual_path !== this.group.items[index].virtual_path
-                ) {
-                    this.form.master_image_id = '';
-                    this.item = null;
-                    this.$emit('selected', null);
-                }
-
-                this.group.item = this.group.items[index];
-            }
-
-            this.$nextTick(async () => {
-                if (this.$refs.itemList) {
-                    await this.$refs.itemList.load();
-                }
-            });
-        },
-
-        setImage(item) {
-            if (item) {
-                if (typeof item === 'string') {
-                    const index = this.$refs.itemList.items.findIndex((el) => el.id === item);
-                    if (index !== -1) {
-                        item = this.$refs.itemList.items[index];
-                    } else {
-                        item = {
-                            id: item,
-                        };
-                    }
-                }
-
-                if (this.group.item) {
-                    item.command = item.command || this.group.item.command;
-                    item.command_arguments = item.command_arguments || this.group.item.command_arguments;
-                }
-
-                this.$emit('selected', item);
-            } else {
-                this.$emit('selected', null);
-            }
-        },
-    },
-    render(createElement: CreateElement): VNode {
-        const vm = this;
-        const h = createElement;
-
-        const groupOptions = vm.group.items.map((item) => ({
-            id: item.virtual_path,
-            value: item.virtual_path,
         }));
 
-        let masterImages = h();
+        const loadImage = wrapFnWithBusyState(busy, async () => {
+            if (!form.master_image_id) return;
 
-        if (vm.isVirtualGroupPathDefined) {
-            masterImages = h('div', {
-                staticClass: 'col',
-            }, [
-                h(MasterImageList, {
-                    ref: 'itemList',
-                    props: {
-                        withHeader: false,
-                        withSearch: false,
-                        withPagination: false,
-                        query: vm.imageQuery,
-                    },
-                    scopedSlots: {
-                        [SlotName.ITEMS]: (props) => buildFormSelect(vm, h, {
-                            validationTranslator: buildVuelidateTranslator(this.$ilingo),
-                            options: props.items.map((item) => ({
-                                id: item.id,
-                                value: item.name,
-                            })),
-                            propName: 'master_image_id',
-                            domProps: {
-                                disabled: props.busy,
-                            },
-                            attrs: {
-                                disabled: props.busy,
-                            },
-                            title: [
-                                'Image',
-                                (vm.form.master_image_id ?
-                                    h('i', { staticClass: 'ml-1 fa fa-check text-success' }) :
-                                    h()
-                                ),
-                            ],
-                            changeCallback(value) {
-                                vm.setImage.call(null, { id: value });
-                            },
-                        }),
-                    },
-                }),
-            ]);
-        }
+            if (
+                masterImageEntity.value &&
+                masterImageEntity.value.id === form.master_image_id
+            ) {
+                form.group_virtual_path = masterImageEntity.value.group_virtual_path;
+                return;
+            }
 
-        return h(
+            try {
+                masterImageEntity.value = await useAPI().masterImage.getOne(form.master_image_id);
+                form.group_virtual_path = masterImageEntity.value.group_virtual_path;
+
+                if (!masterImageGroupEntity.value || form.group_virtual_path !== masterImageGroupEntity.value.virtual_path) {
+                    const { data } = await useAPI().masterImageGroup.getMany({
+                        filters: {
+                            virtual_path: form.group_virtual_path,
+                        },
+                    });
+
+                    const entity = data.pop();
+
+                    if (entity) {
+                        masterImageGroupEntity.value = entity;
+                    }
+                }
+            } catch (e) {
+                // ...
+            }
+        });
+
+        const init = () => {
+            if (!refs.entityId.value) return;
+
+            form.master_image_id = refs.entityId.value;
+        };
+
+        watch(refs.entityId, (val, oldValue) => {
+            if (val && val !== oldValue) {
+                init();
+                loadImage();
+            }
+        });
+
+        init();
+        await loadImage();
+
+        const itemListNode = ref<null | Record<string, any>>(null);
+
+        const selectGroup = (group: MasterImageGroup | null) => {
+            if (!group) {
+                form.group_virtual_path = '';
+                masterImageGroupEntity.value = null;
+                emit('selected', null); // todo: check
+                return;
+            }
+
+            const changed = group.virtual_path !== form.group_virtual_path;
+
+            form.group_virtual_path = group.virtual_path;
+            masterImageGroupEntity.value = group;
+
+            if (changed && itemListNode.value) {
+                form.master_image_id = '';
+                itemListNode.value.load();
+            }
+        };
+
+        const selectImage = (entity: MasterImage | null) => {
+            if (entity) {
+                form.master_image_id = entity.id;
+
+                if (masterImageGroupEntity.value) {
+                    entity.command = entity.command || masterImageGroupEntity.value.command;
+                    entity.command_arguments = entity.command_arguments || masterImageGroupEntity.value.command_arguments;
+                }
+
+                emit('selected', entity);
+                return;
+            }
+
+            emit('selected', null);
+        };
+
+        const buildMasterImageVNode = () : VNodeArrayChildren => {
+            if (!isVirtualGroupPathDefined.value) {
+                return [];
+            }
+
+            return [
+                h('div', {
+                    class: 'col',
+                }, [
+                    h(MasterImageList, {
+                        ref: itemListNode,
+                        headerSearch: false,
+                        headerTitle: false,
+                        footerPagination: false,
+                        query: imageQuery.value,
+                    }, {
+                        [SlotName.ITEMS]: (props: ListItemsSlotProps<MasterImage>) => {
+                            const options: FormSelectOption[] = props.data.map((entity) => ({
+                                id: entity.id,
+                                value: entity.name,
+                            }));
+
+                            return buildFormSelect({
+                                validationTranslator: buildValidationTranslator(),
+                                validationResult: $v.value.master_image_id,
+                                label: true,
+                                labelContent: [
+                                    'Image',
+                                    form.master_image_id ?
+                                        h('i', { class: 'fa fa-check text-success ms-1' }) :
+                                        h(''),
+                                ],
+                                value: form.master_image_id,
+                                onChange(input) {
+                                    const index = props.data.findIndex((el) => el.id === input);
+                                    if (index !== -1) {
+                                        selectImage(props.data[index]);
+                                        return;
+                                    }
+
+                                    selectImage(null);
+                                },
+                                options,
+                            });
+                        },
+                    }),
+                ]),
+            ];
+        };
+
+        return () => h(
             'div',
-            { staticClass: 'row' },
+            { class: 'row' },
             [
                 h(
                     'div',
-                    { staticClass: 'col' },
+                    { class: 'col' },
                     [
-                        buildFormSelect(vm, h, {
-                            validationTranslator: buildVuelidateTranslator(this.$ilingo),
-                            options: groupOptions,
-                            propName: 'group_virtual_path',
-                            title: [
-                                'Group',
-                                vm.isVirtualGroupPathDefined ?
-                                    h('i', { staticClass: 'fa fa-check text-success ml-1' }) :
-                                    h(''),
-                            ],
-                            changeCallback(value) {
-                                vm.setGroup.call(null, value);
+                        h(MasterImageGroupList, {
+                            headerSearch: false,
+                            headerTitle: false,
+                            footerPagination: false,
+                        }, {
+                            [SlotName.ITEMS]: (props: ListItemsSlotProps<MasterImageGroup>) => {
+                                const options : FormSelectOption[] = props.data.map((entity) => ({
+                                    id: entity.virtual_path,
+                                    value: entity.virtual_path,
+                                }));
+
+                                return buildFormSelect({
+                                    validationTranslator: buildValidationTranslator(),
+                                    validationResult: $v.value.group_virtual_path,
+                                    label: true,
+                                    labelContent: [
+                                        'Group',
+                                        isVirtualGroupPathDefined.value ?
+                                            h('i', { class: 'fa fa-check text-success ms-1' }) :
+                                            h(''),
+                                    ],
+                                    value: form.group_virtual_path,
+                                    onChange(input) {
+                                        const index = props.data.findIndex((el) => el.virtual_path === input);
+                                        if (index !== -1) {
+                                            selectGroup(props.data[index]);
+                                            return;
+                                        }
+
+                                        selectGroup(null);
+                                    },
+                                    options,
+                                });
                             },
                         }),
                     ],
                 ),
-                masterImages,
+                buildMasterImageVNode(),
             ],
         );
     },

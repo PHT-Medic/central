@@ -7,13 +7,13 @@
 
 import type {
     SocketClientToServerEvents,
-    SocketInterServerEvents,
     SocketServerToClientEvents,
 } from '@personalhealthtrain/central-common';
 import type {
     AbilityManager, Realm, Robot, User,
 } from '@authup/core';
 import type { Namespace, Server, Socket } from 'socket.io';
+import type { DefaultEventsMap } from 'socket.io/dist/typed-events';
 
 export type SocketDataInterface = {
     ability?: AbilityManager,
@@ -30,20 +30,20 @@ export type SocketDataInterface = {
 export type SocketServerInterface = Server<
 SocketClientToServerEvents,
 SocketServerToClientEvents,
-SocketInterServerEvents,
+DefaultEventsMap,
 SocketDataInterface
 >;
 
 export type SocketNamespaceInterface = Namespace<
 SocketClientToServerEvents,
 SocketServerToClientEvents,
-SocketInterServerEvents,
+DefaultEventsMap,
 SocketDataInterface
 >;
 
 export type SocketInterface = Socket<
 SocketClientToServerEvents,
 SocketServerToClientEvents,
-SocketInterServerEvents,
+DefaultEventsMap,
 SocketDataInterface
 >;

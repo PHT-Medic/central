@@ -9,14 +9,15 @@ import type { UserSecret } from '@personalhealthtrain/central-common';
 import {
     SecretType,
 } from '@personalhealthtrain/central-common';
-import { maxLength, minLength, required } from 'vuelidate/lib/validators';
-import type { CreateElement, VNode } from 'vue';
-import Vue from 'vue';
+import useVuelidate from '@vuelidate/core';
+import { maxLength, minLength, required } from '@vuelidate/validators';
+import type { PropType } from 'vue';
+import { defineComponent } from 'vue';
 import {
     buildFormInput, buildFormSelect, buildFormSubmit, buildFormTextarea,
-} from '@vue-layout/utils';
+} from '@vue-layout/form-controls';
 
-export default Vue.extend({
+export default defineComponent({
     name: 'UserSecretForm',
     props: {
         userId: {
@@ -24,28 +25,26 @@ export default Vue.extend({
             default: undefined,
         },
         entity: {
-            type: Object,
-            default: () => {},
+            type: Object as PropType<UserSecret>,
         },
     },
-    data() {
-        return {
-            form: {
-                key: '',
-                type: '',
-                content: '',
-            },
+    emits: ['created', 'updated', 'failed'],
+    setup(props, { emit }) {
+        const refs = toRefs(props);
+        const fileInput = ref<null | Record<string, any>>(null);
 
-            busy: false,
+        const typeOptions = [
+            { id: SecretType.RSA_PUBLIC_KEY, value: 'RSA' },
+            { id: SecretType.PAILLIER_PUBLIC_KEY, value: 'Paillier' },
+        ];
+        const busy = ref(false);
+        const form = reactive({
+            key: '',
+            type: SecretType.RSA_PUBLIC_KEY,
+            content: '',
+        });
 
-            typeOptions: [
-                { id: SecretType.RSA_PUBLIC_KEY, value: 'RSA' },
-                { id: SecretType.PAILLIER_PUBLIC_KEY, value: 'Paillier' },
-            ],
-        };
-    },
-    validations: {
-        form: {
+        const $v = useVuelidate({
             key: {
                 required,
                 minLength: minLength(3),
@@ -59,48 +58,62 @@ export default Vue.extend({
             type: {
                 required,
             },
-        },
-    },
-    computed: {
-        isEditing() {
-            return this.entity &&
-                Object.prototype.hasOwnProperty.call(this.entity, 'id');
-        },
-    },
-    created() {
-        this.resetFormData();
-    },
-    methods: {
-        resetFormData() {
-            const keys = Object.keys(this.form);
+        }, form);
+
+        const handleTypeChanged = (type: SecretType) => {
+            if (
+                form.key &&
+                form.key !== SecretType.PAILLIER_PUBLIC_KEY &&
+                form.key !== SecretType.RSA_PUBLIC_KEY
+            ) {
+                return;
+            }
+
+            form.key = type;
+        };
+
+        const resetFormData = () => {
+            const keys = Object.keys(form) as (keyof UserSecret)[];
             for (let i = 0; i < keys.length; i++) {
+                const key = keys[i];
+
                 if (
-                    typeof this.entity !== 'undefined' &&
-                    this.entity[keys[i]]
+                    refs.entity.value &&
+                    refs.entity.value[keys[i]]
                 ) {
-                    this.form[keys[i]] = this.entity[keys[i]];
+                    (form as any)[keys[i]] = refs.entity.value[keys[i]];
                 } else {
-                    switch (keys[i]) {
+                    switch (key) {
                         case 'type':
-                            this.form[keys[i]] = SecretType.RSA_PUBLIC_KEY;
-                            this.handleTypeChanged(this.form[keys[i]]);
+                            form.type = SecretType.RSA_PUBLIC_KEY;
+                            handleTypeChanged(form.type);
                             break;
                         default:
-                            this.form[keys[i]] = '';
+                            (form as any)[key] = '' as any;
                             break;
                     }
                 }
             }
-        },
+        };
 
-        readFile() {
-            this.busy = true;
+        onMounted(() => resetFormData());
 
-            const file = this.$refs.myFile.files[0];
+        const readFile = () => {
+            busy.value = true;
+
+            if (!fileInput.value) {
+                return;
+            }
+
+            const file = fileInput.value.files[0];
 
             const reader = new FileReader();
             reader.readAsText(file, 'UTF-8');
             reader.onload = (evt) => {
+                if (!evt.target) {
+                    return;
+                }
+
                 let content = evt.target.result;
 
                 if (Buffer.isBuffer(content)) {
@@ -111,132 +124,127 @@ export default Vue.extend({
                     content = content.toString();
                 }
 
-                this.form.content = Buffer.from(content as string, 'utf-8').toString('hex');
-                this.busy = false;
-                this.$refs.myFile.value = '';
+                form.content = Buffer.from(content as string, 'utf-8').toString('hex');
+                busy.value = false;
+
+                if (fileInput.value) {
+                    fileInput.value.value = '';
+                }
             };
             reader.onerror = () => {
-                this.busy = false;
-                this.$refs.myFile.value = '';
+                busy.value = false;
+                if (fileInput.value) {
+                    fileInput.value.value = '';
+                }
             };
-        },
+        };
 
-        async submit() {
-            if (this.busy || this.$v.$invalid) {
+        const submit = async () => {
+            if (busy.value || $v.value.$invalid) {
                 return;
             }
 
-            this.busy = true;
+            busy.value = true;
 
             try {
                 let response;
 
-                if (this.isEditing) {
-                    response = await this.$api.userSecret.update(this.entity.id, { ...this.form });
+                if (refs.entity.value) {
+                    response = await useAPI().userSecret.update(refs.entity.value.id, { ...form });
 
-                    this.$emit('updated', response);
+                    emit('updated', response);
                 } else {
-                    response = await this.$api.userSecret.create({ ...this.form });
+                    response = await useAPI().userSecret.create({ ...form });
 
-                    this.$emit('created', response);
+                    emit('created', response);
                 }
             } catch (e) {
                 if (e instanceof Error) {
-                    this.$emit('failed', e);
+                    emit('failed', e);
                 }
             }
 
-            this.busy = false;
-        },
+            busy.value = false;
+        };
 
-        handleTypeChanged(type) {
-            if (
-                this.form.key &&
-                this.form.key !== SecretType.PAILLIER_PUBLIC_KEY &&
-                this.form.key !== SecretType.RSA_PUBLIC_KEY
-            ) {
-                return;
-            }
+        return () => {
+            const type = buildFormSelect({
+                label: true,
+                labelContent: 'Type',
+                value: form.type,
+                onChange(input: SecretType) {
+                    form.type = input;
+                    handleTypeChanged(input);
+                },
+                options: typeOptions,
+            });
 
-            this.form.key = type;
-        },
-    },
-    render(h: CreateElement) : VNode {
-        const vm = this;
-        const type = buildFormSelect<UserSecret>(vm, h, {
-            title: 'Type',
-            propName: 'type',
-            changeCallback(input) {
-                vm.form.type = input;
-                vm.handleTypeChanged.call(null, input);
-            },
-            options: vm.typeOptions,
-        });
+            const key = buildFormInput({
+                label: true,
+                labelContent: 'Name',
+                value: form.key,
+                onChange(input: string) {
+                    form.key = input;
+                },
+            });
 
-        const key = buildFormInput<UserSecret>(vm, h, {
-            title: 'Name',
-            propName: 'key',
-        });
-
-        const file = h('div', {
-            staticClass: 'form-group',
-            class: {
-                'form-group-error': vm.$v.form.content.$error,
-                'form-group-warning': vm.$v.form.content.$invalid &&
-                    !vm.$v.form.content.$dirty,
-            },
-        }, [
-            h('label', 'File'),
-            h('div', { staticClass: 'custom-file' }, [
-                h('label', { staticClass: 'custom-file-label' }, [
-                    'Public key file path...',
-                ]),
-                h('input', {
-                    ref: 'myFile',
-                    attrs: {
+            const file = h('div', {
+                class: ['form-group', {
+                    'form-group-error': $v.value.content.$error,
+                    'form-group-warning': $v.value.content.$invalid &&
+                        !$v.value.content.$dirty,
+                }],
+            }, [
+                h('label', 'File'),
+                h('div', { class: 'input-group' }, [
+                    h('input', {
+                        ref: fileInput,
                         type: 'file',
-                    },
-                    staticClass: 'custom-file-input',
-                    on: {
-                        change($event) {
+                        class: 'form-control',
+                        placeholder: 'Public key file path...',
+                        onChange($event: any) {
                             $event.preventDefault();
 
-                            vm.readFile.call(null);
+                            readFile();
                         },
-                    },
+                    }),
+                ]),
+            ]);
+
+            const content = buildFormTextarea({
+                label: true,
+                labelContent: 'Content',
+                value: form.content,
+                onChange(input) {
+                    form.content = input;
+                },
+                props: {
+                    rows: 8,
+                },
+            });
+
+            return h('div', [
+                type,
+                h('hr'),
+                key,
+                h('hr'),
+                h('div', { class: 'alert alert-dark alert-sm' }, [
+                    'A secret can either be specified via',
+                    h('strong', { class: 'pl-1 pr-1' }, 'file'),
+                    'upload or by pasting its',
+                    h('strong', { class: 'pl-1 pr-1' }, 'content'),
+                    'in the textarea shown below.',
+                ]),
+                file,
+                content,
+                h('hr'),
+                buildFormSubmit({
+                    createText: 'Create',
+                    updateText: 'Update',
+                    submit,
+                    busy,
                 }),
-            ]),
-        ]);
-
-        const content = buildFormTextarea(vm, h, {
-            title: 'Content',
-            propName: 'content',
-            attrs: {
-                rows: 8,
-            },
-        });
-
-        const submit = buildFormSubmit(vm, h, {
-            createText: 'Create',
-            updateText: 'Update',
-        });
-
-        return h('div', [
-            type,
-            h('hr'),
-            key,
-            h('hr'),
-            h('div', { staticClass: 'alert alert-dark alert-sm' }, [
-                'A secret can either be specified via',
-                h('strong', { staticClass: 'pl-1 pr-1' }, 'file'),
-                'upload or by pasting its',
-                h('strong', { staticClass: 'pl-1 pr-1' }, 'content'),
-                'in the textarea shown below.',
-            ]),
-            file,
-            content,
-            h('hr'),
-            submit,
-        ]);
+            ]);
+        };
     },
 });

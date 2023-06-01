@@ -5,47 +5,50 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { CreateElement, VNode } from 'vue';
-import Vue from 'vue';
+import { BModal } from 'bootstrap-vue-next';
+import { defineComponent } from 'vue';
 import { LicenseAgreementCommand, useLicenseAgreementEventEmitter } from '../../../domains/license-agreement';
 import LicenseAgreementForm from './LicenseAgreementForm';
 
-export default Vue.extend({
+export default defineComponent({
     name: 'LicenseAgreement',
-    created() {
-        const eventEmitter = useLicenseAgreementEventEmitter();
-        eventEmitter.on(LicenseAgreementCommand.ACCEPT, this.handleAcceptLicenseAgreementAction);
-    },
-    beforeDestroy() {
-        const eventEmitter = useLicenseAgreementEventEmitter();
-        eventEmitter.off(LicenseAgreementCommand.ACCEPT, this.handleAcceptLicenseAgreementAction);
-    },
-    methods: {
-        handleAcceptLicenseAgreementAction() {
-            if (this.$refs.modal) {
-                this.$refs.modal.show();
+    setup() {
+        const modalRef = ref<null | Record<string, any>>(null);
+
+        const handleAcceptLicenseAgreementAction = () => {
+            if (modalRef.value) {
+                modalRef.value.show();
             }
-        },
-        handleAccepted() {
-            if (this.$refs.modal) {
-                this.$refs.modal.hide();
+        };
+
+        const handleAccepted = () => {
+            if (modalRef.value) {
+                modalRef.value.hide();
             }
 
             // todo: reload current route
-        },
-        handleDeclined() {
-            if (this.$refs.modal) {
-                this.$refs.modal.hide();
+        };
+
+        const handleDeclined = () => {
+            if (modalRef.value) {
+                modalRef.value.hide();
             }
 
             // todo: redirect logout
-        },
-    },
-    render(h: CreateElement): VNode {
-        const vm = this;
+        };
 
-        return h('b-modal', {
-            ref: 'modal',
+        onMounted(() => {
+            const eventEmitter = useLicenseAgreementEventEmitter();
+            eventEmitter.on(LicenseAgreementCommand.ACCEPT, handleAcceptLicenseAgreementAction);
+        });
+
+        onUnmounted(() => {
+            const eventEmitter = useLicenseAgreementEventEmitter();
+            eventEmitter.off(LicenseAgreementCommand.ACCEPT, handleAcceptLicenseAgreementAction);
+        });
+
+        return () => h(BModal, {
+            ref: modalRef,
             props: {
                 titleHtml: '<i class="fa-solid fa-file-contract"></i> License Agreement',
                 size: 'lg',
@@ -56,13 +59,11 @@ export default Vue.extend({
             },
         }, [
             h(LicenseAgreementForm, {
-                on: {
-                    accepted() {
-                        vm.handleAccepted.call(null);
-                    },
-                    declined() {
-                        vm.handleDeclined.call(null);
-                    },
+                onAccepted() {
+                    handleAccepted();
+                },
+                onDeclined() {
+                    handleDeclined();
                 },
             }),
         ]);

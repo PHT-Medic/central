@@ -6,6 +6,5 @@
  */
 
 export * from './api';
-export * from './socket';
 export * from './constants';
 export * from './entity';

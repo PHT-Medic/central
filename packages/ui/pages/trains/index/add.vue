@@ -4,39 +4,43 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
+<script lang="ts">
+import type { Train } from '@personalhealthtrain/central-common';
+import { storeToRefs } from 'pinia';
+import { ref } from 'vue';
+import { defineNuxtComponent } from '#app';
+import { navigateTo, useRoute } from '#imports';
 import TrainBasicForm from '../../../components/domains/train/TrainBasicForm';
+import { useAuthStore } from '../../../store/auth';
 
-export default {
+export default defineNuxtComponent({
     components: { TrainBasicForm },
-    data() {
+    setup() {
+        const proposalId = ref<string | null>(null);
+
+        const store = useAuthStore();
+        const { realmId } = storeToRefs(store);
+
+        const route = useRoute();
+        if (typeof route.query.proposal_id === 'string') {
+            proposalId.value = route.query.proposal_id;
+        }
+
+        const handleCreated = async (train: Train) => {
+            await navigateTo(`/trains/${train.id}/setup`);
+        };
+
         return {
-            proposal_id: undefined,
+            proposalId,
+            realmId,
+            handleCreated,
         };
     },
-    computed: {
-        realmId() {
-            return this.$store.getters['auth/realmId'];
-        },
-    },
-    created() {
-        if (typeof this.$route.query.proposal_id !== 'undefined') {
-            const proposalId = parseInt(this.$route.query.proposal_id, 10);
-            if (!Number.isNaN(proposalId)) {
-                this.proposal_id = proposalId;
-            }
-        }
-    },
-    methods: {
-        handleCreated(train) {
-            this.$router.push(`/trains/${train.id}/setup`);
-        },
-    },
-};
+});
 </script>
 <template>
-    <train-basic-form
-        :proposal-id="proposal_id"
+    <TrainBasicForm
+        :proposal-id="proposalId"
         :realm-id="realmId"
         @created="handleCreated"
     />

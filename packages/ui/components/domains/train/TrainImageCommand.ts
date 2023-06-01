@@ -5,10 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { CreateElement, VNode } from 'vue';
-import Vue from 'vue';
+import type { MasterImage, TrainFile } from '@personalhealthtrain/central-common';
+import { isClientErrorWithStatusCode } from 'hapic';
+import { defineComponent, toRefs } from 'vue';
+import { wrapFnWithBusyState } from '../../../core/busy';
 
-export default Vue.extend({
+export default defineComponent({
+    name: 'TrainImageCommand',
     props: {
         trainId: {
             type: String,
@@ -23,70 +26,47 @@ export default Vue.extend({
             default: undefined,
         },
     },
-    data() {
-        return {
-            masterImage: {
-                item: null,
-                busy: false,
-                loaded: false,
-            },
-            trainFile: {
-                item: null,
-                busy: false,
-                loaded: false,
-            },
-        };
-    },
-    computed: {
-        commandStr() {
-            const masterImage = this.masterImage.item;
+    emits: ['failed'],
+    async setup(props, { emit }) {
+        const refs = toRefs(props);
+
+        const masterImageEntity = ref<null | MasterImage>(null);
+        const masterImageBusy = ref(false);
+
+        const trainFileEntity = ref<null | TrainFile>(null);
+        const trainFileBusy = ref(false);
+
+        const command = computed(() => {
+            let command = '<Command>';
 
             if (
-                masterImage &&
-                masterImage.command &&
-                !masterImage.command.match(/\//g)
+                masterImageEntity.value &&
+                masterImageEntity.value.command &&
+                !masterImageEntity.value.command.match(/\//g)
             ) {
-                masterImage.command = `/usr/bin/${masterImage.command}`;
+                command = `/usr/bin/${masterImageEntity.value.command}`;
             }
 
-            return !masterImage || !masterImage.command ? '<Command>' : masterImage.command;
-        },
-        fileStr() {
-            const { item } = this.trainFile;
-            if (!item) {
+            return command;
+        });
+
+        const file = computed(() => {
+            if (!trainFileEntity.value) {
                 return '<File>';
             }
 
-            let fileDirectoryPath = item.directory || '.';
+            let fileDirectoryPath = trainFileEntity.value.directory || '.';
             if (fileDirectoryPath === '.') fileDirectoryPath = './';
 
-            return `${fileDirectoryPath}${item.name}`;
-        },
-    },
-    watch: {
-        masterImageId(val, oldVal) {
-            if (val && val !== oldVal) {
-                this.loadMasterImage();
-            }
-        },
-    },
-    created() {
-        Promise.resolve()
-            .then(this.load);
-    },
-    methods: {
-        async load() {
-            await this.loadMasterImage();
-            await this.loadTrainFile();
-        },
-        async loadMasterImage() {
-            if (this.masterImage.busy || !this.masterImageId) return;
+            return `${fileDirectoryPath}${trainFileEntity.value.name}`;
+        });
 
-            this.masterImage.busy = true;
+        const loadMasterImage = wrapFnWithBusyState(masterImageBusy, async () => {
+            if (!refs.masterImageId.value) return;
 
             try {
-                const item = await this.$api.masterImage.getOne(this.masterImageId);
-                const { data } = await this.$api.masterImageGroup.getMany({
+                const item = await useAPI().masterImage.getOne(refs.masterImageId.value);
+                const { data } = await useAPI().masterImageGroup.getMany({
                     filter: {
                         virtual_path: item.group_virtual_path,
                     },
@@ -97,50 +77,49 @@ export default Vue.extend({
                     item.command_arguments = item.command_arguments || data[0].command_arguments;
                 }
 
-                this.masterImage.item = item;
-
-                this.masterImage.loaded = true;
+                masterImageEntity.value = item;
             } catch (e) {
-                // ...
-            }
-
-            this.masterImage.busy = false;
-        },
-        async loadTrainFile() {
-            if (this.trainFile.busy || !this.trainFileId || !this.trainId) return;
-
-            this.trainFile.busy = true;
-
-            try {
-                this.trainFile.item = await this.$api.trainFile.getOne(this.trainFileId);
-
-                this.trainFile.loaded = true;
-            } catch (e) {
-                if (e instanceof Error) {
-                    this.$emit('failed', e);
+                if (!isClientErrorWithStatusCode(e, 404)) {
+                    emit('failed', e);
                 }
             }
+        });
 
-            this.trainFile.busy = false;
-        },
-        setTrainFile(item) {
-            this.trainFile.item = item;
-        },
-    },
-    render(h: CreateElement): VNode {
-        const vm = this;
+        watch(refs.masterImageId, async (value, oldValue) => {
+            if (value && value !== oldValue) {
+                await loadMasterImage();
+            }
+        });
 
-        return h(
-            'div',
-            { staticClass: 'command-box' },
-            [
-                h('strong', { staticClass: 'pr-1 shell-sign' }, [
-                    '$',
-                ]),
-                vm.commandStr,
-                ' ',
-                vm.fileStr,
-            ],
-        );
+        const loadTrainFile = wrapFnWithBusyState(trainFileBusy, async () => {
+            if (!refs.trainFileId.value) return;
+
+            try {
+                trainFileEntity.value = await useAPI().trainFile.getOne(refs.trainFileId.value);
+            } catch (e) {
+                if (!isClientErrorWithStatusCode(e, 404)) {
+                    emit('failed', e);
+                }
+            }
+        });
+
+        watch(refs.trainFileId, async (value, oldValue) => {
+            if (value && value !== oldValue) {
+                await loadTrainFile();
+            }
+        });
+
+        await Promise.all([loadMasterImage, loadTrainFile]);
+
+        return () => h('div', {
+            class: 'command-box',
+        }, [
+            h('strong', { class: 'pr-1 shell-sign' }, [
+                '$',
+            ]),
+            command.value,
+            ' ',
+            file.value,
+        ]);
     },
 });

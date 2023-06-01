@@ -4,12 +4,28 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
-export default {
+<script lang="ts">
+import { DomainEventName } from '@authup/core';
+import {
+    DomainEventSubscriptionName,
+    DomainType, buildDomainEventFullName, buildDomainEventSubscriptionFullName,
+} from '@personalhealthtrain/central-common';
+import type {
+    SocketServerToClientEventContext,
+    TrainFile,
+    TrainFileEventContext,
+} from '@personalhealthtrain/central-common';
+import type { PropType } from 'vue';
+import {
+    computed, defineComponent, onMounted, onUnmounted, ref, toRefs,
+} from 'vue';
+import { useSocket } from '../../../composables/socket';
+
+export default defineComponent({
     props: {
         file: {
-            type: Object,
-            default: undefined,
+            type: Object as PropType<TrainFile>,
+            required: true,
         },
         filesSelected: {
             type: Array,
@@ -17,86 +33,116 @@ export default {
         },
         fileSelectedId: {
             type: String,
-            default: undefined,
         },
     },
-    data() {
-        return {
-            busy: false,
+    emits: ['toggle', 'check', 'updated', 'deleted'],
+    setup(props, { emit }) {
+        const refs = toRefs(props);
+
+        const busy = ref(false);
+
+        const path = computed(() => `${refs.file.value.directory}/${refs.file.value.name}`);
+
+        const marked = computed(() => {
+            if (!refs.filesSelected.value) {
+                return false;
+            }
+
+            return refs.filesSelected.value.findIndex((file) => file === refs.file.value.id) !== -1;
+        });
+
+        const isMatch = computed(() => this.fileSelectedId === refs.file.value.id);
+
+        const toggle = () => {
+            emit('toggle', refs.file);
         };
-    },
-    computed: {
-        path() {
-            return `${this.file.directory}/${this.file.name}`;
-        },
-        marked() {
-            return this.filesSelected.findIndex((file) => file === this.file.id) !== -1;
-        },
-        isMatch() {
-            return this.fileSelectedId === this.file.id;
-        },
-    },
-    mounted() {
-        const socket = this.$socket.useRealmWorkspace(this.file.realm_id);
-        socket.emit('trainFilesSubscribe', { data: { id: this.file.id } });
 
-        socket.on('trainFileUpdated', this.handleSocketUpdated);
-        socket.on('trainFileDeleted', this.handleSocketDeleted);
-    },
-    beforeDestroy() {
-        const socket = this.$socket.useRealmWorkspace(this.file.realm_id);
-        socket.emit('trainFilesUnsubscribe', { data: { id: this.file.id } });
-        socket.off('trainFileUpdated', this.handleSocketUpdated);
-        socket.off('trainFileDeleted', this.handleSocketDeleted);
-    },
-    methods: {
-        toggle() {
-            this.$emit('toggle', this.file);
-        },
-        markToggle() {
-            this.$emit('check', {
-                ...this.file,
-            });
-        },
-        handleSocketUpdated(context) {
+        const markToggle = () => {
+            emit('check', refs.file);
+        };
+
+        const handleSocketUpdated = (context: SocketServerToClientEventContext<TrainFileEventContext>) => {
             if (
-                this.file.id !== context.data.id ||
-                context.meta.roomId !== this.file.id
+                refs.file.value.id !== context.data.id ||
+                context.meta.roomId !== refs.file.value.id
             ) return;
 
-            this.handleUpdated(context.data);
-        },
-        handleSocketDeleted(context) {
+            emit('updated', context.data);
+        };
+
+        const handleSocketDeleted = (context: SocketServerToClientEventContext<TrainFileEventContext>) => {
             if (
-                this.file.id !== context.data.id ||
-                context.meta.roomId !== this.file.id
+                refs.file.value.id !== context.data.id ||
+                context.meta.roomId !== refs.file.value.id
             ) return;
 
-            this.handleDeleted({ ...context.data });
-        },
-        handleUpdated(entity) {
-            this.$emit('updated', entity);
-        },
-        handleDeleted(entity) {
-            this.$emit('deleted', entity);
-        },
+            emit('deleted', context.data);
+        };
 
-        async drop() {
-            if (this.busy) return;
+        const socket = useSocket().useRealmWorkspace(refs.file.value.realm_id);
 
-            this.busy = true;
+        onMounted(() => {
+            socket.emit(buildDomainEventSubscriptionFullName(
+                DomainType.TRAIN_FILE,
+                DomainEventSubscriptionName.SUBSCRIBE,
+            ), refs.file.value.id);
+
+            socket.on(buildDomainEventFullName(
+                DomainType.TRAIN_FILE,
+                DomainEventName.UPDATED,
+            ), handleSocketUpdated);
+
+            socket.on(buildDomainEventFullName(
+                DomainType.TRAIN_FILE,
+                DomainEventName.DELETED,
+            ), handleSocketDeleted);
+        });
+
+        onUnmounted(() => {
+            socket.emit(buildDomainEventSubscriptionFullName(
+                DomainType.TRAIN_FILE,
+                DomainEventSubscriptionName.UNSUBSCRIBE,
+            ), refs.file.value.id);
+
+            socket.off(buildDomainEventFullName(
+                DomainType.TRAIN_FILE,
+                DomainEventName.UPDATED,
+            ), handleSocketUpdated);
+
+            socket.off(buildDomainEventFullName(
+                DomainType.TRAIN_FILE,
+                DomainEventName.DELETED,
+            ), handleSocketDeleted);
+        });
+
+        const drop = async () => {
+            if (busy.value) return;
+
+            busy.value = true;
 
             try {
                 const file = await this.$api.trainFile.delete(this.file.id);
-                this.handleDeleted(file);
+                emit('deleted', file);
             } catch (e) {
-                this.$emit('failed', e);
+                if (e instanceof Error) {
+                    emit('failed', e);
+                }
             }
 
-            this.busy = false;
-        },
+            busy.value = false;
+        };
+
+        return {
+            drop,
+            marked,
+            markToggle,
+            path,
+            isMatch,
+            toggle,
+            busy,
+        };
     },
-};
+});
 </script>
 <template>
     <div

@@ -6,13 +6,13 @@
  */
 
 import { DomainEventName } from '@personalhealthtrain/central-common';
-import type { DomainEventContext } from '@personalhealthtrain/central-common';
+import type { DomainsEventContext } from '@personalhealthtrain/central-common';
 import { hasClient, hasConfig, useClient } from 'redis-extension';
 import type { DomainEventDestinations } from '../type';
 import { buildDomainEventChannelName, transformDomainEventData } from '../utils';
 
 export async function publishDomainRedisEvent(
-    context: DomainEventContext,
+    context: DomainsEventContext,
     destinations: DomainEventDestinations,
 ) : Promise<any> {
     if (!hasClient() && !hasConfig()) {

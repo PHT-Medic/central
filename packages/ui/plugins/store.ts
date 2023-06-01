@@ -5,47 +5,115 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Context } from '@nuxt/types';
-import type { Inject } from '@nuxt/types/app';
-
+import { OAuth2TokenKind } from '@authup/core';
 import { Adapter } from 'browser-storage-adapter';
+import type { Pinia } from 'pinia';
+import { AuthBrowserStorageKey } from '../config/auth';
+import { useAuthStore } from '../store/auth';
 
-export default (ctx : Context, inject : Inject) => {
-    const setServerCookie = (value: string) => {
-        if (ctx.res.headersSent) {
-            return;
-        }
+declare module '#app' {
+    interface NuxtApp {
+        $warehouse: Adapter;
+    }
+}
 
-        let cookies = ctx.res.getHeader('Set-Cookie') || [];
-        if (typeof cookies === 'number' || typeof cookies === 'string') {
-            if (typeof cookies === 'number') {
-                cookies = cookies.toString();
-            }
-            cookies = [cookies];
-        }
+declare module '@vue/runtime-core' {
+    interface ComponentCustomProperties {
+        $warehouse: Adapter;
+    }
+}
 
-        cookies.unshift(value);
-
-        ctx.res.setHeader(
-            'Set-Cookie',
-            cookies.filter((v, i, arr) => arr.findIndex((val) => val.startsWith(v.substring(0, v.indexOf('=')))) === i),
-        );
-    };
-
-    const getServerCookies = () => ctx.req.headers.cookie;
+export default defineNuxtPlugin((ctx) => {
+    const { apiUrl } = ctx.$config.public;
 
     const warehouse = new Adapter({
         driver: {
             cookie: {
                 path: '/',
-                ...(process.env.API_URL === 'production' ? {
-                    domain: new URL(process.env.API_URL).hostname,
-                } : {}),
+                domain: new URL(apiUrl).hostname,
             },
         },
-        isServer: () => process.server,
-        setServerCookie,
-        getServerCookies,
+        isServer: () => !!process.server,
+        setCookie: (key, value) => {
+            const cookie = useCookie<unknown>(key);
+            cookie.value = value;
+        },
+        getCookie: (key) => {
+            const cookie = useCookie(key);
+            return cookie.value;
+        },
     });
-    inject('warehouse', warehouse);
-};
+
+    ctx.provide('warehouse', warehouse);
+
+    const authStore = useAuthStore(ctx.$pinia as Pinia);
+
+    const keys : string[] = Object.values(AuthBrowserStorageKey);
+    for (let i = 0; i < keys.length; i++) {
+        const value = warehouse.get(keys[i]);
+        if (!value) {
+            continue;
+        }
+
+        switch (keys[i]) {
+            case AuthBrowserStorageKey.ACCESS_TOKEN:
+                authStore.setToken(OAuth2TokenKind.ACCESS, value);
+                break;
+            case AuthBrowserStorageKey.ACCESS_TOKEN_EXPIRE_DATE:
+                authStore.setTokenExpireDate(new Date(value));
+                break;
+            case AuthBrowserStorageKey.REFRESH_TOKEN:
+                authStore.setToken(OAuth2TokenKind.REFRESH, value);
+                break;
+            case AuthBrowserStorageKey.USER:
+                authStore.setUser(value);
+                break;
+            case AuthBrowserStorageKey.REALM:
+                authStore.setRealm(value);
+                break;
+            case AuthBrowserStorageKey.REALM_MANAGEMENT:
+                authStore.setRealmManagement(value);
+                break;
+        }
+    }
+
+    authStore.$subscribe((mutation, state) => {
+        if (mutation.storeId !== 'auth') return;
+
+        if (typeof state.accessToken === 'undefined') {
+            warehouse.remove(AuthBrowserStorageKey.ACCESS_TOKEN);
+        } else {
+            warehouse.set(AuthBrowserStorageKey.ACCESS_TOKEN, state.accessToken);
+        }
+
+        if (typeof state.accessTokenExpireDate === 'undefined') {
+            warehouse.remove(AuthBrowserStorageKey.ACCESS_TOKEN_EXPIRE_DATE);
+        } else {
+            warehouse.set(AuthBrowserStorageKey.ACCESS_TOKEN_EXPIRE_DATE, state.accessTokenExpireDate);
+        }
+
+        if (typeof state.refreshToken === 'undefined') {
+            warehouse.remove(AuthBrowserStorageKey.REFRESH_TOKEN);
+        } else {
+            warehouse.set(AuthBrowserStorageKey.REFRESH_TOKEN, state.refreshToken);
+        }
+
+        if (typeof state.user === 'undefined') {
+            warehouse.remove(AuthBrowserStorageKey.USER);
+        } else {
+            warehouse.set(AuthBrowserStorageKey.USER, state.user);
+        }
+
+        if (typeof state.realm === 'undefined') {
+            warehouse.remove(AuthBrowserStorageKey.REALM);
+        } else {
+            warehouse.set(AuthBrowserStorageKey.REALM, state.realm);
+        }
+
+        if (typeof state.realmManagement === 'undefined') {
+            warehouse.remove(AuthBrowserStorageKey.REALM_MANAGEMENT);
+        } else {
+            warehouse.set(AuthBrowserStorageKey.REALM_MANAGEMENT, state.realmManagement);
+        }
+    });
+});

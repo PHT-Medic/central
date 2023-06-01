@@ -6,339 +6,223 @@
   -->
 <script lang="ts">
 import type {
-    SocketClientToServerEvents,
-    SocketServerToClientEvents,
-    Train,
+    Train, TrainFile,
 } from '@personalhealthtrain/central-common';
 import {
-    TrainFileSocketClientToServerEventName,
-    TrainFileSocketServerToClientEventName,
-    buildSocketTrainFileRoomName, hasOwnProperty,
+    hasOwnProperty,
 } from '@personalhealthtrain/central-common';
-import { required } from 'vuelidate/lib/validators';
+import { BFormCheckbox } from 'bootstrap-vue-next';
+import { isClientErrorWithStatusCode } from 'hapic';
 import type { PropType } from 'vue';
-import Vue from 'vue';
-import type { Socket } from 'socket.io-client';
-import { REALM_MASTER_NAME } from '@authup/core';
-import TrainFile from './TrainFile.vue';
+import {
+    computed, defineComponent, reactive, ref, toRefs, watch,
+} from 'vue';
+import { useAPI } from '#imports';
+import { wrapFnWithBusyState } from '../../../core/busy';
+import TrainFileNode from './TrainFile.vue';
+import TrainFileList from './TrainFileList';
 import TrainFormFile from './TrainFormFile.vue';
 import TrainImageCommand from '../train/TrainImageCommand';
 
-export default {
-    components: { TrainImageCommand, TrainFormFile, TrainFile },
+export default defineComponent({
+    components: {
+        BFormCheckbox,
+        TrainFileList,
+        TrainImageCommand,
+        TrainFormFile,
+        TrainFileNode,
+    },
     props: {
-        train: {
+        entity: {
             type: Object as PropType<Train>,
-            default: undefined,
+            required: true,
         },
     },
-    data() {
-        return {
-            items: [],
-            meta: {
-                limit: 10,
-                offset: 0,
-                total: 0,
-            },
-            busy: false,
+    emits: ['created', 'updated', 'deleted', 'uploaded', 'failed', 'setEntrypointFile'],
+    setup(props, { emit }) {
+        const refs = toRefs(props);
 
-            socketLocked: false,
+        const form = reactive({
+            entrypoint_file_id: '',
+            path: '',
+            files: [],
+        });
 
-            selected: [],
-            selectAll: false,
-            directoryMode: true,
+        const selected = ref([]);
+        const selectAll = ref(false);
+        const directoryMode = ref(true);
+        const busy = ref(false);
+        const entryPointFile = ref<null | TrainFile>(null);
 
-            actionBusy: false,
-            formInfo: {
-                filesSyncing: false,
-            },
-            form: {
-                entrypoint_file_id: undefined,
-                path: '',
-                files: [],
-            },
+        const paths = computed(() => form.path.split('/').filter((el) => el !== ''));
 
-            entryPointFile: null,
+        const initFromProperties = () => {
+            if (refs.entity.value.entrypoint_file_id) {
+                form.entrypoint_file_id = refs.entity.value.entrypoint_file_id;
+            }
         };
-    },
-    computed: {
-        paths() {
-            return this.form.path.split('/').filter((el) => el !== '');
-        },
-        entrypointFileId() {
-            if (!this.form.entrypoint_file_id) {
-                return '';
+
+        const updatedAt = computed(() => (refs.entity.value ?
+            refs.entity.value.updated_at :
+            undefined));
+
+        watch(updatedAt, (val, oldValue) => {
+            if (val && val !== oldValue) {
+                initFromProperties();
             }
+        });
 
-            const index = this.items.findIndex((file) => file.id === this.form.entrypoint_file_id);
-            if (index === -1) {
-                return '';
-            }
+        const handleCreated = (entity: TrainFile) => {
+            emit('created', entity);
+        };
+        const handleDeleted = (entity: TrainFile) => {
+            emit('deleted', entity);
 
-            return `${this.items[index].directory}/${this.items[index].name}`;
-        },
-        socketRealmId() {
-            if (this.realmId) {
-                return this.realmId;
-            }
-
-            if (this.$store.getters['auth/realmName'] === REALM_MASTER_NAME) {
-                return undefined;
-            }
-
-            if (this.train.realm_id) {
-                return this.train.realm_id;
-            }
-
-            return this.$store.getters['auth/realmId'];
-        },
-
-        updatedAt() {
-            return this.train?.updated_at ? this.train.updated_at : undefined;
-        },
-    },
-    watch: {
-        updatedAt(val, oldVal) {
-            if (val && val !== oldVal) {
-                this.initFromProperties();
-            }
-        },
-    },
-    created() {
-        this.initFromProperties();
-
-        Promise.resolve()
-            .then(this.load);
-    },
-    mounted() {
-        const socket : Socket<
-        SocketServerToClientEvents,
-        SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.socketRealmId);
-
-        socket.emit(TrainFileSocketClientToServerEventName.SUBSCRIBE);
-        socket.on(TrainFileSocketServerToClientEventName.CREATED, this.handleSocketCreated);
-    },
-    beforeDestroy() {
-        const socket : Socket<
-        SocketServerToClientEvents,
-        SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.socketRealmId);
-
-        socket.emit(TrainFileSocketClientToServerEventName.UNSUBSCRIBE);
-        socket.off(TrainFileSocketServerToClientEventName.CREATED, this.handleSocketCreated);
-    },
-    methods: {
-        initFromProperties() {
-            if (!this.train) return;
-
-            if (!!this.train.entrypoint_file_id && this.train.entrypoint_file_id.length > 0) {
-                this.form.entrypoint_file_id = this.train.entrypoint_file_id;
-            }
-        },
-        handleSocketCreated(context) {
-            if (
-                this.socketLocked ||
-                context.meta.roomName !== buildSocketTrainFileRoomName() ||
-                context.data.train_id !== this.train.id
-            ) return;
-
-            this.handleCreated(context.data);
-        },
-        handleCreated(item, withCheck = true) {
-            let exists = false;
-            if (withCheck) {
-                const index = this.items.findIndex((el) => el.id === item.id);
-                exists = index !== -1;
-            }
-
-            if (!exists) {
-                this.items.push(item);
-
-                if (this.items.length > this.meta.limit) {
-                    this.items.splice(this.meta.limit, 1);
-                }
-
-                this.meta.total++;
-
-                this.$emit('created', item);
-            }
-        },
-        handleUpdated(item) {
-            const index = this.items.findIndex((el) => el.id === item.id);
-            if (index !== -1) {
-                const keys = Object.keys(item);
-                for (let i = 0; i < keys.length; i++) {
-                    Vue.set(this.items[index], keys[i], item[keys[i]]);
-                }
-            }
-
-            this.$emit('updated', item);
-        },
-        handleDeleted(item) {
-            const index = this.items.findIndex((el) => el.id === item.id);
-            if (index !== -1) {
-                if (this.form.entrypoint_file_id === this.items[index].id) {
-                    this.changeEntryPointFile(this.items[index]);
-                }
-
-                this.items.splice(index, 1);
-                this.meta.total--;
-
-                this.$emit('deleted', item);
-            }
-
-            const selectedIndex = this.selected.indexOf(item.id);
+            const selectedIndex = selected.value.indexOf(entity.id);
             if (selectedIndex !== -1) {
-                this.selected.splice(selectedIndex, 1);
+                selected.value.splice(selectedIndex, 1);
             }
-        },
-        async load() {
-            if (this.busy) return;
+        };
 
-            this.busy = true;
+        const handleUpdated = (entity: TrainFile) => {
+            emit('updated', entity);
+        };
 
-            try {
-                const response = await this.$api.trainFile.getMany({ filter: { train_id: this.train.id } });
-                this.items = response.data;
-            } catch (e) {
-                // ...
-            }
-
-            this.busy = false;
-        },
-        async upload() {
-            if (this.actionBusy) return;
-
-            if (this.form.files.length === 0) return;
-
-            this.actionBusy = true;
+        const upload = wrapFnWithBusyState(busy, async () => {
+            if (form.files.length === 0) return;
 
             try {
                 const formData = new FormData();
-                formData.set('train_id', this.train.id);
+                formData.set('train_id', refs.entity.value.id);
 
-                for (let i = 0; i < this.form.files.length; i++) {
-                    formData.append(`files[${i}]`, this.form.files[i]);
+                for (let i = 0; i < form.files.length; i++) {
+                    formData.append(`files[${i}]`, form.files[i]);
                 }
 
-                this.socketLocked = true;
-                const response = await this.$api.trainFile.upload(formData);
-                response.data.map((item) => this.handleCreated(item, false));
-                this.socketLocked = false;
+                const response = await useAPI().trainFile.upload(formData);
+                response.data.map((item) => handleCreated(item));
 
-                this.$emit('uploaded', this.form.files);
-                this.form.files = [];
+                emit('uploaded', form.files);
+                form.files = [];
             } catch (e) {
-                this.socketLocked = false;
-                this.$emit('failed', e.message);
+                emit('failed', e);
             }
+        });
 
-            this.actionBusy = false;
-        },
-
-        //----------------------------------------------------------------
-
-        async dropSelected() {
-            if (this.actionBusy) return;
-
-            if (this.selected.length === 0) return;
-
-            this.actionBusy = true;
+        const dropSelected = wrapFnWithBusyState(busy, async () => {
+            if (selected.value.length === 0) return;
 
             try {
-                for (let i = 0; i < this.selected.length; i++) {
-                    const file = await this.$api.trainFile.delete(this.selected[i]);
-                    this.handleDeleted(file);
+                for (let i = 0; i < selected.value.length; i++) {
+                    const file = await this.$api.trainFile.delete(selected.value[i]);
+                    handleDeleted(file);
                 }
             } catch (e) {
-                // ...
+                if (!isClientErrorWithStatusCode(e, 404)) {
+                    emit('failed', e);
+                }
             }
+        });
 
-            this.actionBusy = false;
-        },
-        selectAllFiles() {
-            if (this.selectAll) {
-                this.selected = this.items.map((file) => file.id).filter((id) => id !== this.form.entrypoint_file_id);
+        const fileListNode = ref<null | TrainFileList>(null);
+
+        const selectAllFiles = () => {
+            if (selectAll.value) {
+                if (fileListNode.value) {
+                    selected.value = fileListNode.value.data.map((file) => file.id).filter((id) => id !== form.entrypoint_file_id);
+                }
             } else {
-                this.selected = [];
+                selected.value = [];
             }
-        },
-        toggleFile(event) {
-            const index = this.selected.findIndex((file) => file === event.id);
+        };
+
+        const toggleFile = (file: TrainFile) => {
+            const index = selected.value.findIndex((file) => file === file.id);
             if (index === -1) {
-                this.selected.push(event.id);
+                selected.value.push(file.id);
             } else {
-                this.selected.splice(index, 1);
+                selected.value.splice(index, 1);
             }
-        },
+        };
 
-        checkFormFiles(event) {
-            event.preventDefault();
+        const filesNode = ref<null | string>(null);
 
-            for (let i = 0; i < event.target.files.length; i++) {
-                this.form.files.push(event.target.files[i]);
+        const checkFormFiles = ($event: any) => {
+            $event.preventDefault();
+
+            for (let i = 0; i < $event.target.files.length; i++) {
+                form.files.push($event.target.files[i]);
             }
 
-            this.$refs.files.value = '';
-        },
-        dropFormFile(event) {
-            const index = this.form.files.findIndex((file) => {
+            if (filesNode.value) {
+                filesNode.value = '';
+            }
+        };
+
+        const dropFormFile = ($event: any) => {
+            const index = form.files.findIndex((file) => {
                 if (
                     hasOwnProperty(file, 'webkitRelativePath') &&
-                    hasOwnProperty(event, 'webkitRelativePath')
+                    hasOwnProperty($event, 'webkitRelativePath')
                 ) {
-                    return file.webkitRelativePath === event.webkitRelativePath;
+                    return file.webkitRelativePath === $event.webkitRelativePath;
                 }
-                return file.name === event.name;
+                return file.name === $event.name;
             });
 
             if (index !== -1) {
-                this.form.files.splice(index, 1);
+                form.files.splice(index, 1);
             }
-        },
+        };
 
-        changeEntryPointFile(file) {
-            if (this.form.entrypoint_file_id === file.id) {
-                this.form.entrypoint_file_id = undefined;
-                this.entryPointFile = null;
+        const changeEntryPointFile = (file: TrainFile) => {
+            if (form.entrypoint_file_id === file.id) {
+                form.entrypoint_file_id = null as string;
+                entryPointFile.value = null;
             } else {
-                this.form.entrypoint_file_id = file.id;
-                this.entryPointFile = file;
+                form.entrypoint_file_id = file.id;
+                entryPointFile.value = file;
             }
-
-            this.$refs.imageCommand.setTrainFile(this.entryPointFile);
 
             // do not allow deletion of entrypoint file.
-            if (this.form.entrypoint_file_id) {
-                const index = this.selected.findIndex((file) => file === this.form.entrypoint_file_id);
+            if (form.entrypoint_file_id) {
+                const index = selected.value.findIndex((file) => file === form.entrypoint_file_id);
                 if (index !== -1) {
-                    this.selected.splice(index, 1);
+                    selected.value.splice(index, 1);
                 }
             }
 
-            this.$emit('setEntrypointFile', this.entryPointFile);
-        },
+            emit('setEntrypointFile', entryPointFile);
+        };
 
-        getParentPath(path) {
-            if (path === '/') return '';
-
-            const parts = path.split('/').filter((el) => el !== '');
-            parts.pop();
-
-            return parts.join('/');
-        },
-    },
-    validations() {
         return {
-            form: {
-                entrypoint_executable: {
-                    required,
-                },
-            },
+            directoryMode,
+            busy,
+            checkFormFiles,
+            paths,
+            form,
+
+            selected,
+            selectAll,
+            dropSelected,
+            selectAllFiles,
+
+            dropFormFile,
+
+            upload,
+
+            handleCreated,
+            handleDeleted,
+            handleUpdated,
+
+            toggleFile,
+            changeEntryPointFile,
+
+            filesNode,
+            fileListNode,
         };
     },
-};
+});
 </script>
 <template>
     <div>
@@ -350,12 +234,12 @@ export default {
                     <div class="custom-file">
                         <input
                             id="files"
-                            ref="files"
+                            ref="filesNode"
                             type="file"
                             :webkitdirectory="directoryMode"
                             class="custom-file-input"
                             multiple
-                            :disbaled="actionBusy"
+                            :disbaled="busy"
                             @change="checkFormFiles"
                         >
                         <label
@@ -365,12 +249,12 @@ export default {
                     </div>
                 </div>
                 <div class="form-group">
-                    <b-form-checkbox
+                    <BFormCheckbox
                         v-model="directoryMode"
                         switch
                     >
                         Directory mode
-                    </b-form-checkbox>
+                    </BFormCheckbox>
                 </div>
 
                 <hr>
@@ -390,11 +274,11 @@ export default {
                         <h6 class="title text-muted">
                             Path:
                             <span class="sub-title">
-                                <template v-for="(path, key) in paths">
-                                    {{ path }} <span
-                                        :key="key"
-                                        class="text-dark"
-                                    >/</span>
+                                <template
+                                    v-for="(path, key) in paths"
+                                    :key="key"
+                                >
+                                    {{ path }} <span class="text-dark">/</span>
                                 </template>
                                 <template v-if="paths.length === 0">
                                     [root]
@@ -412,20 +296,23 @@ export default {
                 </div>
 
                 <div class="d-flex flex-column">
-                    <train-form-file
+                    <template
                         v-for="(file,key) in form.files"
                         :key="key"
-                        class="mr-1"
-                        :file="file"
-                        @drop="dropFormFile"
-                    />
+                    >
+                        <train-form-file
+                            class="mr-1"
+                            :file="file"
+                            @drop="dropFormFile"
+                        />
+                    </template>
                 </div>
 
                 <div class="form-group">
                     <button
                         type="button"
                         class="btn btn-xs btn-dark"
-                        :disabled="actionBusy || form.files.length === 0"
+                        :disabled="busy || form.files.length === 0"
                         @click.prevent="upload"
                     >
                         Upload
@@ -438,15 +325,14 @@ export default {
                 <span>Entrypoint Command</span>
                 <br>
                 <train-image-command
-                    ref="imageCommand"
                     class="mt-2 mb-2"
-                    :master-image-id="train.master_image_id"
-                    :train-file-id="train.entrypoint_file_id"
-                    :train-id="train.id"
+                    :master-image-id="entity.master_image_id"
+                    :train-file-id="entity.entrypoint_file_id"
+                    :train-id="entity.id"
                 />
 
                 <div
-                    v-if="!entrypointFileId"
+                    v-if="!form.entrypoint_file_id"
                     class="alert alert-warning alert-sm mb-0"
                 >
                     A file from the list below must be selected as entrypoint for the image command.
@@ -476,27 +362,41 @@ export default {
                     <label for="selectAllFiles">Select all</label>
                 </div>
 
-                <div class="d-flex flex-column">
-                    <template v-for="file in items">
-                        <train-file
-                            :key="file.id"
-                            class="mr-1"
-                            :file="file"
-                            :files-selected="selected"
-                            :file-selected-id="form.entrypoint_file_id"
-                            @check="toggleFile"
-                            @updated="handleUpdated"
-                            @deleted="handleDeleted"
-                            @toggle="changeEntryPointFile"
-                        />
+                <TrainFileList
+                    ref="fileListNode"
+                    :header-search="false"
+                    :header-title="false"
+                    :footer-pagination="false"
+                    @created="handleCreated"
+                    @updated="handleUpdated"
+                    @deleted="handleDeleted"
+                >
+                    <template #items="props">
+                        <div class="d-flex flex-column">
+                            <template
+                                v-for="file in props.data"
+                                :key="file.id"
+                            >
+                                <TrainFileNode
+                                    class="mr-1"
+                                    :file="file"
+                                    :files-selected="selected"
+                                    :file-selected-id="form.entrypoint_file_id"
+                                    @check="toggleFile"
+                                    @updated="props.updated"
+                                    @deleted="props.deleted"
+                                    @toggle="changeEntryPointFile"
+                                />
+                            </template>
+                        </div>
                     </template>
-                </div>
+                </TrainFileList>
 
                 <div class="form-group">
                     <button
                         type="button"
                         class="btn btn-warning btn-xs"
-                        :disabled="actionBusy || selected.length === 0"
+                        :disabled="busy || selected.length === 0"
                         @click.prevent="dropSelected"
                     >
                         <i class="fa fa-trash" /> Delete

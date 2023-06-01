@@ -4,15 +4,18 @@
   For the full copyright and license information,
   view the LICENSE file that was distributed with this source code.
   -->
-<script>
-import { LayoutKey, LayoutNavigationID } from '../../config/layout';
+<script lang="ts">
+import { defineNuxtComponent, definePageMeta } from '#imports';
+import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 
-export default {
-    meta: {
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
+export default defineNuxtComponent({
+    setup() {
+        definePageMeta({
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+        });
     },
-};
+});
 </script>
 <template>
     <div>

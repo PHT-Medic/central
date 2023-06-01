@@ -5,214 +5,172 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { CreateElement, VNode } from 'vue';
-import Vue from 'vue';
-import type { ComponentListItemData } from '@vue-layout/utils';
+import { DomainEventName } from '@authup/core';
+import { defineComponent } from 'vue';
 import type {
-    SocketClientToServerEvents,
     SocketServerToClientEventContext,
-    SocketServerToClientEvents,
-    TrainStation,
+    TrainStation, TrainStationEventContext,
 } from '@personalhealthtrain/central-common';
 import {
-    TrainStationSocketClientToServerEventName,
-    TrainStationSocketServerToClientEventName,
-    buildSocketTrainStationInRoomName, buildSocketTrainStationOutRoomName,
+    DomainEventSubscriptionName,
+    DomainType,
+    buildDomainEventFullName,
+    buildDomainEventSubscriptionFullName,
 } from '@personalhealthtrain/central-common';
-import type { Socket } from 'socket.io-client';
+import { useSocket } from '../../../composables/socket';
 
-export type TrainStationAssignActionProperties = {
-    trainId: string,
-    stationId: string,
-    realmId: string,
-};
-
-export const TrainStationAssignAction = Vue.extend<
-ComponentListItemData<TrainStation>,
-any,
-any,
-TrainStationAssignActionProperties>({
+export default defineComponent({
     name: 'TrainStationAssignAction',
     props: {
-        trainId: String,
-        stationId: String,
+        trainId: {
+            type: String,
+            required: true,
+        },
+        stationId: {
+            type: String,
+            required: true,
+        },
         realmId: String,
     },
-    data() {
-        return {
-            busy: false,
-            item: null,
+    emits: ['created', 'deleted', 'failed'],
+    async setup(props, { emit }) {
+        const busy = ref(false);
+        const item = ref<null | TrainStation>(null);
 
-            loaded: false,
-
-            socket: null,
-        };
-    },
-    created() {
-        Promise.resolve()
-            .then(() => this.init())
-            .then(() => {
-                this.loaded = true;
+        try {
+            const response = await useAPI().trainStation.getMany({
+                filters: {
+                    train_id: props.trainId,
+                    station_id: props.stationId,
+                },
+                page: {
+                    limit: 1,
+                },
             });
-    },
-    beforeDestroy() {
-        const socket : Socket<
-        SocketServerToClientEvents,
-        SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.realmId);
 
-        socket.emit(TrainStationSocketClientToServerEventName.OUT_UNSUBSCRIBE);
-        socket.off(TrainStationSocketServerToClientEventName.CREATED, this.handleSocketCreated);
-        socket.off(TrainStationSocketServerToClientEventName.DELETED, this.handleSocketDeleted);
-    },
-    mounted() {
-        const socket : Socket<
-        SocketServerToClientEvents,
-        SocketClientToServerEvents
-        > = this.$socket.useRealmWorkspace(this.realmId);
-
-        socket.emit(TrainStationSocketClientToServerEventName.OUT_SUBSCRIBE);
-        socket.on(TrainStationSocketServerToClientEventName.CREATED, this.handleSocketCreated);
-        socket.on(TrainStationSocketServerToClientEventName.DELETED, this.handleSocketDeleted);
-    },
-    methods: {
-        async init() {
-            try {
-                const response = await this.$api.trainStation.getMany({
-                    filters: {
-                        train_id: this.trainId,
-                        station_id: this.stationId,
-                    },
-                    page: {
-                        limit: 1,
-                    },
-                });
-
-                if (response.meta.total === 1) {
-                    const { 0: item } = response.data;
-
-                    this.item = item;
-                }
-            } catch (e) {
-                // ...
+            if (response.meta.total === 1) {
+                // eslint-disable-next-line prefer-destructuring
+                item.value = response.data[0];
             }
-        },
-        async add() {
-            if (this.busy || this.item) return;
-
-            this.busy = true;
-
-            try {
-                const response = await this.$api.trainStation.create({
-                    train_id: this.trainId,
-                    station_id: this.stationId,
-                });
-
-                this.item = response;
-
-                this.$emit('created', response);
-            } catch (e) {
-                if (e instanceof Error) {
-                    this.$emit('failed', e);
-                }
-            }
-
-            this.busy = false;
-        },
-        async drop() {
-            if (this.busy || !this.item) return;
-
-            this.busy = true;
-
-            try {
-                const userRole = await this.$api.trainStation.delete(this.item.id);
-
-                this.item = null;
-
-                this.$emit('deleted', userRole);
-            } catch (e) {
-                if (e instanceof Error) {
-                    this.$emit('failed', e);
-                }
-            }
-
-            this.busy = false;
-        },
-
-        isSameSocketRoom(room) {
-            switch (this.direction) {
-                case 'in':
-                    return room === buildSocketTrainStationInRoomName();
-                case 'out':
-                    return room === buildSocketTrainStationOutRoomName();
-            }
-
-            return false;
-        },
-        async handleSocketCreated(context: SocketServerToClientEventContext<TrainStation>) {
-            if (
-                !this.isSameSocketRoom(context.meta.roomName) ||
-                context.data.train_id !== this.trainId
-            ) return;
-
-            if (!this.item) {
-                this.item = context.data;
-            }
-
-            this.$emit('created', context.data);
-        },
-        handleSocketDeleted(context: SocketServerToClientEventContext<TrainStation>) {
-            if (
-                !this.isSameSocketRoom(context.meta.roomName) ||
-                context.data.train_id !== this.trainId
-            ) return;
-
-            if (
-                this.item && this.item.id === context.data.id
-            ) {
-                this.item = null;
-            }
-
-            this.$emit('deleted', context.data);
-        },
-    },
-    render(createElement: CreateElement): VNode {
-        const vm = this;
-        const h = createElement;
-
-        let button = h();
-
-        if (vm.loaded) {
-            button = h('button', {
-                class: {
-                    'btn-success': !vm.item,
-                    'btn-danger': vm.item,
-                },
-                staticClass: 'btn btn-xs',
-                on: {
-                    click($event: any) {
-                        $event.preventDefault();
-
-                        if (vm.item) {
-                            return vm.drop.call(null);
-                        }
-
-                        return vm.add.call(null);
-                    },
-                },
-            }, [
-                h('i', {
-                    staticClass: 'fa',
-                    class: {
-                        'fa-plus': !vm.item,
-                        'fa-trash': vm.item,
-                    },
-                }),
-            ]);
+        } catch (e) {
+            // ...
         }
 
-        return h('div', [button]);
+        const socket = useSocket().useRealmWorkspace(props.realmId);
+
+        const handleSocketCreated = (context: SocketServerToClientEventContext<TrainStationEventContext>) => {
+            if (context.data.train_id === props.trainId) {
+                item.value = context.data;
+                emit('created', context.data);
+            }
+        };
+
+        const handleSocketDeleted = (context: SocketServerToClientEventContext<TrainStationEventContext>) => {
+            if (item.value && item.value.id === context.data.id) {
+                item.value = null;
+
+                emit('deleted', context.data);
+            }
+        };
+
+        onMounted(() => {
+            socket.emit(buildDomainEventSubscriptionFullName(
+                DomainType.TRAIN_STATION,
+                DomainEventSubscriptionName.SUBSCRIBE,
+            ));
+
+            socket.on(buildDomainEventFullName(
+                DomainType.TRAIN_STATION,
+                DomainEventName.CREATED,
+            ), handleSocketCreated);
+
+            socket.on(buildDomainEventFullName(
+                DomainType.TRAIN_STATION,
+                DomainEventName.DELETED,
+            ), handleSocketDeleted);
+        });
+
+        onUnmounted(() => {
+            socket.emit(buildDomainEventSubscriptionFullName(
+                DomainType.TRAIN_STATION,
+                DomainEventSubscriptionName.UNSUBSCRIBE,
+            ));
+
+            socket.off(buildDomainEventFullName(
+                DomainType.TRAIN_STATION,
+                DomainEventName.CREATED,
+            ), handleSocketCreated);
+
+            socket.off(buildDomainEventFullName(
+                DomainType.TRAIN_STATION,
+                DomainEventName.DELETED,
+            ), handleSocketDeleted);
+        });
+
+        const add = async () => {
+            if (busy.value || item.value) return;
+
+            busy.value = true;
+
+            try {
+                const response = await useAPI().trainStation.create({
+                    train_id: props.trainId,
+                    station_id: props.stationId,
+                });
+
+                item.value = response;
+
+                emit('created', response);
+            } catch (e) {
+                if (e instanceof Error) {
+                    emit('failed', e);
+                }
+            }
+
+            busy.value = false;
+        };
+
+        const drop = async () => {
+            if (busy.value || !item.value) return;
+
+            busy.value = true;
+
+            try {
+                const userRole = await useAPI().trainStation.delete(item.value.id);
+
+                item.value = null;
+
+                emit('deleted', userRole);
+            } catch (e) {
+                if (e instanceof Error) {
+                    emit('failed', e);
+                }
+            }
+
+            busy.value = false;
+        };
+
+        return () => h('button', {
+            class: ['btn btn-xs', {
+                'btn-success': !item.value,
+                'btn-danger': item.value,
+            }],
+            onClick($event: any) {
+                $event.preventDefault();
+
+                if (item.value) {
+                    return drop();
+                }
+
+                return add();
+            },
+        }, [
+            h('i', {
+                class: ['fa', {
+                    'fa-plus': !item.value,
+                    'fa-trash': item.value,
+                }],
+            }),
+        ]);
     },
 });
-
-export default TrainStationAssignAction;

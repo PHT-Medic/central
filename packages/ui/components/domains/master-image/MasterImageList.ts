@@ -5,32 +5,20 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { CreateElement, PropType, VNode } from 'vue';
-import Vue from 'vue';
+import type { PropType } from 'vue';
+import { defineComponent } from 'vue';
 import type { MasterImage } from '@personalhealthtrain/central-common';
-import { mergeDeep } from '@personalhealthtrain/central-common';
-import type {
-    ComponentListData,
-    ComponentListHandlerMethodOptions,
-    ComponentListMethods,
-    ComponentListProperties,
-    PaginationMeta,
-} from '@vue-layout/utils';
-import {
-    buildListHeader,
-    buildListItems,
-    buildListNoMore, buildListPagination, buildListSearch,
-} from '@vue-layout/utils';
 import type { BuildInput } from 'rapiq';
+import { createDomainListBuilder } from '../../../core';
+import type {
+    DomainListHeaderSearchOptionsInput,
+    DomainListHeaderTitleOptionsInput,
+} from '../../../core';
 
-export const MasterImageList = Vue.extend<
-ComponentListData<MasterImage>,
-ComponentListMethods<MasterImage>,
-any,
-ComponentListProperties<BuildInput<MasterImage>>
->({
+export default defineComponent({
+    name: 'MasterImageList',
     props: {
-        loadOnInit: {
+        loadOnSetup: {
             type: Boolean,
             default: true,
         },
@@ -40,181 +28,57 @@ ComponentListProperties<BuildInput<MasterImage>>
                 return {};
             },
         },
-        withHeader: {
+        noMore: {
             type: Boolean,
             default: true,
         },
-        withNoMore: {
+        footerPagination: {
             type: Boolean,
             default: true,
         },
-        withPagination: {
-            type: Boolean,
+        headerTitle: {
+            type: [Boolean, Object] as PropType<boolean | DomainListHeaderTitleOptionsInput>,
             default: true,
         },
-        withSearch: {
-            type: Boolean,
+        headerSearch: {
+            type: [Boolean, Object] as PropType<boolean | DomainListHeaderSearchOptionsInput>,
             default: true,
         },
     },
-    data() {
-        return {
-            busy: false,
-            items: [],
-            q: '',
-            meta: {
-                limit: 10,
-                offset: 0,
-                total: 0,
+    setup(props, ctx) {
+        const { build } = createDomainListBuilder<MasterImage>({
+            props: toRefs(props),
+            setup: ctx,
+            load: (buildInput) => useAPI().masterImage.getMany(buildInput),
+            queryFilter: (q) => ({
+                path: q.length > 0 ? `~${q}` : q,
+            }),
+            query: {
+                sort: {
+                    path: 'ASC',
+                },
             },
-            itemBusy: false,
-        };
-    },
-    computed: {
-        itemsFinal() {
-            const { items } = this;
-            return items.sort((a, b) => a.path.toLocaleString().localeCompare(b.path));
-        },
-    },
-    watch: {
-        q(val, oldVal) {
-            if (val === oldVal) return;
+            defaults: {
+                footerPagination: true,
 
-            if (val.length === 1 && val.length > oldVal.length) {
-                return;
-            }
+                headerSearch: true,
+                headerTitle: {
+                    content: 'Master Images',
+                    icon: 'fa fa-compact-disc',
+                },
 
-            this.meta.offset = 0;
-
-            this.load();
-        },
-    },
-    created() {
-        if (this.loadOnInit) {
-            this.load();
-        }
-    },
-    methods: {
-        async load(options?: PaginationMeta) {
-            if (this.busy) return;
-
-            if (options) {
-                this.meta.offset = options.offset;
-            }
-
-            this.busy = true;
-
-            try {
-                const response = await this.$api.masterImage.getMany(mergeDeep({
-                    page: {
-                        limit: this.meta.limit,
-                        offset: this.meta.offset,
+                items: {
+                    item: {
+                        textPropName: 'virtual_path',
                     },
-                    filter: {
-                        path: this.q.length > 0 ? `~${this.q}` : this.q,
-                    },
-                }, this.query));
+                },
 
-                this.items = response.data;
-                const { total } = response.meta;
-
-                this.meta.total = total;
-            } catch (e) {
-                // ...
-            }
-
-            this.busy = false;
-        },
-        goTo(options, resolve, reject) {
-            if (options.offset === this.meta.offset) return;
-
-            this.meta.offset = options.offset;
-
-            this.load()
-                .then(resolve)
-                .catch(reject);
-        },
-
-        handleCreated(
-            item: MasterImage,
-            options?: ComponentListHandlerMethodOptions<MasterImage>,
-        ) {
-            options = options || {};
-
-            const index = this.items.findIndex((el: MasterImage) => el.id === item.id);
-            if (index === -1) {
-                if (options.unshift) {
-                    this.items.unshift(item);
-                } else {
-                    this.items.push(item);
-                }
-            }
-        },
-        handleUpdated(item: MasterImage) {
-            const index = this.items.findIndex((el: MasterImage) => el.id === item.id);
-            if (index !== -1) {
-                const keys : (keyof MasterImage)[] = Object.keys(item) as (keyof MasterImage)[];
-                for (let i = 0; i < keys.length; i++) {
-                    Vue.set(this.items[index], keys[i], item[keys[i]]);
-                }
-            }
-        },
-        handleDeleted(item: MasterImage) {
-            const index = this.items.findIndex((el: MasterImage) => el.id === item.id);
-            if (index !== -1) {
-                this.items.splice(index, 1);
-                this.meta.total--;
-            }
-        },
-    },
-    render(createElement: CreateElement): VNode {
-        const vm = this;
-
-        const header = buildListHeader(this, createElement, {
-            titleText: 'MasterImages',
-            iconClass: 'fa fa-compact-disc',
-        });
-
-        const search = buildListSearch(this, createElement);
-
-        const items = buildListItems<MasterImage>(this, createElement, {
-            itemIconClass: 'fa fa-compact-disc',
-            itemTextFn(item) {
-                return createElement('span', [
-                    item.name,
-                    ' ',
-                    createElement(
-                        'small',
-                        {
-                            staticClass: 'text-primary',
-                        },
-                        [
-                            item.path,
-                        ],
-                    ),
-                ]);
-            },
-            itemSlots: {
-                handleDeleted: vm.handleDeleted,
-                handleUpdated: vm.handleUpdated,
+                noMore: {
+                    textContent: 'No more master-images available...',
+                },
             },
         });
 
-        const noMore = buildListNoMore(this, createElement, {
-            text: 'There are no more master-images available...',
-        });
-        const pagination = buildListPagination(this, createElement);
-
-        return createElement(
-            'div',
-            { staticClass: 'list' },
-            [
-                header,
-                search,
-                items,
-                noMore,
-                pagination,
-            ],
-        );
+        return () => build();
     },
 });

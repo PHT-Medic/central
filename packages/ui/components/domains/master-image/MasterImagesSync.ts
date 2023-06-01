@@ -5,59 +5,61 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { MasterImage } from '@personalhealthtrain/central-common';
 import {
+    DomainType,
     MasterImageCommand,
 } from '@personalhealthtrain/central-common';
-import type { CreateElement, VNode } from 'vue';
-import Vue from 'vue';
-import { SlotName } from '@vue-layout/utils';
+import { defineComponent } from 'vue';
+import { SlotName } from '@vue-layout/list-controls';
 import EntityDelete from '../EntityDelete';
-import { MasterImageList } from './MasterImageList';
+import MasterImageList from './MasterImageList';
 
-export default Vue.extend({
+export default defineComponent({
     components: { EntityDelete, MasterImageList },
-    data() {
-        return {
+    emits: ['failed'],
+    setup(props, { emit }) {
+        const meta = reactive({
             busy: false,
-            masterImagesMeta: {
-                busy: false,
-                created: '?',
-                deleted: '?',
-                updated: '?',
-            },
-        };
-    },
-    methods: {
-        async syncMasterImages() {
-            if (this.masterImagesMeta.busy) return;
+            created: '?',
+            deleted: '?',
+            updated: '?',
+        });
 
-            this.masterImagesMeta.busy = true;
+        const itemList = ref<null | Record<string, any>>(null);
+
+        const syncMasterImages = async () => {
+            if (meta.busy) return;
+
+            meta.busy = true;
 
             try {
-                const { images } = await this.$api.masterImage
+                const { images } = await useAPI().masterImage
                     .runCommand(MasterImageCommand.SYNC);
 
-                this.masterImagesMeta.created = images.created.length;
-                this.masterImagesMeta.deleted = images.deleted.length;
-                this.masterImagesMeta.updated = images.updated.length;
+                meta.created = images.created.length;
+                meta.deleted = images.deleted.length;
+                meta.updated = images.updated.length;
 
-                await this.$refs.itemList.load();
+                if (itemList.value) {
+                    await itemList.value.load();
+                }
             } catch (e) {
                 if (e instanceof Error) {
-                    this.$emit('failed', e);
+                    emit('failed', e);
                 }
             }
 
-            this.masterImagesMeta.busy = false;
-        },
-        async handleDeleted(id) {
-            this.$refs.itemList.handleDeleted(id);
-        },
-    },
-    render(h: CreateElement): VNode {
-        const vm = this;
+            meta.busy = false;
+        };
 
-        return h(
+        const handleDeleted = async (data: MasterImage) => {
+            if (itemList.value) {
+                itemList.value.handleDeleted(data.id);
+            }
+        };
+
+        return () => h(
             'div',
             [
                 h('p', [
@@ -65,35 +67,28 @@ export default Vue.extend({
                     'which will keep the master images between the harbor service and the UI in sync. ' +
                     'It is also possible to manually sync the master images from harbor.',
                 ]),
-                h('div', { staticClass: 'mb-1' }, [
+                h('div', { class: 'mb-1' }, [
                     h('button', {
-                        domProps: {
-                            disabled: vm.masterImagesMeta.busy,
-                        },
-                        attrs: {
-                            type: 'button',
-                            disabled: vm.masterImagesMeta.busy,
-                        },
-                        staticClass: 'btn btn-xs btn-success',
-                        on: {
-                            click(event) {
-                                event.preventDefault();
+                        type: 'button',
+                        disabled: meta.busy,
+                        class: 'btn btn-xs btn-success',
+                        onClick(event: any) {
+                            event.preventDefault();
 
-                                vm.syncMasterImages.call(null);
-                            },
+                            return syncMasterImages();
                         },
                     }, [
-                        h('i', { staticClass: 'fa fa-sync mr-1' }),
+                        h('i', { class: 'fa fa-sync me-1' }),
                         'Sync',
                     ]),
                 ]),
-                h('p', { staticClass: 'text-muted' }, [
+                h('p', { class: 'text-muted' }, [
                     'The last synchronisation created',
-                    h('strong', { staticClass: 'text-success ml-1 mr-1' }, [vm.masterImagesMeta.created]),
+                    h('strong', { class: 'text-success ms-1 me-1' }, [meta.created]),
                     'updated',
-                    h('strong', { staticClass: 'text-primary ml-1 mr-1' }, [vm.masterImagesMeta.updated]),
+                    h('strong', { class: 'text-primary ms-1 me-1' }, [meta.updated]),
                     'deleted',
-                    h('strong', { staticClass: 'text-danger ml-1 mr-1' }, [vm.masterImagesMeta.deleted]),
+                    h('strong', { class: 'text-danger ms-1 me-1' }, [meta.deleted]),
                     'master image(s).',
                 ]),
 
@@ -101,18 +96,14 @@ export default Vue.extend({
                     ref: 'itemList',
                     scopedSlots: {
                         [SlotName.HEADER_TITLE]: () => h('strong', ['Overview']),
-                        [SlotName.ITEM_ACTIONS]: (props) => h(EntityDelete, {
-                            staticClass: 'btn btn-xs btn-danger',
-                            props: {
-                                elementType: 'button',
-                                entityId: props.item.id,
-                                entityType: 'masterImage',
-                                withText: false,
-                            },
-                            on: {
-                                deleted(item) {
-                                    vm.handleDeleted.call(null, item);
-                                },
+                        [SlotName.ITEM_ACTIONS]: (props : { data: MasterImage }) => h(EntityDelete, {
+                            class: 'btn btn-xs btn-danger',
+                            elementType: 'button',
+                            entityId: props.data.id,
+                            entityType: DomainType.MASTER_IMAGE,
+                            withText: false,
+                            onDeleted(item: MasterImage) {
+                                return handleDeleted(item);
                             },
                         }),
                     },

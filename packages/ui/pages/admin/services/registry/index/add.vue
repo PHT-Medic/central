@@ -4,27 +4,35 @@
   - For the full copyright and license information,
   - view the LICENSE file that was distributed with this source code.
   -->
-<script>
+<script lang="ts">
+import type { Registry } from '@personalhealthtrain/central-common';
 import { PermissionID } from '@personalhealthtrain/central-common';
-import { LayoutKey, LayoutNavigationID } from '../../../../../config/layout';
-import { RegistryForm } from '../../../../../components/domains/registry/RegistryForm';
+import { definePageMeta, navigateTo } from '#imports';
+import { defineNuxtComponent } from '#app';
+import { LayoutKey, LayoutNavigationID } from '~/config/layout';
+import RegistryForm from '../../../../../components/domains/registry/RegistryForm';
 
-export default {
+export default defineNuxtComponent({
     components: { RegistryForm },
-    meta: {
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-        [LayoutKey.REQUIRED_PERMISSIONS]: [
-            PermissionID.ROBOT_ADD,
-        ],
+    setup() {
+        definePageMeta({
+            [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
+            [LayoutKey.REQUIRED_LOGGED_IN]: true,
+            [LayoutKey.REQUIRED_PERMISSIONS]: [
+                PermissionID.ROBOT_ADD,
+            ],
+        });
+
+        const handleCreated = async (e: Registry) => {
+            await navigateTo(`/admin/services/registry/${e.id}`);
+        };
+
+        return {
+            handleCreated,
+        };
     },
-    methods: {
-        handleCreated(e) {
-            this.$nuxt.$router.push(`/admin/services/registry/${e.id}`);
-        },
-    },
-};
+});
 </script>
 <template>
-    <registry-form @created="handleCreated" />
+    <RegistryForm @created="handleCreated" />
 </template>

@@ -6,29 +6,31 @@
  */
 
 import type {
-    DomainEventName, DomainEventSubscriptionName, DomainSubType, DomainType,
+    DomainEventName, DomainEventSubscriptionName,
 } from './constants';
-import type { DomainEventFullName, DomainEventSubscriptionFullName } from './types';
+import type { DomainEventFullName, DomainEventSubscriptionFullName, DomainInput } from './types';
 
-export function buildDomainEventFullName<T extends `${DomainType}` | `${DomainSubType}`>(
+export function buildDomainEventFullName<T extends DomainInput>(
     type: T,
-    event: `${DomainEventName}`,
+    event: `${DomainEventName}` | DomainEventName,
 ) : DomainEventFullName<T> {
     const eventCapitalized = event.substring(0, 1).toUpperCase() + event.substring(1);
 
     return type + eventCapitalized as DomainEventFullName<T>;
 }
 
-export function buildDomainEventSubscriptionFullName<T extends `${DomainType}` | `${DomainSubType}`>(
+export function buildDomainEventSubscriptionFullName<
+    T extends DomainInput,
+>(
     type: T,
-    event: `${DomainEventSubscriptionName}`,
+    event: `${DomainEventSubscriptionName}` | DomainEventSubscriptionName,
 ) : DomainEventSubscriptionFullName<T> {
     const eventCapitalized = event.substring(0, 1).toUpperCase() + event.substring(1);
 
     return type + eventCapitalized as DomainEventSubscriptionFullName<T>;
 }
 
-export function buildDomainChannelName(type: string, id?: string | number) {
+export function buildDomainChannelName(type: DomainInput, id?: string | number) {
     return `${type}${id ? `:${id}` : ''}`;
 }
 

@@ -5,31 +5,21 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import type { UserSecret } from '@personalhealthtrain/central-common';
-import { SecretType, mergeDeep } from '@personalhealthtrain/central-common';
-import type { CreateElement, PropType, VNode } from 'vue';
-import Vue from 'vue';
-import type {
-    ComponentListData,
-    ComponentListHandlerMethodOptions,
-    ComponentListMethods,
-    ComponentListProperties,
-    PaginationMeta,
-} from '@vue-layout/utils';
-import {
-    buildListHeader,
-    buildListItems,
-    buildListNoMore, buildListPagination, buildListSearch,
-} from '@vue-layout/utils';
+import { SecretType } from '@personalhealthtrain/central-common';
+import type { PropType } from 'vue';
+import { defineComponent } from 'vue';
 import type { BuildInput } from 'rapiq';
+import type {
+    DomainListHeaderSearchOptionsInput,
+    DomainListHeaderTitleOptionsInput,
+} from '../../../core';
+import {
+    createDomainListBuilder,
+} from '../../../core';
 
-export const UserSecretList = Vue.extend<
-ComponentListData<UserSecret>,
-ComponentListMethods<UserSecret>,
-any,
-ComponentListProperties<BuildInput<UserSecret>>
->({
+export default defineComponent({
     props: {
-        loadOnInit: {
+        loadOnSetup: {
             type: Boolean,
             default: true,
         },
@@ -39,180 +29,71 @@ ComponentListProperties<BuildInput<UserSecret>>
                 return {};
             },
         },
-        withHeader: {
+        noMore: {
             type: Boolean,
             default: true,
         },
-        withNoMore: {
+        footerPagination: {
             type: Boolean,
             default: true,
         },
-        withPagination: {
-            type: Boolean,
+        headerTitle: {
+            type: [Boolean, Object] as PropType<boolean | DomainListHeaderTitleOptionsInput>,
             default: true,
         },
-        withSearch: {
-            type: Boolean,
+        headerSearch: {
+            type: [Boolean, Object] as PropType<boolean | DomainListHeaderSearchOptionsInput>,
             default: true,
         },
     },
-    data() {
-        return {
-            busy: false,
-            items: [],
-            meta: {
-                limit: 10,
-                offset: 0,
-                total: 0,
-            },
-            q: '',
+    setup(props, ctx) {
+        const { build } = createDomainListBuilder<UserSecret>({
+            props: toRefs(props),
+            setup: ctx,
+            load: (buildInput) => useAPI().userSecret.getMany(buildInput),
+            defaults: {
+                footerPagination: true,
 
-            itemBusy: false,
-        };
-    },
-    computed: {
-        formattedItems() {
-            if (typeof this.filterItems === 'undefined') {
-                return this.items;
-            }
+                headerSearch: true,
+                headerTitle: {
+                    content: 'Secrets',
+                    icon: 'fa fa-key',
+                },
 
-            return this.items.filter(this.filterItems);
-        },
-    },
-    watch: {
-        q(val, oldVal) {
-            if (val === oldVal) return;
-
-            this.meta.offset = 0;
-
-            this.load();
-        },
-    },
-    created() {
-        if (this.loadOnInit) {
-            this.load();
-        }
-    },
-    methods: {
-        async load(options?: PaginationMeta) {
-            if (this.busy) return;
-
-            if (options) {
-                this.meta.offset = options.offset;
-            }
-
-            this.busy = true;
-
-            try {
-                const query = mergeDeep({
-                    page: {
-                        limit: this.meta.limit,
-                        offset: this.meta.offset,
-                    },
-                    filter: {
-                        key: this.q.length > 0 ? `~${this.q}` : this.q,
-                    },
-                }, this.query);
-
-                const response = await this.$api.userSecret.getMany(query);
-
-                this.items = response.data;
-                const { total } = response.meta;
-
-                this.meta.total = total;
-            } catch (e) {
-                // ...
-            }
-
-            this.busy = false;
-        },
-
-        handleCreated(
-            item: UserSecret,
-            options?: ComponentListHandlerMethodOptions<UserSecret>,
-        ) {
-            options = options || {};
-
-            const index = this.items.findIndex((el: UserSecret) => el.id === item.id);
-            if (index === -1) {
-                if (options.unshift) {
-                    this.items.unshift(item);
-                } else {
-                    this.items.push(item);
-                }
-            }
-        },
-        handleUpdated(item: UserSecret) {
-            const index = this.items.findIndex((el: UserSecret) => el.id === item.id);
-            if (index !== -1) {
-                const keys : (keyof UserSecret)[] = Object.keys(item) as (keyof UserSecret)[];
-                for (let i = 0; i < keys.length; i++) {
-                    Vue.set(this.items[index], keys[i], item[keys[i]]);
-                }
-            }
-        },
-        handleDeleted(item: UserSecret) {
-            const index = this.items.findIndex((el: UserSecret) => el.id === item.id);
-            if (index !== -1) {
-                this.items.splice(index, 1);
-                this.meta.total--;
-            }
-        },
-    },
-    render(createElement: CreateElement): VNode {
-        const vm = this;
-        const header = buildListHeader(this, createElement, { titleText: 'Secrets', iconClass: 'fa fa-key' });
-        const search = buildListSearch(this, createElement);
-        const items = buildListItems<UserSecret>(this, createElement, {
-            itemIconClass: 'fa fa-key',
-            itemSlots: {
-                handleDeleted: vm.handleDeleted,
-                handleUpdated: vm.handleUpdated,
-                handleCreated: vm.handleCreated,
-            },
-            itemTextFn(item) {
-                return [
-                    createElement(
-                        'span',
-                        {
-                            staticClass: 'badge badge-pill',
-                            class: {
-                                'badge-primary': item.type === SecretType.RSA_PUBLIC_KEY,
-                                'badge-dark': item.type === SecretType.PAILLIER_PUBLIC_KEY,
-                            },
+                items: {
+                    item: {
+                        textFn(item) {
+                            return [
+                                h(
+                                    'span',
+                                    {
+                                        class: ['badge badge-pill', {
+                                            'badge-primary': item.type === SecretType.RSA_PUBLIC_KEY,
+                                            'badge-dark': item.type === SecretType.PAILLIER_PUBLIC_KEY,
+                                        }],
+                                    },
+                                    [
+                                        (item.type === SecretType.PAILLIER_PUBLIC_KEY ? 'Paillier' : 'RSA'),
+                                    ],
+                                ),
+                                h(
+                                    'span',
+                                    {
+                                        class: 'ml-1',
+                                    },
+                                    [item.key],
+                                ),
+                            ];
                         },
-                        [
-                            (item.type === SecretType.PAILLIER_PUBLIC_KEY ? 'Paillier' : 'RSA'),
-                        ],
-                    ),
-                    createElement(
-                        'span',
-                        {
-                            staticClass: 'ml-1',
-                        },
-                        [item.key],
-                    ),
-                ];
+                    },
+                },
+
+                noMore: {
+                    textContent: 'No more secrets available...',
+                },
             },
         });
 
-        const noMore = buildListNoMore(this, createElement, {
-            text: 'There are no more secrets available...',
-        });
-        const pagination = buildListPagination(this, createElement);
-
-        return createElement(
-            'div',
-            { staticClass: 'list' },
-            [
-                header,
-                search,
-                items,
-                noMore,
-                pagination,
-            ],
-        );
+        return () => build();
     },
 });
-
-export default UserSecretList;

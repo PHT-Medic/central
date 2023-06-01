@@ -5,30 +5,37 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { RealmList, initFormAttributesFromSource } from '@authup/client-vue';
 import type { Registry, Station } from '@personalhealthtrain/central-common';
 import {
     Ecosystem, isHex,
 } from '@personalhealthtrain/central-common';
-import { RealmList } from '@authup/vue2';
+import {
+    buildFormInput, buildFormSelect, buildFormSubmit, buildFormTextarea,
+} from '@vue-layout/form-controls';
+import type { ListItemSlotProps, ListItemsSlotProps } from '@vue-layout/list-controls';
+import { SlotName } from '@vue-layout/list-controls';
+import useVuelidate from '@vuelidate/core';
 import {
     email, helpers, maxLength, minLength, required,
-} from 'vuelidate/lib/validators';
-import {
-    SlotName, buildFormInput, buildFormSelect, buildFormSubmit, buildFormTextarea, initPropertiesFromSource,
-} from '@vue-layout/utils';
+} from '@vuelidate/validators';
+import { BFormCheckbox } from 'bootstrap-vue-next';
 import type {
-    CreateElement, PropType, VNode, VNodeChildren, VNodeData,
+    PropType, VNodeArrayChildren,
 } from 'vue';
-import Vue from 'vue';
-import type { BuildInput } from 'rapiq';
-import { buildVuelidateTranslator } from '../../../config/ilingo/utils';
-import { RegistryList } from '../registry/RegistryList';
+import {
+    computed, defineComponent, nextTick, ref,
+} from 'vue';
+import { buildValidationTranslator } from '../../../composables/ilingo';
+import { useAPI } from '#imports';
+import { wrapFnWithBusyState } from '../../../core/busy';
+import RegistryList from '../registry/RegistryList';
 import StationRegistryProjectDetails from './StationRegistryProjectDetails';
 import StationRobotDetails from './StationRobotDetails';
 
-const alphaWithUpperNumHyphenUnderscore = helpers.regex('alphaWithUpperNumHyphenUnderscore', /^[a-z0-9-_]*$/);
+const alphaNumHyphenUnderscore = helpers.regex(/^[a-z0-9-_]*$/);
 
-export const StationForm = Vue.extend({
+export default defineComponent({
     name: 'StationForm',
     props: {
         entity: {
@@ -44,29 +51,23 @@ export const StationForm = Vue.extend({
             default: undefined,
         },
     },
-    data() {
-        return {
-            form: {
-                name: '',
-                public_key: '',
-                external_name: '',
-                email: '',
-                realm_id: '',
-                registry_id: '',
-                hidden: false,
-                ecosystem: '',
-            },
+    emits: ['created', 'updated', 'failed', 'robotUpdated'],
+    setup(props, { emit }) {
+        const refs = toRefs(props);
 
-            ecosystems: [
-                { id: Ecosystem.DEFAULT, value: 'DEFAULT' },
-                { id: Ecosystem.PADME, value: 'PADME' },
-            ],
+        const busy = ref(false);
+        const form = reactive({
+            name: '',
+            public_key: '',
+            external_name: '',
+            email: '',
+            realm_id: '',
+            registry_id: '',
+            hidden: false,
+            ecosystem: '',
+        });
 
-            busy: false,
-        };
-    },
-    validations: {
-        form: {
+        const $v = useVuelidate({
             name: {
                 required,
                 minLength: minLength(3),
@@ -82,7 +83,7 @@ export const StationForm = Vue.extend({
 
             },
             external_name: {
-                alphaWithUpperNumHyphenUnderscore,
+                alphaNumHyphenUnderscore,
                 minLength: minLength(3),
                 maxLength: maxLength(64),
             },
@@ -95,321 +96,286 @@ export const StationForm = Vue.extend({
                 minLength: minLength(10),
                 maxLength: maxLength(4096),
             },
-        },
-    },
-    computed: {
-        isEditing() {
-            return this.entity &&
-                Object.prototype.hasOwnProperty.call(this.entity, 'id');
-        },
-        isRealmLocked() {
-            return this.realmId || (this.entity && this.entity.realm_id);
-        },
-        isHexPublicKey() {
-            return this.form.public_key &&
-                isHex(this.form.public_key);
-        },
+        }, form);
 
-        updatedAt() {
-            return this.entity ?
-                this.entity.updated_at :
-                undefined;
-        },
-    },
-    watch: {
-        updatedAt(val, oldVal) {
-            if (val !== oldVal) {
-                this.initFromProperties();
+        const ecosystems = [
+            { id: Ecosystem.DEFAULT, value: 'DEFAULT' },
+            { id: Ecosystem.PADME, value: 'PADME' },
+        ];
+
+        const isRealmLocked = computed(() => refs.realmId.value ||
+                (refs.entity.value && refs.entity.value.realm_id));
+
+        const isHexPublicKey = computed(() => form.public_key && isHex(form.public_key));
+
+        const updatedAt = computed(() => {
+            if (!refs.entity.value) {
+                return undefined;
             }
-        },
-    },
-    created() {
-        Promise.resolve()
-            .then(this.initFromProperties);
-    },
-    methods: {
-        initFromProperties() {
-            initPropertiesFromSource(this.entity, this.form);
 
-            if (
-                !this.form.realm_id &&
-                this.realmId
-            ) {
-                this.form.realm_id = this.realmId;
+            return refs.entity.value.updated_at;
+        });
+
+        const registryNode = ref<typeof RegistryList | null>(null);
+
+        const initForm = () => {
+            if (refs.entity.value) {
+                initFormAttributesFromSource(form, refs.entity.value);
+            }
+
+            if (!form.realm_id && refs.realmId.value) {
+                form.realm_id = refs.realmId.value;
             }
 
             if (
-                !this.form.name &&
-                (this.realmId || this.realmName)
+                !form.name &&
+                (refs.realmId.value || refs.realmName.value)
             ) {
-                this.form.name = this.realmName || this.realmId;
+                form.name = (refs.realmName.value || refs.realmId.value) as string;
             }
 
-            this.$nextTick(() => {
-                if (this.$refs.registry) {
-                    this.$refs.registry.load();
+            nextTick(() => {
+                if (registryNode.value) {
+                    registryNode.value.load();
                 }
             });
-        },
-        async submit() {
-            if (this.busy || this.$v.$invalid) {
-                return;
-            }
+        };
 
-            this.busy = true;
+        initForm();
+
+        watch(updatedAt, (val, oldVal) => {
+            if (val && val !== oldVal) {
+                initForm();
+            }
+        });
+
+        const submit = wrapFnWithBusyState(busy, async () => {
+            if ($v.value.$invalid) return;
 
             try {
                 let station;
-                if (this.isEditing) {
-                    station = await this.$api.station.update(this.entity.id, this.form);
+                if (refs.entity.value) {
+                    station = await useAPI().station.update(refs.entity.value.id, form);
 
-                    this.$emit('updated', station);
+                    emit('updated', station);
                 } else {
-                    station = await this.$api.station.create(this.form);
+                    station = await useAPI().station.create(form);
 
-                    this.$emit('created', station);
+                    emit('created', station);
                 }
             } catch (e) {
                 if (e instanceof Error) {
-                    this.$emit('failed', e);
+                    emit('failed', e);
                 }
             }
+        });
 
-            this.busy = false;
-        },
-        handleUpdated(item) {
-            this.$emit('updated', item);
-        },
-
-        async toggleFormData(key, id) {
-            if (this.form[key] === id) {
-                this.form[key] = null;
+        const toggleFormData = <T extends keyof typeof form>(key: T, id: any) => {
+            if (form[key] === id) {
+                form[key] = null as any;
             } else {
-                this.form[key] = id;
+                form[key] = id;
             }
-        },
-    },
-    render(createElement: CreateElement): VNode {
-        const vm = this;
-        const h = createElement;
+        };
 
-        let realm = [];
-        if (
-            !vm.isRealmLocked &&
-            vm.canManage
-        ) {
-            realm = [
-                h(RealmList, {
-                    props: {
-                        withHeader: false,
-                        withPagination: false,
-                    },
-                    scopedSlots: {
-                        [SlotName.ITEMS]: (props) => buildFormSelect<Station>(vm, h, {
-                            validationTranslator: buildVuelidateTranslator(vm.$ilingo),
-                            title: 'Realms',
-                            propName: 'realm_id',
-                            options: props.items.map((item) => ({
-                                id: item.id,
-                                name: item.name,
-                            })),
-                        }),
-                    },
-                }),
-                h('hr'),
-            ];
-        }
+        return () => {
+            let realm : VNodeArrayChildren = [];
+            if (!isRealmLocked.value) {
+                realm = [
+                    h(
+                        RealmList,
+                        {
+                            headerTitle: false,
+                            headerSearch: false,
+                            footerPagination: false,
+                        },
+                        {
+                            [SlotName.ITEMS]: (props: ListItemsSlotProps<Station>) => buildFormSelect({
+                                validationTranslator: buildValidationTranslator(),
+                                validationResult: $v.value.realm_id,
+                                label: true,
+                                labelContent: 'Realms',
+                                value: form.realm_id,
+                                onChange(input) {
+                                    form.realm_id = input;
+                                },
+                                options: props.data.map((item) => ({
+                                    id: item.id,
+                                    value: item.name,
+                                })),
+                            }),
 
-        const name = buildFormInput<Station>(vm, h, {
-            validationTranslator: buildVuelidateTranslator(vm.$ilingo),
-            title: 'Name',
-            propName: 'name',
-        });
+                        },
+                    ),
+                    h('hr'),
+                ];
+            }
 
-        const externalName = buildFormInput<Station>(vm, h, {
-            validationTranslator: buildVuelidateTranslator(vm.$ilingo),
-            title: 'External Name',
-            propName: 'external_name',
-        });
-
-        const email = buildFormInput<Station>(vm, h, {
-            validationTranslator: buildVuelidateTranslator(vm.$ilingo),
-            title: 'E-Mail',
-            propName: 'email',
-        });
-
-        const publicKey = buildFormTextarea<Station>(vm, h, {
-            validationTranslator: buildVuelidateTranslator(this.$ilingo),
-            title: [
-                'PublicKey',
-                (vm.isHexPublicKey ?
-                    h('span', { staticClass: 'text-danger font-weight-bold pl-1' }, [
-                        'Hex',
-                        h('i', { staticClass: 'fa fa-exclamation-triangle pl-1' }),
-                    ]) :
-                    ''
-                ),
-            ],
-            propName: 'public_key',
-            attrs: {
-                rows: 6,
-            },
-        });
-
-        const hidden = h('div', {
-            staticClass: 'form-group mb-1',
-        }, [
-            h('label', { staticClass: 'mb-2' }, ['Hidden']),
-            h('b-form-checkbox', {
-                staticClass: 'pb-2',
-                model: {
-                    value: vm.form.hidden,
-                    callback(v: boolean) {
-                        vm.form.hidden = v;
-                    },
-                    expression: 'form.hidden',
+            const name = buildFormInput({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.name,
+                label: true,
+                labelContent: 'Name',
+                value: form.name,
+                onChange(input) {
+                    form.name = input;
                 },
-            } as VNodeData, [
-                'Hide for proposal & train selection?',
-            ]),
-        ]);
+            });
 
-        const ecosystem = buildFormSelect<Station>(vm, h, {
-            validationTranslator: buildVuelidateTranslator(this.$ilingo),
-            title: 'Ecosystem',
-            propName: 'ecosystem',
-            options: vm.ecosystems,
-            changeCallback(input) {
-                vm.form.ecosystem = input;
+            const externalName = buildFormInput({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.external_name,
+                label: true,
+                labelContent: 'External Name',
+                value: form.external_name,
+                onChange(input) {
+                    form.external_name = input;
+                },
+            });
 
-                vm.$nextTick(() => {
-                    if (vm.$refs.registry) {
-                        vm.$refs.registry.load();
-                    }
-                });
-            },
-        });
+            const emailNode = buildFormInput({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.email,
+                label: true,
+                labelContent: 'E-Mail',
+                value: form.email,
+                onChange(input) {
+                    form.email = input;
+                },
+            });
 
-        let registry : VNodeChildren = [];
+            const publicKey = buildFormTextarea({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.public_key,
+                label: true,
+                labelContent: [
+                    'PublicKey',
+                    (isHexPublicKey.value ?
+                        h('span', { class: 'text-danger font-weight-bold pl-1' }, [
+                            'Hex',
+                            h('i', { class: 'fa fa-exclamation-triangle pl-1' }),
+                        ]) :
+                        ''
+                    ),
+                ],
+                value: form.public_key,
+                onChange(input) {
+                    form.public_key = input;
+                },
+                props: {
+                    rows: 6,
+                },
+            });
 
-        if (
-            !vm.isRegistryLocked &&
-            vm.form.ecosystem
-        ) {
-            registry = [
-                h('hr'),
-                h(RegistryList, {
-                    ref: 'registry',
-                    props: {
-                        loadOnInit: false,
+            const hidden = h('div', {
+                class: 'form-group mb-1',
+            }, [
+                h('label', { class: 'mb-2' }, ['Hidden']),
+                h(BFormCheckbox, {
+                    class: 'pb-2',
+                    model: {
+                        value: form.hidden,
+                        callback(v: boolean) {
+                            form.hidden = v;
+                        },
+                        expression: 'form.hidden',
+                    },
+                }, [
+                    'Hide for proposal & train selection?',
+                ]),
+            ]);
+
+            const ecosystem = buildFormSelect({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.ecosystem,
+                label: true,
+                labelContent: 'Ecosystem',
+                value: form.ecosystem,
+                options: ecosystems,
+                onChange(input) {
+                    form.ecosystem = input;
+
+                    nextTick(() => {
+                        if (registryNode.value) {
+                            registryNode.value.load();
+                        }
+                    });
+                },
+            });
+
+            let registry : VNodeArrayChildren = [];
+
+            if (form.ecosystem) {
+                registry = [
+                    h('hr'),
+                    h(RegistryList, {
+                        ref: registryNode,
+                        loadOnSetup: false,
                         query: {
                             filter: {
-                                ecosystem: vm.form.ecosystem,
+                                ecosystem: form.ecosystem as Ecosystem,
                             },
-                        } as BuildInput<Registry>,
-                    },
-                    scopedSlots: {
-                        [SlotName.ITEM_ACTIONS]: (props) => h('button', {
-                            attrs: {
-                                disabled: props.busy,
-                            },
-                            class: {
-                                'btn-dark': vm.form.registry_id !== props.item.id,
-                                'btn-warning': vm.form.registry_id === props.item.id,
-                            },
-                            staticClass: 'btn btn-xs',
-                            on: {
-                                click($event) {
-                                    $event.preventDefault();
+                        },
+                    }, {
+                        [SlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Registry>) => h('button', {
+                            disabled: props.busy,
+                            class: ['btn btn-xs', {
+                                'btn-dark': form.registry_id !== props.data.id,
+                                'btn-warning': form.registry_id === props.data.id,
+                            }],
+                            onClick($event: any) {
+                                $event.preventDefault();
 
-                                    vm.toggleFormData.call(null, 'registry_id', props.item.id);
-                                },
+                                toggleFormData('registry_id', props.data.id);
                             },
                         }, [
                             h('i', {
                                 class: {
-                                    'fa fa-plus': vm.form.registry_id !== props.item.id,
-                                    'fa fa-minus': vm.form.registry_id === props.item.id,
+                                    'fa fa-plus': form.registry_id !== props.data.id,
+                                    'fa fa-minus': form.registry_id === props.data.id,
                                 },
                             }),
                         ]),
-                    },
-                }),
-            ];
-        }
+                    }),
+                ];
+            }
 
-        const submit = buildFormSubmit(vm, h, {
-            updateText: 'Update',
-            createText: 'Create',
-        });
+            const submitNode = buildFormSubmit({
+                submit,
+                busy: busy.value,
+                createText: 'Create',
+                updateText: 'Update',
+                validationResult: $v.value,
+                isEditing: !!refs.entity.value,
+            });
 
-        let editingElements : VNodeChildren = [];
+            return h('div', [
+                h('div', { class: 'row' }, [
+                    h('div', {
+                        class: 'col',
+                    }, [
+                        realm,
+                        name,
+                        h('hr'),
+                        externalName,
+                        h('hr'),
+                        ecosystem,
+                        registry,
 
-        if (this.isEditing) {
-            editingElements = [
-                h('hr'),
-                h('div', {
-                    staticClass: 'row',
-                }, [
-                    h('div', { staticClass: 'col' }, [
-                        h('h6', [
-                            h('i', { staticClass: 'fas fa-robot' }),
-                            ' ',
-                            'Registry Credentials',
-                        ]),
-
-                        h(StationRegistryProjectDetails, {
-                            props: {
-                                entity: vm.entity,
-                            },
-                        }),
                     ]),
-                    h('div', { staticClass: 'col' }, [
-                        h('h6', [
-                            h('i', { staticClass: 'fas fa-robot' }),
-                            ' ',
-                            'Robot Credentials',
-                        ]),
-
-                        h(StationRobotDetails, {
-                            props: {
-                                entity: vm.entity,
-                            },
-                        }),
+                    h('div', {
+                        class: 'col',
+                    }, [
+                        hidden,
+                        h('hr'),
+                        emailNode,
+                        h('hr'),
+                        publicKey,
+                        h('hr'),
+                        submitNode,
                     ]),
                 ]),
-            ];
-        }
-
-        return h('div', [
-            h('div', { staticClass: 'row' }, [
-                h('div', {
-                    staticClass: 'col',
-                }, [
-                    realm,
-                    name,
-                    h('hr'),
-                    externalName,
-                    h('hr'),
-                    ecosystem,
-                    registry,
-
-                ]),
-                h('div', {
-                    staticClass: 'col',
-                }, [
-                    hidden,
-                    h('hr'),
-                    email,
-                    h('hr'),
-                    publicKey,
-                    h('hr'),
-                    submit,
-                ]),
-            ]),
-            ...editingElements,
-        ]);
+            ]);
+        };
     },
 });
-
-export default StationForm;

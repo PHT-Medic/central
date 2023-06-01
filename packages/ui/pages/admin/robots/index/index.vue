@@ -1,112 +1,97 @@
-<!--
-  Copyright (c) 2021-2021.
-  Author Peter Placzek (tada5hi)
-  For the full copyright and license information,
-  view the LICENSE file that was distributed with this source code.
-  -->
-<script>
-import { PermissionID } from '@personalhealthtrain/central-common';
-import { LayoutKey, LayoutNavigationID } from '../../../../config/layout/contants';
+<script lang="ts">
 
-export default {
-    meta: {
-        [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
-        [LayoutKey.REQUIRED_LOGGED_IN]: true,
-    },
-    data() {
+import { BTable } from 'bootstrap-vue-next';
+import type { Robot } from '@authup/core';
+import { PermissionName, isRealmResourceWritable } from '@authup/core';
+import { EntityDelete, RobotList } from '@authup/client-vue';
+import { storeToRefs } from 'pinia';
+import type { BuildInput } from 'rapiq';
+import { defineNuxtComponent } from '#app';
+import { resolveComponent } from '#imports';
+import { useAuthStore } from '../../../../store/auth';
+
+export default defineNuxtComponent({
+    components: { BTable, RobotList, EntityDelete },
+    emits: ['deleted'],
+    setup(props, { emit }) {
+        const list = resolveComponent('RobotList');
+
+        const handleDeleted = (e: Robot) => {
+            emit('deleted', e);
+        };
+
+        const store = useAuthStore();
+        const { realm, realmManagementId } = storeToRefs(store);
+
+        const query : BuildInput<Robot> = {
+            filter: {
+                realm_id: [realmManagementId.value, null],
+            },
+        };
+
+        const isResourceWritable = (
+            resource: Robot,
+        ) => isRealmResourceWritable(realm.value, resource.realm_id);
+
+        const hasEditPermission = store.has(PermissionName.ROBOT_EDIT);
+        const hasDropPermission = store.has(PermissionName.ROBOT_DROP);
+
+        const fields = [
+            {
+                key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
+            },
+            {
+                key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
+            },
+            {
+                key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left',
+            },
+            { key: 'options', label: '', tdClass: 'text-left' },
+        ];
+
         return {
-            fields: [
-                {
-                    key: 'name', label: 'Name', thClass: 'text-left', tdClass: 'text-left',
-                },
-                {
-                    key: 'created_at', label: 'Created At', thClass: 'text-center', tdClass: 'text-center',
-                },
-                {
-                    key: 'updated_at', label: 'Updated At', thClass: 'text-left', tdClass: 'text-left',
-                },
-                { key: 'options', label: '', tdClass: 'text-left' },
-            ],
+            fields,
+            isResourceWritable,
+            hasEditPermission,
+            hasDropPermission,
+            handleDeleted,
+            query,
         };
     },
-    computed: {
-        query() {
-            return {
-                filter: {
-                    realm_id: this.managementRealmId,
-                },
-                sort: {
-                    updated_at: 'DESC',
-                },
-            };
-        },
-        canEdit() {
-            return this.$auth.has(PermissionID.ROBOT_EDIT);
-        },
-        canDrop() {
-            return this.$auth.has(PermissionID.ROBOT_DROP);
-        },
-        managementRealmId() {
-            return this.$store.getters['auth/managementRealmId'];
-        },
-    },
-    methods: {
-        async handleDeleted(item) {
-            this.$emit('deleted', item);
-
-            this.$refs.itemsList.handleDeleted(item);
-        },
-    },
-};
+});
 </script>
 <template>
-    <robot-list
-        ref="itemsList"
-        :load-on-init="true"
+    <RobotList
+        :header-title="{ icon: 'fa-solid fa-list pe-1', content: 'Overview' }"
         :query="query"
+        @deleted="handleDeleted"
     >
-        <template #header-title>
-            <h6><i class="fa-solid fa-list pr-1" /> Overview</h6>
-        </template>
         <template #items="props">
-            <b-table
-                :items="props.items"
+            <BTable
+                :items="props.data"
                 :fields="fields"
                 :busy="props.busy"
                 head-variant="'dark'"
                 outlined
             >
                 <template #cell(options)="data">
-                    <nuxt-link
-                        v-if="canEdit"
-                        v-b-tooltip="'Overview'"
-                        :to="'/admin/robots/'+data.item.id"
-                        class="btn btn-xs btn-outline-primary"
+                    <NuxtLink
+                        :to="'/admin/robots/'+ data.item.id"
+                        class="btn btn-xs btn-outline-primary me-1"
+                        :disabled="!hasEditPermission || !isResourceWritable(data.item)"
                     >
-                        <i class="fa fa-bars" />
-                    </nuxt-link>
-                    <auth-entity-delete
-                        v-if="canDrop"
+                        <i class="fa-solid fa-bars" />
+                    </NuxtLink>
+                    <EntityDelete
                         class="btn btn-xs btn-outline-danger"
                         :entity-id="data.item.id"
-                        :entity-type="'robot'"
+                        entity-type="robot"
                         :with-text="false"
-                        @deleted="handleDeleted"
+                        :disabled="!hasDropPermission || !isResourceWritable(data.item)"
+                        @deleted="props.deleted"
                     />
                 </template>
-                <template #cell(created_at)="data">
-                    <timeago :datetime="data.item.created_at" />
-                </template>
-                <template #cell(updated_at)="data">
-                    <timeago :datetime="data.item.updated_at" />
-                </template>
-                <template #table-busy>
-                    <div class="text-center text-danger my-2">
-                        <b-spinner class="align-middle" />
-                        <strong>Loading...</strong>
-                    </div>
-                </template>
-            </b-table>
+            </BTable>
         </template>
-    </robot-list>
+    </RobotList>
 </template>

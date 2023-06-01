@@ -5,41 +5,35 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import {
-    maxLength, minLength,
-} from 'vuelidate/lib/validators';
+import { initFormAttributesFromSource } from '@authup/client-vue';
 import type { Robot } from '@authup/core';
-import { buildFormInput, buildFormSubmit, initPropertiesFromSource } from '@vue-layout/utils';
-import type { CreateElement, PropType, VNode } from 'vue';
-import Vue from 'vue';
-import { buildVuelidateTranslator } from '../../../config/ilingo/utils';
+import { buildFormInput, buildFormSubmit } from '@vue-layout/form-controls';
+import useVuelidate from '@vuelidate/core';
+import { maxLength, minLength } from '@vuelidate/validators';
+import type { FiltersBuildInput } from 'rapiq';
+import { merge } from 'smob';
+import type { PropType } from 'vue';
+import { buildValidationTranslator } from '../../../composables/ilingo';
+import { wrapFnWithBusyState } from '../../../core/busy';
 
-export default Vue.extend<any, any, any, any>({
+export default defineComponent({
     name: 'RobotDetails',
     props: {
-        where: Object as PropType<Partial<Robot>>,
-    },
-    data() {
-        return {
-            busy: false,
-            entity: null,
-            form: {
-                id: '',
-                secret: '',
-            },
-        };
-    },
-    computed: {
-        isEditing() {
-            return true;
+        where: {
+            type: Object as PropType<FiltersBuildInput<Robot>>,
+            required: true,
         },
     },
-    created() {
-        Promise.resolve()
-            .then(this.resolve);
-    },
-    validations: {
-        form: {
+    emits: ['failed', 'resolved', 'updated'],
+    async setup(props, { emit }) {
+        const busy = ref(false);
+
+        const form = reactive({
+            id: '',
+            secret: '',
+        });
+
+        const $v = useVuelidate({
             id: {
 
             },
@@ -47,17 +41,14 @@ export default Vue.extend<any, any, any, any>({
                 minLength: minLength(3),
                 maxLength: maxLength(256),
             },
-        },
-    },
-    methods: {
-        async resolve() {
-            if (this.busy) return;
+        }, form);
 
-            this.busy = true;
+        const entity = ref<null | Robot>(null);
 
+        await wrapFnWithBusyState(busy, async () => {
             try {
-                const { data } = await this.$authupApi.robot.getMany({
-                    filter: this.where,
+                const { data } = await useAuthupAPI().robot.getMany({
+                    filter: props.where,
                     page: {
                         limit: 1,
                     },
@@ -65,89 +56,98 @@ export default Vue.extend<any, any, any, any>({
 
                 if (data.length === 1) {
                     // eslint-disable-next-line prefer-destructuring
-                    this.entity = data[0];
+                    entity.value = data[0];
 
-                    initPropertiesFromSource(this.entity, this.form);
+                    initFormAttributesFromSource(form, entity.value);
 
-                    this.$emit('resolved', this.entity);
+                    emit('resolved', entity.value);
                 }
             } catch (e) {
                 if (e instanceof Error) {
-                    this.$emit('failed', e);
+                    emit('failed', e);
                 }
             }
+        })();
 
-            this.busy = false;
-        },
-
-        handleUpdated(item: Robot) {
-            const keys = Object.keys(item) as (keyof Robot)[];
-            for (let i = 0; i < keys.length; i++) {
-                Vue.set(this.entity, keys[i], item[keys[i]]);
+        const handleUpdated = (data: Robot) => {
+            if (entity.value) {
+                entity.value = merge({}, data, entity.value);
+                emit('updated', entity.value);
+                return;
             }
 
-            Promise.resolve()
-                .then(this.resolve)
-                .then(() => this.$emit('updated', this.entity));
-        },
+            entity.value = data;
 
-        async submit() {
-            if (this.busy || !this.isEditing) return;
+            emit('updated', entity.value);
+        };
 
-            this.busy = true;
+        const submit = wrapFnWithBusyState(busy, async () => {
+            if (!entity.value) {
+                return;
+            }
 
             try {
-                const entity = await this.$authupApi.robot.update(this.entity.id, {
-                    ...this.form,
-                });
+                const response = await useAuthupAPI().robot.update(entity.value.id, form);
 
-                this.handleUpdated(entity);
+                handleUpdated(response);
+
+                emit('updated', response);
             } catch (e) {
                 if (e instanceof Error) {
-                    this.$emit('failed', e);
+                    emit('failed', e);
                 }
             }
-
-            this.busy = false;
-        },
-    },
-    render(h: CreateElement): VNode {
-        const vm = this;
-
-        if (!vm.entity) {
-            return h(
-                'div',
-                { staticClass: 'alert alert-sm alert-warning' },
-                [
-                    'The robot details can not be displayed.',
-                ],
-            );
-        }
-
-        const id = buildFormInput<Robot>(vm, h, {
-            validationTranslator: buildVuelidateTranslator(vm.$ilingo),
-            title: 'ID',
-            propName: 'id',
-            attrs: {
-                disabled: true,
-            },
         });
 
-        const secret = buildFormInput<Robot>(vm, h, {
-            validationTranslator: buildVuelidateTranslator(vm.$ilingo),
-            title: 'Secret',
-            propName: 'secret',
-        });
+        return () => {
+            if (!entity.value) {
+                return h(
+                    'div',
+                    { class: 'alert alert-sm alert-warning' },
+                    [
+                        'The robot details can not be displayed.',
+                    ],
+                );
+            }
 
-        const submit = buildFormSubmit(vm, h, {
-            updateText: 'Update',
-            createText: 'Create',
-        });
+            const id = buildFormInput({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.id,
+                label: true,
+                labelContent: 'ID',
+                value: form.id,
+                props: {
+                    disabled: true,
+                },
+            });
 
-        return h('div', [
-            id,
-            secret,
-            submit,
-        ]);
+            const secret = buildFormInput({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.secret,
+                label: true,
+                labelContent: 'Secret',
+                value: form.secret,
+                props: {
+                    placeholder: '...',
+                },
+                onChange(value) {
+                    form.secret = value;
+                },
+            });
+
+            const submitForm = buildFormSubmit({
+                submit,
+                busy: busy.value,
+                updateText: 'Update',
+                createText: 'Create',
+                isEditing: !!entity.value,
+            });
+
+            return h('div', [
+                id,
+                secret,
+                submitForm,
+            ]);
+        };
     },
 });
