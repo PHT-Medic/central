@@ -50,7 +50,7 @@ export async function syncStationsOfStationRegistry() {
     externalEntities = externalEntities.map((item) => {
         item.external_name = item.external_name
             .toLowerCase()
-            .replaceAll('-', '');
+            .replace(/-/g, '');
 
         return item;
     });
