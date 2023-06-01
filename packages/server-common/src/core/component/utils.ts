@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { hasOwnProperty, isObject } from 'smob';
+import { hasOwnProperty, isObject } from '@personalhealthtrain/central-common';
 import type { ObjectLiteral } from '../../type';
 import { isQueuePayload } from '../queue';
 import type { QueuePayloadError } from '../queue';

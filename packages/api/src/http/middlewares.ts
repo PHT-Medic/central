@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { createRequestJsonHandler, createRequestUrlEncodedHandler } from '@routup/body';
-import { createRequestHandler as createRequestCookieHandler } from '@routup/cookie';
-import { createRequestHandler as createRequestQueryHandler } from '@routup/query';
+import { createJsonHandler, createUrlEncodedHandler } from '@routup/body';
+import { createHandler as createRequestCookieHandler } from '@routup/cookie';
+import { createHandler as createRequestQueryHandler } from '@routup/query';
 import cors from 'cors';
 import type { Router } from 'routup';
 import { EnvironmentName, useEnv } from '../config';
@@ -27,8 +27,8 @@ export function registerMiddlewares(router: Router) {
         credentials: true,
     }));
 
-    router.use(createRequestJsonHandler());
-    router.use(createRequestUrlEncodedHandler({ extended: false }));
+    router.use(createJsonHandler());
+    router.use(createUrlEncodedHandler({ extended: false }));
     router.use(createRequestCookieHandler());
     router.use(createRequestQueryHandler());
 

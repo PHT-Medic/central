@@ -21,9 +21,9 @@
         "test:coverage": "npm run test -- --coverage"
     },
     "dependencies": {
-        "@authup/core": "^0.36.0",
-        "@authup/server-adapter": "^0.36.0",
-        "@ebec/http": "^1.0.0",
+        "@authup/core": "^0.37.0",
+        "@authup/server-adapter": "^0.37.0",
+        "@ebec/http": "^1.1.0",
         "@hapic/harbor": "^2.0.0-alpha.10",
         "@personalhealthtrain/central-common": "2.3.3",
         "@personalhealthtrain/central-server-common": "2.3.3",
@@ -33,7 +33,7 @@
         "gunzip-maybe": "^1.4.2",
         "hapic": "^2.0.0-alpha.10",
         "minio": "^7.0.32",
-        "rapiq": "^0.8.0",
+        "rapiq": "^0.8.1",
         "redis-extension": "^1.3.0",
         "tar-stream": "^3.0.0",
         "uuid": "^9.0.0",
