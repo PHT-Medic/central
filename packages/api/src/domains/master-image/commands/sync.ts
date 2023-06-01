@@ -8,7 +8,7 @@
 import { createClient } from 'hapic';
 import fs from 'node:fs';
 import path from 'node:path';
-import stream from 'node:stream';
+import { Readable } from 'node:stream';
 import tar from 'tar';
 import { scanDirectory } from 'docker-scan';
 import type { Request, Response } from 'routup';
@@ -61,6 +61,6 @@ export async function syncMasterImages(req: Request, res: Response) : Promise<an
         });
     });
 
-    const readStream = stream.Readable.fromWeb(response.data as any);
+    const readStream = Readable.fromWeb(response.data as any);
     readStream.pipe(writable);
 }
