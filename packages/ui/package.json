@@ -50,7 +50,7 @@
         "socket.io-client": "^4.6.1",
         "tsconfig-paths-webpack-plugin": "^4.0.1",
         "vue": "^3.3.4",
-        "vue3-form-wizard": "^0.2.0"
+        "vue3-form-wizard": "^0.2.1"
     },
     "gitHead": "8881a3d4b427c45ac4b81ac4b31bf3d719463ef7",
     "publishConfig": {
