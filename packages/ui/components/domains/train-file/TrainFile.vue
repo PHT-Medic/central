@@ -19,6 +19,7 @@ import type { PropType } from 'vue';
 import {
     computed, defineComponent, onMounted, onUnmounted, ref, toRefs,
 } from 'vue';
+import { useAPI } from '../../../composables/api';
 import { useSocket } from '../../../composables/socket';
 
 export default defineComponent({
@@ -121,7 +122,7 @@ export default defineComponent({
             busy.value = true;
 
             try {
-                const file = await this.$api.trainFile.delete(this.file.id);
+                const file = await useAPI().trainFile.delete(this.file.id);
                 emit('deleted', file);
             } catch (e) {
                 if (e instanceof Error) {

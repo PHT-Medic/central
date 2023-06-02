@@ -11,7 +11,7 @@
     "description": "This package contains the Central UI frontend application of the PHT. It was initially developed as part of my Bachelor Thesis.",
     "scripts": {
         "dev": "nuxi dev",
-        "build": "rimraf .nuxt && nuxi build",
+        "build": "nuxi build",
         "start": "nuxi start",
         "generate": "nuxi generate",
         "prepare": "nuxi prepare"

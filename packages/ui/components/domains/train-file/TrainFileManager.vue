@@ -114,7 +114,7 @@ export default defineComponent({
 
             try {
                 for (let i = 0; i < selected.value.length; i++) {
-                    const file = await this.$api.trainFile.delete(selected.value[i]);
+                    const file = await useAPI().trainFile.delete(selected.value[i]);
                     handleDeleted(file);
                 }
             } catch (e) {

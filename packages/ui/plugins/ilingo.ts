@@ -22,7 +22,7 @@ declare module '@vue/runtime-core' {
 export default defineNuxtPlugin((ctx) => {
     const ilingo = new Ilingo();
 
-    ilingo.setCache({
+    ilingo.setSync({
         de: {
             app: {
                 delete: {

@@ -9,6 +9,7 @@ import type { Train } from '@personalhealthtrain/central-common';
 import { SecretType } from '@personalhealthtrain/central-common';
 import { storeToRefs } from 'pinia';
 import { defineComponent, toRefs } from 'vue';
+import { useAPI } from '../../../composables/api';
 import { useAuthStore } from '../../../store/auth';
 import UserSecretList from '../user-secret/UserSecretList';
 
@@ -49,7 +50,7 @@ export default defineComponent({
                 }
             }
 
-            await this.$api.train.update(refs.trainId.value, payload);
+            await useAPI().train.update(refs.trainId.value, payload);
 
             emit('updated', payload);
         };

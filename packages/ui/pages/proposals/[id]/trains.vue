@@ -57,6 +57,7 @@ export default defineNuxtComponent({
         <div class="content-sidebar flex-column">
             <DomainEntityNav
                 :items="tabs"
+                :direction="'vertical'"
                 :path="'/proposals/' + proposal.id + '/trains'"
             />
         </div>

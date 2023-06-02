@@ -5,6 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
+import { useValidationTranslator } from '@authup/client-vue';
 import type { Train } from '@personalhealthtrain/central-common';
 import { TrainType } from '@personalhealthtrain/central-common';
 import { maxLength, minLength, required } from '@vuelidate/validators';
@@ -13,12 +14,17 @@ import useVuelidate from '@vuelidate/core';
 import {
     computed, reactive, ref, toRefs,
 } from 'vue';
+import type { FormSelectOption } from '@vue-layout/form-controls';
+import { FormInput, FormSelect } from '@vue-layout/form-controls';
+import { useAPI } from '../../../composables/api';
 import { wrapFnWithBusyState } from '../../../core/busy';
 import ProposalList from '../proposal/ProposalList';
 import ProposalItem from '../proposal/ProposalItem';
 
 export default {
-    components: { ProposalList, ProposalItem },
+    components: {
+        FormInput, FormSelect, ProposalList, ProposalItem,
+    },
     props: {
         proposalId: {
             type: String,
@@ -62,7 +68,7 @@ export default {
 
         const add = wrapFnWithBusyState(busy, async () => {
             try {
-                const train = await this.$api.train.create(form);
+                const train = await useAPI().train.create(form);
                 emit('created', train);
             } catch (e) {
                 if (e instanceof Error) {
@@ -79,10 +85,12 @@ export default {
             }
         };
 
-        const types = [
-            { id: TrainType.ANALYSE, name: 'Analysis' },
-            { id: TrainType.DISCOVERY, name: 'Discovery' },
+        const types : FormSelectOption[] = [
+            { id: TrainType.ANALYSE, value: 'Analysis' },
+            { id: TrainType.DISCOVERY, value: 'Discovery' },
         ];
+
+        const translator = useValidationTranslator();
 
         return {
             v$: $v,
@@ -92,6 +100,7 @@ export default {
             proposalQuery,
             types,
             busy,
+            translator,
         };
     },
 };
@@ -100,56 +109,24 @@ export default {
     <form @submit.prevent="add">
         <div class="row">
             <div class="col">
-                <div
-                    class="form-group"
-                    :class="{ 'form-group-error': v$.name.$error }"
-                >
-                    <label>Name <small class="text-muted">(optional)</small></label>
-                    <input
-                        v-model="v$.name.$model"
-                        type="text"
-                        class="form-control"
-                        placeholder="..."
-                    >
-
-                    <div
-                        v-if="!v$.name.minLength"
-                        class="form-group-hint group-required"
-                    >
-                        The length of the name must be greater than <strong>{{ v$.name.$params.minLength.min }}</strong> characters.
-                    </div>
-                    <div
-                        v-if="!v$.name.maxLength"
-                        class="form-group-hint group-required"
-                    >
-                        The length of the name must be less than <strong>{{ v$.name.$params.maxLength.max }}</strong> characters.
-                    </div>
-                </div>
+                <FormInput
+                    v-model="v$.name.$model"
+                    :label="true"
+                    :label-content="'Name'"
+                    :validation-translator="translator"
+                    :validation-result="v$.name"
+                />
 
                 <hr>
 
-                <div class="form-group">
-                    <label>Type</label>
-                    <select
-                        v-model="v$.type.$model"
-                        class="form-control"
-                    >
-                        <option
-                            v-for="(value,key) in types"
-                            :key="key"
-                            :value="value.id"
-                        >
-                            {{ value.name }}
-                        </option>
-                    </select>
-
-                    <div
-                        v-if="!v$.type.required && !v$.type.$model"
-                        class="form-group-hint group-required"
-                    >
-                        Choose one of the available train types...
-                    </div>
-                </div>
+                <FormSelect
+                    v-model="v$.type.$model"
+                    :label="true"
+                    :label-content="'Type'"
+                    :options="types"
+                    :validation-translator="translator"
+                    :validation-result="v$.type"
+                />
                 <div
                     v-if="v$.type.$model"
                     class="alert alert-secondary alert-sm"

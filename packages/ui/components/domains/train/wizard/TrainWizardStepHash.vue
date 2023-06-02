@@ -15,6 +15,7 @@ import type { Train } from '@personalhealthtrain/central-common';
 import { TrainAPICommand } from '@personalhealthtrain/central-common';
 import useVuelidate from '@vuelidate/core';
 import type { PropType } from 'vue';
+import { useAPI } from '../../../../composables/api';
 import { wrapFnWithBusyState } from '../../../../core/busy';
 
 export default defineComponent({
@@ -74,7 +75,7 @@ export default defineComponent({
 
         const generate = wrapFnWithBusyState(busy, async () => {
             try {
-                const train = await this.$api.train.runCommand(refs.train.value.id, TrainAPICommand.GENERATE_HASH);
+                const train = await useAPI().train.runCommand(refs.train.value.id, TrainAPICommand.GENERATE_HASH);
 
                 form.hash = train.hash;
 
