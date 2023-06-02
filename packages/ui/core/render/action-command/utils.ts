@@ -36,12 +36,12 @@ export function renderActionCommand(ctx: Context) {
         disabled: ctx.isDisabled,
     };
 
-    const iconClasses : string[] = [ctx.iconClass, 'pr-1'];
+    const iconClasses : string[] = [ctx.iconClass, 'pe-1'];
 
     switch (ctx.elementType) {
         case 'dropDownItem':
             tag = BDropdownItem as any;
-            iconClasses.push('pl-1', `text-${ctx.classSuffix}`);
+            iconClasses.push('ps-1', `text-${ctx.classSuffix}`);
             break;
         case 'link':
             tag = 'a';

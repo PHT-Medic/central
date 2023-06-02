@@ -171,7 +171,7 @@ export default defineComponent({
                 class: 'mb-2 d-flex flex-column',
             }, [
                 h('div', { class: 'form-group' }, [
-                    h('label', { class: 'pr-1' }, 'Namespace'),
+                    h('label', { class: 'pe-1' }, 'Namespace'),
                     h('input', {
                         class: 'form-control',
                         type: 'text',
@@ -182,7 +182,7 @@ export default defineComponent({
 
                 h('div', [
                     h('div', { class: 'form-group' }, [
-                        h('label', { class: 'pr-1' }, 'ID'),
+                        h('label', { class: 'pe-1' }, 'ID'),
                         h('input', {
                             class: 'form-control',
                             type: 'text',
@@ -192,7 +192,7 @@ export default defineComponent({
                         }),
                     ]),
                     h('div', { class: 'form-group' }, [
-                        h('label', { class: 'pr-1' }, 'Secret'),
+                        h('label', { class: 'pe-1' }, 'Secret'),
                         h('input', {
                             class: 'form-control',
                             type: 'text',
@@ -232,7 +232,7 @@ export default defineComponent({
                                 return execute(RegistryAPICommand.PROJECT_LINK);
                             },
                         }, [
-                            h('i', { class: 'fa-solid fa-link pr-1' }),
+                            h('i', { class: 'fa-solid fa-link pe-1' }),
                             'Link',
                         ]),
                     ]),
@@ -253,7 +253,7 @@ export default defineComponent({
                                 return execute(RegistryAPICommand.PROJECT_UNLINK);
                             },
                         }, [
-                            h('i', { class: 'fa-solid fa-link-slash pr-1' }),
+                            h('i', { class: 'fa-solid fa-link-slash pe-1' }),
                             'Unlink',
                         ]),
                     ]),

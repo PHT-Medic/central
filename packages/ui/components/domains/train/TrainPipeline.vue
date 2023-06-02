@@ -99,7 +99,7 @@ export default defineComponent({
                 'flex-column': listDirection === 'row'
             }"
         >
-            <div class="mr-1">
+            <div class="me-1">
                 <strong>1. Config</strong>
             </div>
             <div>
@@ -107,7 +107,7 @@ export default defineComponent({
             </div>
             <div
                 v-if="withCommand"
-                class="ml-auto"
+                class="ms-auto"
             >
                 <nuxt-link
                     v-if="canConfigure"
@@ -115,7 +115,7 @@ export default defineComponent({
                     type="button"
                     :to="'/trains/'+entity.id+'/setup'"
                 >
-                    <i class="fas fa-wrench pr-1" /> setup
+                    <i class="fas fa-wrench pe-1" /> setup
                 </nuxt-link>
             </div>
         </div>
@@ -128,7 +128,7 @@ export default defineComponent({
                 'flex-column': listDirection === 'row'
             }"
         >
-            <div class="mr-1">
+            <div class="me-1">
                 <strong>2. Build</strong>
             </div>
             <div>
@@ -136,10 +136,10 @@ export default defineComponent({
             </div>
             <div
                 v-if="withCommand"
-                class="ml-auto flex-row d-flex"
+                class="ms-auto flex-row d-flex"
             >
                 <train-build-command
-                    class="mr-1"
+                    class="me-1"
                     :command="trainCommand.BUILD_START"
                     :with-icon="true"
                     :entity="entity"
@@ -179,7 +179,7 @@ export default defineComponent({
                 'flex-column': listDirection === 'row'
             }"
         >
-            <div class="mr-1">
+            <div class="me-1">
                 <strong>3. Run</strong>
             </div>
             <div>
@@ -187,10 +187,10 @@ export default defineComponent({
             </div>
             <div
                 v-if="withCommand"
-                class="ml-auto flex-row d-flex"
+                class="ms-auto flex-row d-flex"
             >
                 <train-run-command
-                    class="mr-1"
+                    class="me-1"
                     :command="trainCommand.RUN_START"
                     :with-icon="true"
                     :entity="entity"
@@ -231,7 +231,7 @@ export default defineComponent({
                 'flex-column': listDirection === 'row'
             }"
         >
-            <div class="mr-1">
+            <div class="me-1">
                 <strong>4. Result</strong>
             </div>
             <div>
@@ -239,10 +239,10 @@ export default defineComponent({
             </div>
             <div
                 v-if="withCommand"
-                class="ml-auto flex-row d-flex"
+                class="ms-auto flex-row d-flex"
             >
                 <train-result-command
-                    class="mr-1"
+                    class="me-1"
                     :command="'resultDownload'"
                     :with-icon="true"
                     :entity="entity"
@@ -250,7 +250,7 @@ export default defineComponent({
                     @failed="handleFailed"
                 />
                 <train-result-command
-                    class="mr-1"
+                    class="me-1"
                     :command="trainCommand.RESULT_START"
                     :with-icon="true"
                     :entity="entity"

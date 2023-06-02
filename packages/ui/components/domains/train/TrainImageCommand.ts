@@ -114,7 +114,7 @@ export default defineComponent({
         return () => h('div', {
             class: 'command-box',
         }, [
-            h('strong', { class: 'pr-1 shell-sign' }, [
+            h('strong', { class: 'pe-1 shell-sign' }, [
                 '$',
             ]),
             command.value,

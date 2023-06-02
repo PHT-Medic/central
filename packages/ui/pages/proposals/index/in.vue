@@ -144,7 +144,7 @@ export default defineNuxtComponent({
                 :source-id="stationId"
             >
                 <template #header-title>
-                    <h6><i class="fa-solid fa-list pr-1" /> Overview</h6>
+                    <h6><i class="fa-solid fa-list pe-1" /> Overview</h6>
                 </template>
                 <template #items="props">
                     <BTable
@@ -195,7 +195,7 @@ export default defineNuxtComponent({
                                         <i class="fa fa-bars" />
                                     </template>
                                     <b-dropdown-item @click.prevent="edit(data.item)">
-                                        <i class="fa fa-comment-alt pl-1 pr-1" /> comment
+                                        <i class="fa fa-comment-alt ps-1 pe-1" /> comment
                                     </b-dropdown-item>
                                     <b-dropdown-divider />
                                     <proposal-station-approval-command

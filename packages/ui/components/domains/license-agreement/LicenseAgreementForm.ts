@@ -46,7 +46,7 @@ export default defineComponent({
             const info = h('div', {
                 class: 'alert alert-sm alert-warning',
             }, [
-                h('i', { class: 'fa fa-exclamation-triangle pr-1' }),
+                h('i', { class: 'fa fa-exclamation-triangle pe-1' }),
                 'It is necessary to accept the license agreement',
                 ' in order to be able to use the application in its entirety.',
             ]);
@@ -73,11 +73,11 @@ export default defineComponent({
                                 return accept();
                             },
                         }, [
-                            h('i', { class: 'fa-solid fa-check pr-1' }),
+                            h('i', { class: 'fa-solid fa-check pe-1' }),
                             'Accept',
                         ]),
                     ]),
-                    h('div', { class: 'ml-1' }, [
+                    h('div', { class: 'ms-1' }, [
                         h('button', {
                             class: 'btn btn-xs btn-dark',
                             type: 'button',
@@ -87,7 +87,7 @@ export default defineComponent({
                                 decline();
                             },
                         }, [
-                            h('i', { class: 'fa-solid fa-times pr-1' }),
+                            h('i', { class: 'fa-solid fa-times pe-1' }),
                             'Decline',
                         ]),
                     ]),

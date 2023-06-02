@@ -45,10 +45,10 @@ export default defineComponent({
         <div class="card-heading">
             <span class="title">
                 {{ path }}
-                <small class="text-muted ml-1">{{ file.size }} Bytes</small>
+                <small class="text-muted ms-1">{{ file.size }} Bytes</small>
             </span>
         </div>
-        <div class="ml-auto">
+        <div class="ms-auto">
             <button
                 type="button"
                 class="btn btn-dark btn-xs"

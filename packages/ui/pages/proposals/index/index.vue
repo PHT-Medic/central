@@ -64,7 +64,7 @@ export default defineNuxtComponent({
                 :query="query"
             >
                 <template #header-title>
-                    <h6><i class="fa-solid fa-list pr-1" /> Overview</h6>
+                    <h6><i class="fa-solid fa-list pe-1" /> Overview</h6>
                 </template>
                 <template #item="props">
                     <div class="list-item">

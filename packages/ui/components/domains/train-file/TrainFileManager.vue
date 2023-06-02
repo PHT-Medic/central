@@ -270,7 +270,7 @@ export default defineComponent({
                             </span>
                         </h6>
                     </div>
-                    <div class="ml-auto">
+                    <div class="ms-auto">
                         <h6 class="title text-muted">
                             Path:
                             <span class="sub-title">
@@ -301,7 +301,7 @@ export default defineComponent({
                         :key="key"
                     >
                         <train-form-file
-                            class="mr-1"
+                            class="me-1"
                             :file="file"
                             @drop="dropFormFile"
                         />
@@ -378,7 +378,7 @@ export default defineComponent({
                                 :key="file.id"
                             >
                                 <TrainFileNode
-                                    class="mr-1"
+                                    class="me-1"
                                     :file="file"
                                     :files-selected="selected"
                                     :file-selected-id="form.entrypoint_file_id"

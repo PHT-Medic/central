@@ -128,7 +128,7 @@ export default defineComponent({
                     withText: false,
                     entityId: entity.value.id,
                     entityType: 'train',
-                    class: 'btn btn-danger btn-xs ml-1',
+                    class: 'btn btn-danger btn-xs ms-1',
                     onDeleted() {
                         handleDeleted();
                     },
@@ -173,14 +173,14 @@ export default defineComponent({
                                                 h(
                                                     'span',
                                                     {
-                                                        class: 'text-muted ml-1',
+                                                        class: 'text-muted ms-1',
                                                     },
                                                     props.entityId,
                                                 ),
                                             ];
                                         }
                                         return [
-                                            h('i', { class: 'fa-solid fa-train-tram mr-1' }),
+                                            h('i', { class: 'fa-solid fa-train-tram me-1' }),
                                             h('nuxt-link', {
                                                 to: `/trains/${props.entityId}`,
                                             }, [
@@ -192,7 +192,7 @@ export default defineComponent({
                                 },
                             ),
                         ]),
-                        h('div', { class: 'ml-auto' }, [
+                        h('div', { class: 'ms-auto' }, [
                             h('button', {
                                 class: 'btn btn-dark btn-xs',
                                 click(event: any) {
@@ -209,7 +209,7 @@ export default defineComponent({
                                 }),
                             ]),
                             h('nuxt-link', {
-                                class: 'btn btn-dark btn-xs ml-1',
+                                class: 'btn btn-dark btn-xs ms-1',
                                 type: 'button',
                                 to: `/trains/${entity.value.id}`,
                             }, [

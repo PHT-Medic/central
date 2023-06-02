@@ -79,7 +79,7 @@ export default defineComponent({
                                 h(
                                     'span',
                                     {
-                                        class: 'ml-1',
+                                        class: 'ms-1',
                                     },
                                     [item.key],
                                 ),

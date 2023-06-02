@@ -251,9 +251,9 @@ export default defineComponent({
                 labelContent: [
                     'PublicKey',
                     (isHexPublicKey.value ?
-                        h('span', { class: 'text-danger font-weight-bold pl-1' }, [
+                        h('span', { class: 'text-danger font-weight-bold ps-1' }, [
                             'Hex',
-                            h('i', { class: 'fa fa-exclamation-triangle pl-1' }),
+                            h('i', { class: 'fa fa-exclamation-triangle ps-1' }),
                         ]) :
                         ''
                     ),

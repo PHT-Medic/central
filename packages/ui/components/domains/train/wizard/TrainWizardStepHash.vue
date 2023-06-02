@@ -154,7 +154,7 @@ export default defineComponent({
                 <a
                     v-if="hashExists"
                     href="javascript:void(0)"
-                    class="badge badge-dark ml-auto"
+                    class="badge badge-dark ms-auto"
                     @click.prevent="copyToClipboard()"
                 ><i class="fa fa-copy" /> Copy</a>
             </label>

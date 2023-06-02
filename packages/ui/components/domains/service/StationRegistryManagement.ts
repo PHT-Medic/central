@@ -40,7 +40,7 @@ export default defineComponent({
 
         return () => h('div', [
             h('h6', [
-                h('i', { class: 'fa-solid fa-rotate mr-1' }),
+                h('i', { class: 'fa-solid fa-rotate me-1' }),
                 'Synchronization',
             ]),
             h('p', { class: 'mb-1' }, [
@@ -59,7 +59,7 @@ export default defineComponent({
                     return sync();
                 },
             }, [
-                h('i', { class: 'fa-solid fa-rotate mr-1' }),
+                h('i', { class: 'fa-solid fa-rotate me-1' }),
                 'Sync',
             ]),
         ]);

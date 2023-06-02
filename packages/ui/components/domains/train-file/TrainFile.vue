@@ -156,10 +156,10 @@ export default defineComponent({
         >
             <span class="title">
                 {{ path }}
-                <small class="text-muted ml-1">{{ file.size }} Bytes</small>
+                <small class="text-muted ms-1">{{ file.size }} Bytes</small>
             </span>
         </div>
-        <div class="ml-auto d-flex flex-row mr-1">
+        <div class="ms-auto d-flex flex-row me-1">
             <div>
                 <button
                     v-if="!fileSelectedId || isMatch"
@@ -179,7 +179,7 @@ export default defineComponent({
                     />
                 </button>
             </div>
-            <div class="ml-1">
+            <div class="ms-1">
                 <button
                     type="button"
                     class="btn btn-danger btn-xs"

@@ -54,12 +54,12 @@ export default defineComponent({
 
         return () => h('div', [
             h('h6', [
-                h('i', { class: 'fa fa-sign-in-alt mr-1' }),
+                h('i', { class: 'fa fa-sign-in-alt me-1' }),
                 'Incoming',
             ]),
             h('p', { class: 'mb-1' }, [
                 'The incoming project is required for the',
-                h('i', { class: 'pl-1 pr-1' }, ['TrainBuilder']),
+                h('i', { class: 'ps-1 pe-1' }, ['TrainBuilder']),
                 'to work properly. When the TrainBuilder ' +
                 'is finished with building the train, the train will be pushed to the incoming project. ' +
                 'From there the TrainRouter can move it to the first station project of the route.',
@@ -68,12 +68,12 @@ export default defineComponent({
             h('hr'),
 
             h('h6', [
-                h('i', { class: 'fa fa-sign-out-alt mr-1' }),
+                h('i', { class: 'fa fa-sign-out-alt me-1' }),
                 'Outgoing',
             ]),
             h('p', { class: 'mb-1' }, [
                 'The outgoing project is required for the',
-                h('i', { class: 'pl-1 pr-1' }, 'ResultService'),
+                h('i', { class: 'ps-1 pe-1' }, 'ResultService'),
                 'to pull the train from the',
                 'outgoing project and extract the results of the journey.',
             ]),
@@ -81,7 +81,7 @@ export default defineComponent({
             h('hr'),
 
             h('h6', [
-                h('i', { class: 'fa fa-info mr-1' }),
+                h('i', { class: 'fa fa-info me-1' }),
                 'Info',
             ]),
             h('p', [
@@ -99,7 +99,7 @@ export default defineComponent({
                     return setup();
                 },
             }, [
-                h('i', { class: 'fa fa-cogs mr-1' }),
+                h('i', { class: 'fa fa-cogs me-1' }),
                 'Setup',
             ]),
         ]);

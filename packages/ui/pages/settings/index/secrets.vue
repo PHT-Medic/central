@@ -135,7 +135,7 @@ export default defineNuxtComponent({
 <template>
     <div class="row">
         <div class="col-4">
-            <h6><i class="fa-solid fa-file-lines pr-1" /> Form</h6>
+            <h6><i class="fa-solid fa-file-lines pe-1" /> Form</h6>
             <user-secret-form
                 ref="formNode"
                 :user-id="userId"
@@ -152,10 +152,10 @@ export default defineNuxtComponent({
                 @deleted="handleDeleted"
             >
                 <template #header-title>
-                    <h6><i class="fa-solid fa-list pr-1" /> Overview</h6>
+                    <h6><i class="fa-solid fa-list pe-1" /> Overview</h6>
                 </template>
                 <template #item-actions="props">
-                    <div class="ml-1">
+                    <div class="ms-1">
                         <button
                             type="button"
                             class="btn btn-xs"

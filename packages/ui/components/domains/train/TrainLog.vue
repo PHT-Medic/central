@@ -75,7 +75,7 @@ export default defineComponent({
                     h('div', { class: ['line-message', { error: refs.entity.value.error }] }, [
                         message,
                     ]),
-                    h('div', { class: 'ml-auto' }, [
+                    h('div', { class: 'ms-auto' }, [
                         h(Timeago, { datetime: refs.entity.value.created_at }),
                     ]),
                 ]),

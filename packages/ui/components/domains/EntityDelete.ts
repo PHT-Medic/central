@@ -101,7 +101,7 @@ export default defineComponent({
                 icon = [
                     h('i', {
                         class: [props.elementIcon, {
-                            'pr-1': props.withText,
+                            'pe-1': props.withText,
                         }],
                     }),
                 ];

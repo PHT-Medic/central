@@ -175,7 +175,7 @@ export default {
             ref="modalNode"
             size="lg"
             button-size="sm"
-            :title-html="'<i class=\'fa-solid fa-diagram-project pr-1 \'></i> ' + (item ? item.name : 'Unknown') + '-Project'"
+            :title-html="'<i class=\'fa-solid fa-diagram-project pe-1 \'></i> ' + (item ? item.name : 'Unknown') + '-Project'"
             :no-close-on-backdrop="true"
             :no-close-on-esc="true"
             :hide-footer="true"

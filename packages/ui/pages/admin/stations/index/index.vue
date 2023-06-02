@@ -92,7 +92,7 @@ export default defineNuxtComponent({
         :load-on-init="true"
     >
         <template #header-title>
-            <h6><i class="fa-solid fa-list pr-1" /> Overview</h6>
+            <h6><i class="fa-solid fa-list pe-1" /> Overview</h6>
         </template>
         <template #items="props">
             <BTable

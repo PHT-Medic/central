@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import { PermissionID, ServiceID } from '@personalhealthtrain/central-common';
-import { definePageMeta } from '#imports';
+import { definePageMeta, navigateTo } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 
@@ -108,7 +108,7 @@ export default defineNuxtComponent({
                         </div>
                         <div class="event-card-footer">
                             <div class="d-flex flex-row">
-                                <div class="ml-auto">
+                                <div class="ms-auto">
                                     <span class="foot-print">{{ item.version }}</span>
                                 </div>
                             </div>

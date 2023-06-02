@@ -230,9 +230,9 @@ export default defineComponent({
                 h('hr'),
                 h('div', { class: 'alert alert-dark alert-sm' }, [
                     'A secret can either be specified via',
-                    h('strong', { class: 'pl-1 pr-1' }, 'file'),
+                    h('strong', { class: 'ps-1 pe-1' }, 'file'),
                     'upload or by pasting its',
-                    h('strong', { class: 'pl-1 pr-1' }, 'content'),
+                    h('strong', { class: 'ps-1 pe-1' }, 'content'),
                     'in the textarea shown below.',
                 ]),
                 file,
