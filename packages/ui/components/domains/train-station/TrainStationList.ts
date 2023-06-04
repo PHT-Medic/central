@@ -34,6 +34,7 @@ import type {
 import {
     createDomainListBuilder,
 } from '../../../core';
+import TrainStationDetails from './TrainStationDetails';
 
 enum Direction {
     IN = 'in',
@@ -78,7 +79,7 @@ export default defineComponent({
             default: undefined,
         },
         target: {
-            type: String as PropType<`${DomainType}`>,
+            type: String as PropType<'station' | 'train'>,
             default: DomainType.STATION,
         },
         direction: {
@@ -98,8 +99,6 @@ export default defineComponent({
         const {
             build,
             handleCreated,
-            handleUpdated,
-            handleDeleted,
         } = createDomainListBuilder<TrainStation>({
             props: refs,
             setup: ctx,
@@ -153,12 +152,35 @@ export default defineComponent({
 
                 items: {
                     item: {
+                        fn(
+                            item,
+                            itemProps,
+                            slotContent,
+                        ) {
+                            const slots : Record<string, any> = {};
+                            if (slotContent) {
+                                slots.default = slotContent;
+                            }
+
+                            return h(TrainStationDetails, {
+                                entity: item,
+                                direction: refs.direction.value,
+                                target: refs.target.value,
+                                onUpdated: itemProps.updated,
+                                onDeleted: itemProps.deleted,
+                                onFailed: itemProps.failed,
+                            }, slots);
+                        },
                         textFn(item) {
-                            return h('span', [
-                                refs.target.value === DomainType.STATION ?
-                                    item.station.name :
-                                    item.train.name,
-                            ]);
+                            if (refs.target.value === DomainType.STATION) {
+                                return h('span', [item.station.name]);
+                            }
+
+                            if (refs.target.value === DomainType.TRAIN) {
+                                return h('span', [item.train.name]);
+                            }
+
+                            return h('span', [item.id]);
                         },
                     },
                 },
@@ -212,42 +234,22 @@ export default defineComponent({
             handleCreated(context.data);
         };
 
-        const handleSocketUpdated = (context: SocketServerToClientEventContext<TrainStationEventContext>) => {
-            if (
-                !isSameSocketRoom(context.meta.roomName) ||
-                !isSocketEventForSource(context.data)
-            ) return;
-
-            handleUpdated(context.data);
-        };
-
-        const handleSocketDeleted = (context: SocketServerToClientEventContext<TrainStationEventContext>) => {
-            if (
-                !isSameSocketRoom(context.meta.roomName) ||
-                !isSocketEventForSource(context.data)
-            ) return;
-
-            handleDeleted(context.data);
-        };
-
         const socket : Socket<
         SocketServerToClientEvents,
         SocketClientToServerEvents
         > = useSocket().useRealmWorkspace(realmId.value);
 
         onMounted(() => {
-            if (realmId.value) {
-                if (refs.direction.value === Direction.IN) {
-                    socket.emit(buildDomainEventSubscriptionFullName(
-                        DomainSubType.TRAIN_STATION_IN,
-                        DomainEventSubscriptionName.SUBSCRIBE,
-                    ));
-                } else {
-                    socket.emit(buildDomainEventSubscriptionFullName(
-                        DomainSubType.TRAIN_STATION_OUT,
-                        DomainEventSubscriptionName.SUBSCRIBE,
-                    ));
-                }
+            if (refs.direction.value === Direction.IN) {
+                socket.emit(buildDomainEventSubscriptionFullName(
+                    DomainSubType.TRAIN_STATION_IN,
+                    DomainEventSubscriptionName.SUBSCRIBE,
+                ));
+            } else if (refs.direction.value === Direction.OUT) {
+                socket.emit(buildDomainEventSubscriptionFullName(
+                    DomainSubType.TRAIN_STATION_OUT,
+                    DomainEventSubscriptionName.SUBSCRIBE,
+                ));
             } else {
                 socket.emit(buildDomainEventSubscriptionFullName(
                     DomainType.TRAIN_STATION,
@@ -259,31 +261,19 @@ export default defineComponent({
                 DomainType.TRAIN_STATION,
                 DomainEventName.CREATED,
             ), handleSocketCreated);
-
-            socket.on(buildDomainEventFullName(
-                DomainType.TRAIN_STATION,
-                DomainEventName.DELETED,
-            ), handleSocketDeleted);
-
-            socket.on(buildDomainEventFullName(
-                DomainType.TRAIN_STATION,
-                DomainEventName.UPDATED,
-            ), handleSocketUpdated);
         });
 
         onUnmounted(() => {
-            if (realmId.value) {
-                if (refs.direction.value === Direction.IN) {
-                    socket.emit(buildDomainEventSubscriptionFullName(
-                        DomainSubType.TRAIN_STATION_IN,
-                        DomainEventSubscriptionName.UNSUBSCRIBE,
-                    ));
-                } else {
-                    socket.emit(buildDomainEventSubscriptionFullName(
-                        DomainSubType.TRAIN_STATION_OUT,
-                        DomainEventSubscriptionName.UNSUBSCRIBE,
-                    ));
-                }
+            if (refs.direction.value === Direction.IN) {
+                socket.emit(buildDomainEventSubscriptionFullName(
+                    DomainSubType.TRAIN_STATION_IN,
+                    DomainEventSubscriptionName.UNSUBSCRIBE,
+                ));
+            } else if (refs.direction.value === Direction.OUT) {
+                socket.emit(buildDomainEventSubscriptionFullName(
+                    DomainSubType.TRAIN_STATION_OUT,
+                    DomainEventSubscriptionName.UNSUBSCRIBE,
+                ));
             } else {
                 socket.emit(buildDomainEventSubscriptionFullName(
                     DomainType.TRAIN_STATION,
@@ -295,16 +285,6 @@ export default defineComponent({
                 DomainType.TRAIN_STATION,
                 DomainEventName.CREATED,
             ), handleSocketCreated);
-
-            socket.off(buildDomainEventFullName(
-                DomainType.TRAIN_STATION,
-                DomainEventName.DELETED,
-            ), handleSocketDeleted);
-
-            socket.off(buildDomainEventFullName(
-                DomainType.TRAIN_STATION,
-                DomainEventName.UPDATED,
-            ), handleSocketUpdated);
         });
 
         return () => build();

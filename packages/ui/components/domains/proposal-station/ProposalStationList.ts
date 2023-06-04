@@ -27,6 +27,7 @@ import { realmIdForSocket } from '../../../composables/domain/realm';
 import { useSocket } from '../../../composables/socket';
 import type { DomainListHeaderSearchOptionsInput, DomainListHeaderTitleOptionsInput } from '../../../core';
 import { createDomainListBuilder } from '../../../core';
+import ProposalStationDetails from './ProposalStationDetails';
 
 enum Direction {
     IN = 'in',
@@ -71,7 +72,7 @@ export default defineComponent({
             default: undefined,
         },
         target: {
-            type: String as PropType<DomainType>,
+            type: String as PropType<'station' | 'proposal'>,
             default: DomainType.STATION,
         },
         direction: {
@@ -91,8 +92,6 @@ export default defineComponent({
         const {
             build,
             handleCreated,
-            handleUpdated,
-            handleDeleted,
         } = createDomainListBuilder<ProposalStation>({
             props: refs,
             setup: ctx,
@@ -146,12 +145,35 @@ export default defineComponent({
 
                 items: {
                     item: {
+                        fn(
+                            item,
+                            itemProps,
+                            slotContent,
+                        ) {
+                            const slots : Record<string, any> = {};
+                            if (slotContent) {
+                                slots.default = slotContent;
+                            }
+
+                            return h(ProposalStationDetails, {
+                                entity: item,
+                                direction: refs.direction.value,
+                                target: refs.target.value,
+                                onUpdated: itemProps.updated,
+                                onDeleted: itemProps.deleted,
+                                onFailed: itemProps.failed,
+                            }, slots);
+                        },
                         textFn(item) {
-                            return h('span', [
-                                refs.target.value === DomainType.STATION ?
-                                    item.station.name :
-                                    item.proposal.title,
-                            ]);
+                            if (refs.target.value === DomainType.STATION) {
+                                return h('span', [item.station.name]);
+                            }
+
+                            if (refs.target.value === DomainType.PROPOSAL) {
+                                return h('span', [item.proposal.title]);
+                            }
+
+                            return h('span', [item.id]);
                         },
                     },
                 },
@@ -205,24 +227,6 @@ export default defineComponent({
             handleCreated(context.data);
         };
 
-        const handleSocketUpdated = (context: SocketServerToClientEventContext<ProposalStationEventContext>) => {
-            if (
-                !isSameSocketRoom(context.meta.roomName) ||
-                !isSocketEventForSource(context.data)
-            ) return;
-
-            handleUpdated(context.data);
-        };
-
-        const handleSocketDeleted = (context: SocketServerToClientEventContext<ProposalStationEventContext>) => {
-            if (
-                !isSameSocketRoom(context.meta.roomName) ||
-                !isSocketEventForSource(context.data)
-            ) return;
-
-            handleDeleted(context.data);
-        };
-
         const socket = useSocket().useRealmWorkspace(realmId.value);
 
         onMounted(() => {
@@ -249,16 +253,6 @@ export default defineComponent({
                 DomainType.PROPOSAL_STATION,
                 DomainEventName.CREATED,
             ), handleSocketCreated);
-
-            socket.on(buildDomainEventFullName(
-                DomainType.PROPOSAL_STATION,
-                DomainEventName.DELETED,
-            ), handleSocketDeleted);
-
-            socket.on(buildDomainEventFullName(
-                DomainType.PROPOSAL_STATION,
-                DomainEventName.UPDATED,
-            ), handleSocketUpdated);
         });
 
         onUnmounted(() => {
@@ -285,16 +279,6 @@ export default defineComponent({
                 DomainType.PROPOSAL_STATION,
                 DomainEventName.CREATED,
             ), handleSocketCreated);
-
-            socket.off(buildDomainEventFullName(
-                DomainType.PROPOSAL_STATION,
-                DomainEventName.DELETED,
-            ), handleSocketDeleted);
-
-            socket.off(buildDomainEventFullName(
-                DomainType.PROPOSAL_STATION,
-                DomainEventName.UPDATED,
-            ), handleSocketUpdated);
         });
 
         return () => build();

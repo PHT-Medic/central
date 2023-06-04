@@ -7,7 +7,7 @@
 
 import type { Ref } from 'vue';
 
-type Fn = () => Promise<void>;
+type Fn = (...args: any[]) => Promise<void>;
 type OutputFn = () => Promise<any>;
 export function wrapFnWithBusyState(
     busy: Ref<boolean>,
