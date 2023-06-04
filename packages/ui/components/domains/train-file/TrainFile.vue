@@ -52,7 +52,7 @@ export default defineComponent({
             return refs.filesSelected.value.findIndex((file) => file === refs.file.value.id) !== -1;
         });
 
-        const isMatch = computed(() => this.fileSelectedId === refs.file.value.id);
+        const isMatch = computed(() => refs.fileSelectedId.value === refs.file.value.id);
 
         const toggle = () => {
             emit('toggle', refs.file);
@@ -122,7 +122,7 @@ export default defineComponent({
             busy.value = true;
 
             try {
-                const file = await useAPI().trainFile.delete(this.file.id);
+                const file = await useAPI().trainFile.delete(refs.file.value.id);
                 emit('deleted', file);
             } catch (e) {
                 if (e instanceof Error) {

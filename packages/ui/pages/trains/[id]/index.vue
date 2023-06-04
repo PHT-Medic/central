@@ -38,7 +38,7 @@ export default defineNuxtComponent({
 </script>
 
 <template>
-    <div>
+    <div v-if="entity">
         <div class="panel-box mb-3">
             <h6 class="mb-3">
                 <span class="text-info">{{ entity.stations }}</span> Station(s)

@@ -67,13 +67,11 @@ export default defineNuxtComponent({
                     <h6><i class="fa-solid fa-list pe-1" /> Overview</h6>
                 </template>
                 <template #item="props">
-                    <div class="list-item">
-                        <proposal-item
-                            :entity="props.data"
-                            @updated="props.handleUpdated"
-                            @deleted="props.handleDeleted"
-                        />
-                    </div>
+                    <ProposalItem
+                        :entity="props.data"
+                        @updated="props.handleUpdated"
+                        @deleted="props.handleDeleted"
+                    />
                 </template>
             </ProposalList>
         </div>

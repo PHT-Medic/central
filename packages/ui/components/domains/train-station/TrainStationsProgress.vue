@@ -82,84 +82,85 @@ export default defineComponent({
 <template>
     <div>
         <template v-if="elementType === 'steps'">
-            <TrainStationList
-                :query="query"
-                :header-title="false"
-                :header-search="false"
-                :footer-pagination="false"
-                :no-more="false"
-                :realm-id="entity.realm_id"
-                :source-id="entity.id"
-                class="train-stations-progress"
-            >
-                <template
-                    #items="props"
+            <div class="train-stations-progress">
+                <TrainStationList
+                    :query="query"
+                    :header-title="false"
+                    :header-search="false"
+                    :footer-pagination="false"
+                    :no-more="false"
+                    :realm-id="entity.realm_id"
+                    :source-id="entity.id"
                 >
-                    <div
-                        v-if="!props.busy"
-                        class="d-flex flex-column progress-step"
-                    >
-                        <div class="d-flex justify-content-center icon-circle bg-dark text-light">
-                            <span class="icon">Incoming</span>
-                        </div>
-                        <div class="mt-1">
-                            <strong>Status</strong>
-                        </div>
-                        <div>
-                            <train-station-static-run-status-text
-                                :id="trainStationStatic.INCOMING"
-                                :train-build-status="entity.build_status"
-                                :train-run-status="entity.run_status"
-                                :train-run-station-index="entity.run_station_index"
-                            />
-                        </div>
-                    </div>
                     <template
-                        v-for="(item) in props.data"
-                        :key="item.id"
+                        #items="props"
                     >
                         <div
+                            v-if="!props.busy"
                             class="d-flex flex-column progress-step"
                         >
-                            <div
-                                class="d-flex justify-content-center icon-circle progress-step text-light"
-                                :class="{
-                                    'bg-secondary': !item.run_status,
-                                    'bg-dark': item.run_status === trainStationRunStatus.DEPARTED,
-                                    'active': item.run_status === trainStationRunStatus.ARRIVED
-                                }"
-                            >
-                                <span class="icon">{{ item.station.name }}</span>
+                            <div class="d-flex justify-content-center icon-circle bg-dark text-light">
+                                <span class="icon">Incoming</span>
                             </div>
                             <div class="mt-1">
                                 <strong>Status</strong>
                             </div>
                             <div>
-                                <train-station-run-status-text :status="item.run_status" />
+                                <train-station-static-run-status-text
+                                    :id="trainStationStatic.INCOMING"
+                                    :train-build-status="entity.build_status"
+                                    :train-run-status="entity.run_status"
+                                    :train-run-station-index="entity.run_station_index"
+                                />
+                            </div>
+                        </div>
+                        <template
+                            v-for="(item) in props.data"
+                            :key="item.id"
+                        >
+                            <div
+                                class="d-flex flex-column progress-step"
+                            >
+                                <div
+                                    class="d-flex justify-content-center icon-circle progress-step text-light"
+                                    :class="{
+                                        'bg-secondary': !item.run_status,
+                                        'bg-dark': item.run_status === trainStationRunStatus.DEPARTED,
+                                        'active': item.run_status === trainStationRunStatus.ARRIVED
+                                    }"
+                                >
+                                    <span class="icon">{{ item.station.name }}</span>
+                                </div>
+                                <div class="mt-1">
+                                    <strong>Status</strong>
+                                </div>
+                                <div>
+                                    <train-station-run-status-text :status="item.run_status" />
+                                </div>
+                            </div>
+                        </template>
+                        <div
+                            v-if="!props.busy"
+                            class="d-flex flex-column progress-step"
+                        >
+                            <div class="d-flex justify-content-center icon-circle bg-dark text-light">
+                                <span class="icon">Outgoing</span>
+                            </div>
+                            <div class="mt-1">
+                                <strong>Status</strong>
+                            </div>
+                            <div>
+                                <train-station-static-run-status-text
+                                    :id="trainStationStatic.OUTGOING"
+                                    :train-build-status="entity.build_status"
+                                    :train-run-status="entity.run_status"
+                                    :train-run-station-index="entity.run_station_index"
+                                />
                             </div>
                         </div>
                     </template>
-                    <div
-                        v-if="!props.busy"
-                        class="d-flex flex-column progress-step"
-                    >
-                        <div class="d-flex justify-content-center icon-circle bg-dark text-light">
-                            <span class="icon">Outgoing</span>
-                        </div>
-                        <div class="mt-1">
-                            <strong>Status</strong>
-                        </div>
-                        <div>
-                            <train-station-static-run-status-text
-                                :id="trainStationStatic.OUTGOING"
-                                :train-build-status="entity.build_status"
-                                :train-run-status="entity.run_status"
-                                :train-run-station-index="entity.run_station_index"
-                            />
-                        </div>
-                    </div>
-                </template>
-            </TrainStationList>
+                </TrainStationList>
+            </div>
         </template>
         <template v-else>
             <div class="progress bg-white">
@@ -183,5 +184,6 @@ export default defineComponent({
     flex-direction: row;
     justify-content: space-between;
     display: flex;
+    margin-bottom: 1rem;
 }
 </style>

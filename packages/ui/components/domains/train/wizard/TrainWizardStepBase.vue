@@ -33,20 +33,6 @@ export default defineComponent({
     },
     emits: ['updated', 'failed'],
     setup(props, { emit }) {
-        const form = reactive({
-            stationIds: [],
-        });
-
-        const $v = useVuelidate({
-            stationIds: {
-                required,
-                minLength: minLength(1),
-                $each: {
-                    required,
-                },
-            },
-        }, form);
-
         const handleMasterImageSelected = async (item: MasterImage) => {
             try {
                 const response = await useAPI().train.update(this.train.id, {
@@ -92,6 +78,7 @@ export default defineComponent({
             handleMasterImageSelected,
             handleTrainStationCreated,
             handleTrainStationDeleted,
+            trainStationList,
         };
     },
 });

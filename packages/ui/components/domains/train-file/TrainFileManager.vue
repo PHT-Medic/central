@@ -230,23 +230,17 @@ export default defineComponent({
             <div class="col">
                 <h6><i class="fa fa-upload" /> Upload</h6>
                 <div class="form-group">
-                    <label>Directories / Files</label>
-                    <div class="custom-file">
-                        <input
-                            id="files"
-                            ref="filesNode"
-                            type="file"
-                            :webkitdirectory="directoryMode"
-                            class="custom-file-input"
-                            multiple
-                            :disbaled="busy"
-                            @change="checkFormFiles"
-                        >
-                        <label
-                            class="custom-file-label"
-                            for="files"
-                        >Select files...</label>
-                    </div>
+                    <label class="form-label">Directories / Files</label>
+                    <input
+                        id="files"
+                        ref="filesNode"
+                        type="file"
+                        :webkitdirectory="directoryMode"
+                        class="form-control"
+                        multiple
+                        :disbaled="busy"
+                        @change="checkFormFiles"
+                    >
                 </div>
                 <div class="form-group">
                     <BFormCheckbox

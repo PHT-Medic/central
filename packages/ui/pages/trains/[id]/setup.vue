@@ -19,20 +19,34 @@ export default defineNuxtComponent({
             required: true,
         },
     },
-    methods: {
-        async handleFinished() {
+    emits: ['updated', 'failed'],
+    setup(props, { emit }) {
+        const handleFinished = async () => {
             await navigateTo(`/trains/${this.entity.id}`);
-        },
-        handleUpdated(train) {
-            this.$emit('updated', train);
-        },
+        };
+
+        const handleUpdated = (entity: Train) => {
+            emit('updated', entity);
+        };
+
+        const handleFailed = (e) => {
+            emit('failed', e);
+        };
+
+        return {
+            handleFinished,
+            handleUpdated,
+            handleFailed,
+        };
     },
 });
 </script>
 <template>
     <train-wizard
+        v-if="entity"
         :entity="entity"
         @updated="handleUpdated"
         @finished="handleFinished"
+        @failed="handleFailed"
     />
 </template>

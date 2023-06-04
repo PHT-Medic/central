@@ -15,7 +15,7 @@ export default defineComponent({
         TrainUserSecretPicker,
     },
     props: {
-        train: {
+        entity: {
             type: Object as PropType<Train>,
             required: true,
         },
@@ -33,14 +33,14 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div>
+    <div v-if="entity">
         <div class="mb-2">
             <h6><i class="fa fa-key" /> Security</h6>
 
             <train-user-secret-picker
-                :train-id="train.id"
-                :user-paillier-secret-id="train.user_paillier_secret_id"
-                :user-rsa-secret-id="train.user_rsa_secret_id"
+                :train-id="entity.id"
+                :user-paillier-secret-id="entity.user_paillier_secret_id"
+                :user-rsa-secret-id="entity.user_rsa_secret_id"
                 @updated="handleUpdated"
             />
         </div>

@@ -62,14 +62,15 @@ export default defineComponent({
 
                 items: {
                     item: {
+                        icon: false,
                         textFn(item) {
                             return [
                                 h(
                                     'span',
                                     {
                                         class: ['badge badge-pill', {
-                                            'badge-primary': item.type === SecretType.RSA_PUBLIC_KEY,
-                                            'badge-dark': item.type === SecretType.PAILLIER_PUBLIC_KEY,
+                                            'bg-primary': item.type === SecretType.RSA_PUBLIC_KEY,
+                                            'bg-dark': item.type === SecretType.PAILLIER_PUBLIC_KEY,
                                         }],
                                     },
                                     [

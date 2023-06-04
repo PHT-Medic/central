@@ -84,7 +84,7 @@ export default defineComponent({
 
                 return h(
                     'div',
-                    { class: 'p-1' },
+                    { class: 'p-1 w-100' },
                     [
                         h(
                             'div',
@@ -99,11 +99,9 @@ export default defineComponent({
                                     'div',
                                     [
                                         h(
-                                            'nuxt-link',
+                                            NuxtLink,
                                             {
-                                                props: {
-                                                    to: `/proposals/${props.data.id}`,
-                                                },
+                                                to: `/proposals/${props.data.id}`,
                                                 class: 'mb-0',
                                             },
                                             [

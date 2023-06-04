@@ -8,3 +8,15 @@
 export function isHex(value: string) : boolean {
     return /^[A-Fa-f0-9]+$/i.test(value);
 }
+
+export function hexToUTF8(value: string) {
+    try {
+        return decodeURIComponent(`%${value.match(/.{1,2}/g).join('%')}`);
+    } catch (e) {
+        if (e instanceof URIError) {
+            return value;
+        }
+
+        throw e;
+    }
+}

@@ -8,6 +8,7 @@
 import type { UserSecret } from '@personalhealthtrain/central-common';
 import {
     SecretType,
+    hexToUTF8, isHex,
 } from '@personalhealthtrain/central-common';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
@@ -16,6 +17,7 @@ import { defineComponent } from 'vue';
 import {
     buildFormInput, buildFormSelect, buildFormSubmit, buildFormTextarea,
 } from '@vue-layout/form-controls';
+import { wrapFnWithBusyState } from '../../../core/busy';
 
 export default defineComponent({
     name: 'UserSecretForm',
@@ -29,7 +31,7 @@ export default defineComponent({
         },
     },
     emits: ['created', 'updated', 'failed'],
-    setup(props, { emit }) {
+    setup(props, { emit, expose }) {
         const refs = toRefs(props);
         const fileInput = ref<null | Record<string, any>>(null);
 
@@ -77,24 +79,43 @@ export default defineComponent({
             for (let i = 0; i < keys.length; i++) {
                 const key = keys[i];
 
-                if (
-                    refs.entity.value &&
-                    refs.entity.value[keys[i]]
-                ) {
-                    (form as any)[keys[i]] = refs.entity.value[keys[i]];
-                } else {
-                    switch (key) {
-                        case 'type':
+                switch (key) {
+                    case 'content': {
+                        if (refs.entity.value) {
+                            form.content = isHex(refs.entity.value.content) ?
+                                hexToUTF8(refs.entity.value.content) :
+                                refs.entity.value.content;
+                        } else {
+                            form.content = '';
+                        }
+                        break;
+                    }
+                    case 'type': {
+                        if (refs.entity.value) {
+                            form.type = refs.entity.value.type;
+                        } else {
                             form.type = SecretType.RSA_PUBLIC_KEY;
-                            handleTypeChanged(form.type);
-                            break;
-                        default:
+                        }
+                        handleTypeChanged(form.type);
+                        break;
+                    }
+                    default: {
+                        if (
+                            refs.entity.value &&
+                            refs.entity.value[key]
+                        ) {
+                            (form as any)[key] = refs.entity.value[key];
+                        } else {
                             (form as any)[key] = '' as any;
-                            break;
+                        }
                     }
                 }
             }
         };
+
+        expose({
+            resetFormData,
+        });
 
         onMounted(() => resetFormData());
 
@@ -139,12 +160,10 @@ export default defineComponent({
             };
         };
 
-        const submit = async () => {
-            if (busy.value || $v.value.$invalid) {
+        const submit = wrapFnWithBusyState(busy, async () => {
+            if ($v.value.$invalid) {
                 return;
             }
-
-            busy.value = true;
 
             try {
                 let response;
@@ -163,9 +182,7 @@ export default defineComponent({
                     emit('failed', e);
                 }
             }
-
-            busy.value = false;
-        };
+        });
 
         return () => {
             const type = buildFormSelect({
@@ -242,7 +259,9 @@ export default defineComponent({
                     createText: 'Create',
                     updateText: 'Update',
                     submit,
-                    busy,
+                    busy: busy.value,
+                    isEditing: !!refs.entity.value,
+                    validationResult: $v.value,
                 }),
             ]);
         };

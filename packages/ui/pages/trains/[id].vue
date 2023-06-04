@@ -12,6 +12,7 @@ import {
     buildDomainEventFullName,
     buildDomainEventSubscriptionFullName,
 } from '@personalhealthtrain/central-common';
+import { useToast } from 'bootstrap-vue-next';
 import { isClientErrorWithStatusCode } from 'hapic';
 import type { Ref } from 'vue';
 import { onMounted, onUnmounted } from 'vue';
@@ -19,7 +20,7 @@ import type {
     SocketServerToClientEventContext, Train,
     TrainEventContext,
 } from '@personalhealthtrain/central-common';
-import { definePageMeta } from '#imports';
+import { definePageMeta, ref } from '#imports';
 import {
     createError, defineNuxtComponent, navigateTo, useRoute,
 } from '#app';
@@ -36,13 +37,17 @@ export default defineNuxtComponent({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
         });
+
+        const toast = useToast();
+
         let entity : Ref<Train>;
 
         try {
-            entity.value = await useAPI().train.getOne(useRoute().params.id as string);
+            const response = await useAPI().train.getOne(useRoute().params.id as string);
+            entity = ref(response);
         } catch (e) {
             if (isClientErrorWithStatusCode(e, 404)) {
-                navigateTo({
+                await navigateTo({
                     path: '/trains',
                 });
             }
@@ -55,6 +60,12 @@ export default defineNuxtComponent({
             for (let i = 0; i < keys.length; i++) {
                 entity.value[keys[i]] = data[keys[i]];
             }
+        };
+
+        const handleFailed = (e: Error) => {
+            toast.show({ body: e.message }, {
+                pos: 'top-center',
+            });
         };
 
         const handleSocketUpdated = (context: SocketServerToClientEventContext<TrainEventContext>) => {
@@ -118,6 +129,7 @@ export default defineNuxtComponent({
         return {
             tabs,
             entity,
+            handleFailed,
             handleUpdated,
         };
     },
@@ -152,6 +164,7 @@ export default defineNuxtComponent({
         <NuxtPage
             :entity="entity"
             @updated="handleUpdated"
+            @failed="handleFailed"
         />
     </div>
 </template>

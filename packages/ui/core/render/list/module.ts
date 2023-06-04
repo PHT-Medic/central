@@ -129,8 +129,8 @@ export function createDomainListBuilder<T extends Record<string, any>>(
         await load({ offset: 0 });
     });
 
-    const handleCreated = buildListCreatedHandler(data);
-    const handleDeleted = buildListDeletedHandler(data);
+    const handleCreated = buildListCreatedHandler(data, meta);
+    const handleDeleted = buildListDeletedHandler(data, meta);
     const handleUpdated = buildListUpdatedHandler(data);
 
     const options = mergeDomainListOptions(context.props, context.defaults);

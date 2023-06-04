@@ -81,6 +81,8 @@ export default defineComponent({
             initFormAttributesFromSource(form, refs.entity.value);
         };
 
+        initFromProperties();
+
         const updatedAt = computed(() => (refs.entity.value ?
             refs.entity.value.updated_at :
             undefined));
@@ -100,7 +102,7 @@ export default defineComponent({
         };
 
         const submit = wrapFnWithBusyState(busy, async () => {
-            if (!$v.value.$invalid) return;
+            if ($v.value.$invalid) return;
 
             try {
                 let response;
@@ -209,9 +211,10 @@ export default defineComponent({
 
             const submitNode = buildFormSubmit({
                 submit,
-                busy,
+                busy: busy.value,
                 updateText: 'Update',
                 createText: 'Create',
+                isEditing: !!refs.entity.value,
                 validationResult: $v.value,
             });
 

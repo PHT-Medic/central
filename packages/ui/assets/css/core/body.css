@@ -49,14 +49,18 @@ Content
     }
 }
 
-.list,
-.c-list {
+.list {
     display: flex;
     flex-direction: column;
 }
 
-.list .list-item,
-.c-list .c-list-item {
+.list .list-items {
+    padding-left: 0;
+    list-style: none;
+    margin-bottom: 0;
+}
+
+.list .list-item {
     background-color: #ececec;
     border: 1px solid #dedede;
 

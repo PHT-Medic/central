@@ -24,12 +24,6 @@ import { useAuthStore } from '../../../store/auth';
 
 export default defineNuxtComponent({
     components: { EntityDelete, UserSecretList, UserSecretForm },
-    data() {
-        return {
-            item: undefined,
-            busy: false,
-        };
-    },
     setup() {
         const toast = useToast();
 
@@ -101,7 +95,7 @@ export default defineNuxtComponent({
         };
 
         const handleDeleted = (item: UserSecret) => {
-            if (entity.value && item.id === entityId.value) {
+            if (entity.value && item.id === entity.value.id) {
                 triggerEdit(entity.value as UserSecret);
             }
 
@@ -128,6 +122,7 @@ export default defineNuxtComponent({
             triggerEdit,
             triggerSync,
             entityId,
+            entity,
         };
     },
 });
@@ -139,7 +134,7 @@ export default defineNuxtComponent({
             <user-secret-form
                 ref="formNode"
                 :user-id="userId"
-                :entity="item"
+                :entity="entity"
                 @failed="handleFailed"
                 @updated="handleUpdated"
                 @created="handleCreated"
@@ -155,10 +150,10 @@ export default defineNuxtComponent({
                     <h6><i class="fa-solid fa-list pe-1" /> Overview</h6>
                 </template>
                 <template #item-actions="props">
-                    <div class="ms-1">
+                    <div class="me-1">
                         <button
                             type="button"
-                            class="btn btn-xs"
+                            class="btn btn-xs me-1"
                             :class="{'btn-primary': entityId !== props.data.id, 'btn-dark': entityId === props.data.id}"
                             @click.prevent="triggerEdit(props.data)"
                         >
@@ -169,17 +164,17 @@ export default defineNuxtComponent({
                         </button>
                         <button
                             type="button"
-                            class="btn btn-xs btn-primary"
+                            class="btn btn-xs btn-primary me-1"
                             @click.prevent="triggerSync()"
                         >
-                            <i class="fa-solid fa-square-arrow-up-right" />
+                            <i class="fa-solid fa-refresh" />
                         </button>
                         <entity-delete
                             :with-text="false"
                             class="btn btn-xs btn-danger"
                             :entity-id="props.data.id"
                             :entity-type="'userSecret'"
-                            @deleted="props.handleDeleted"
+                            @deleted="props.deleted"
                         />
                     </div>
                 </template>

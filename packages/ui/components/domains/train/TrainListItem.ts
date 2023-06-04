@@ -21,6 +21,7 @@ import {
     buildDomainEventFullName,
     buildDomainEventSubscriptionFullName,
 } from '@personalhealthtrain/central-common';
+import { NuxtLink } from '#components';
 import { realmIdForSocket } from '../../../composables/domain/realm';
 import { useSocket } from '../../../composables/socket';
 import { useAuthStore } from '../../../store/auth';
@@ -195,7 +196,7 @@ export default defineComponent({
                         h('div', { class: 'ms-auto' }, [
                             h('button', {
                                 class: 'btn btn-dark btn-xs',
-                                click(event: any) {
+                                onClick(event: any) {
                                     event.preventDefault();
 
                                     toggleView();
@@ -208,7 +209,7 @@ export default defineComponent({
                                     }],
                                 }),
                             ]),
-                            h('nuxt-link', {
+                            h(NuxtLink, {
                                 class: 'btn btn-dark btn-xs ms-1',
                                 type: 'button',
                                 to: `/trains/${entity.value.id}`,
@@ -223,7 +224,7 @@ export default defineComponent({
                     class: 'mt-1 mb-1',
                 }),
                 h(TrainPipeline, {
-                    entity,
+                    entity: entity.value,
                     withCommand: extendedView.value,
                     listDirection: extendedView.value ? 'column' : 'row',
                     onUpdated(item: Train) {

@@ -109,14 +109,14 @@ export default defineComponent({
                 v-if="withCommand"
                 class="ms-auto"
             >
-                <nuxt-link
+                <NuxtLink
                     v-if="canConfigure"
                     class="btn btn-xs btn-primary"
                     type="button"
                     :to="'/trains/'+entity.id+'/setup'"
                 >
                     <i class="fas fa-wrench pe-1" /> setup
-                </nuxt-link>
+                </NuxtLink>
             </div>
         </div>
 
@@ -199,10 +199,8 @@ export default defineComponent({
                 />
                 <b-dropdown
                     id="dropdown-1"
-                    text="Dropdown Button"
                     variant="dark"
                     size="xs"
-                    html="<i class='fa fa-bars'></i>"
                 >
                     <train-run-command
                         :command="trainCommand.RUN_STATUS"
@@ -260,7 +258,6 @@ export default defineComponent({
                 <b-dropdown
                     variant="dark"
                     size="xs"
-                    html="<i class='fa fa-bars'></i>"
                 >
                     <train-result-command
                         :command="trainCommand.RESULT_STATUS"

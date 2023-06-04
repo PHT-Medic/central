@@ -44,11 +44,10 @@ export default defineComponent({
             required: true,
         },
     },
-    emits: ['finished'],
+    emits: ['finished', 'failed'],
     async setup(props, { emit }) {
         const refs = toRefs(props);
 
-        const busy = ref(false);
         const form = reactive({
             query: null,
             master_image_id: null,
@@ -68,6 +67,8 @@ export default defineComponent({
             initFormAttributesFromSource(form, entity);
         };
 
+        updateForm(refs.entity.value);
+
         const initialized = ref(false);
         const valid = ref(false);
 
@@ -83,7 +84,7 @@ export default defineComponent({
             'finish',
         ];
 
-        const isConfigured = computed(() => this.entity.configuration_status === TrainConfigurationStatus.FINISHED);
+        const isConfigured = computed(() => refs.entity.value.configuration_status === TrainConfigurationStatus.FINISHED);
 
         const updatedAt = computed(() => (refs.entity.value ?
             refs.entity.value.updated_at :
@@ -106,43 +107,11 @@ export default defineComponent({
 
             if (keys.length === 0) return;
 
-            const item = await useAPI().train.update(this.entity.id, data);
+            const item = await useAPI().train.update(refs.entity.value.id, data);
             handleUpdated(item);
         };
 
         const wizardNode = ref<null | Record<string, any>>(null);
-        const init = async () => {
-            let canPass = true;
-            let i = 0;
-
-            while (canPass) {
-                try {
-                    await this.passWizardStep();
-
-                    i++;
-                    index.value = i;
-                } catch (e) {
-                    canPass = false;
-                }
-
-                if (i >= steps.length) {
-                    canPass = false;
-                }
-            }
-
-            const nuxtApp = useNuxtApp();
-
-            // todo: check process.client var
-            if (nuxtApp.isHydrating) {
-                if (wizardNode.value) {
-                    wizardNode.value.changeTab(0, i);
-                }
-            } else {
-                startIndex.value = i;
-            }
-
-            initialized.value = true;
-        };
 
         const canPassBaseWizardStep = async () => {
             if (!form.master_image_id) {
@@ -230,16 +199,39 @@ export default defineComponent({
             }
 
             promise
-                .then(() => {
-                    resolve();
-                })
-                .catch((e) => {
-                    if (e instanceof Error) {
-                        emit('failed', e);
-                    }
-                    reject();
-                });
+                .then(() => resolve(true))
+                .catch((e) => reject(e));
         });
+
+        const init = async () => {
+            let canPass = true;
+            let i = 0;
+
+            while (canPass) {
+                try {
+                    await passWizardStep();
+
+                    i++;
+                    index.value = i;
+                } catch (e) {
+                    canPass = false;
+                }
+
+                if (i >= steps.length) {
+                    canPass = false;
+                }
+            }
+
+            if (wizardNode.value) {
+                wizardNode.value.changeTab(0, i);
+            } else {
+                startIndex.value = i;
+            }
+
+            initialized.value = true;
+        };
+
+        await init();
 
         const prevWizardStep = () => {
             if (wizardNode.value) {
@@ -273,6 +265,12 @@ export default defineComponent({
             valid.value = true;
         };
 
+        const handleWizardErrorEvent = (e?: Error) => {
+            if (e instanceof Error) {
+                emit('failed', e);
+            }
+        };
+
         const handleWizardFinishedEvent = () => {
             emit('finished');
         };
@@ -293,6 +291,7 @@ export default defineComponent({
             handleUpdated,
             handleWizardChangedEvent,
             handleWizardFinishedEvent,
+            handleWizardErrorEvent,
 
             prevWizardStep,
             nextWizardStep,
@@ -325,6 +324,7 @@ export default defineComponent({
                 :start-index="startIndex"
                 @on-change="handleWizardChangedEvent"
                 @on-complete="handleWizardFinishedEvent"
+                @on-error="handleWizardErrorEvent"
             >
                 <template #title>
                     <h4 class="wizard-title">
@@ -379,7 +379,7 @@ export default defineComponent({
                     :before-change="passWizardStep"
                 >
                     <train-wizard-step-security
-                        :train="entity"
+                        :entity="entity"
                         @updated="handleUpdated"
                     />
                 </TabContent>

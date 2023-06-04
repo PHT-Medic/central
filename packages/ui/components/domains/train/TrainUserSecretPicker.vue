@@ -71,13 +71,13 @@ export default defineComponent({
                 :with-header="false"
                 :query="{filter: {user_id: userId}, sort: {created_at: 'DESC'}}"
             >
-                <template #item-actions="{item}">
+                <template #item-actions="props">
                     <div class="d-flex flex-row">
-                        <template v-if="item.id === userRsaSecretId || item.id === userPaillierSecretId">
+                        <template v-if="props.data.id === userRsaSecretId || props.data.id === userPaillierSecretId">
                             <button
                                 type="button"
                                 class="btn btn-xs btn-warning"
-                                @click.prevent="set(item.type, null)"
+                                @click.prevent="set(props.data.type, null)"
                             >
                                 <i class="fa fa-minus" />
                             </button>
@@ -86,7 +86,7 @@ export default defineComponent({
                             <button
                                 type="button"
                                 class="btn btn-xs btn-dark"
-                                @click.prevent="set(item.type, item.id)"
+                                @click.prevent="set(props.data.type, props.data.id)"
                             >
                                 <i class="fa fa-plus" />
                             </button>
