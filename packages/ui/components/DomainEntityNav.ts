@@ -7,8 +7,8 @@
 
 import type { PropType } from 'vue';
 import { defineComponent, toRef } from 'vue';
-import type { DomainEntityNavItems } from '../core/render/enity-nav';
-import { buildDomainEntityNav } from '../core/render/enity-nav';
+import type { NavItems } from '../core/render/nav';
+import { createNavRenderFn } from '../core/render/nav';
 
 export default defineComponent({
     props: {
@@ -17,7 +17,7 @@ export default defineComponent({
             required: true,
         },
         items: {
-            type: Array as PropType<DomainEntityNavItems>,
+            type: Array as PropType<NavItems>,
             required: true,
         },
         direction: {
@@ -31,9 +31,11 @@ export default defineComponent({
         const items = toRef(props, 'items');
         const direction = toRef(props, 'direction');
 
-        return () => buildDomainEntityNav(props.path, items.value, {
+        const render = createNavRenderFn(props.path, items.value, {
             direction: direction.value,
             prevLink: props.prevLink,
         });
+
+        return () => render();
     },
 });

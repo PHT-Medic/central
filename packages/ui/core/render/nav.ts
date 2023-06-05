@@ -6,22 +6,22 @@
  */
 
 import { defineComponent, ref } from 'vue';
-import type { PropType, VNodeChild } from 'vue';
+import type { MaybeRef, PropType, VNodeChild } from 'vue';
 import { onClickOutside } from '@vueuse/core';
 import { NuxtLink } from '#components';
 
-export type DomainEntityNavItem = {
+export type NavItem = {
     name: string,
     icon: string,
     urlSuffix: string,
-    components?: DomainEntityNavItem[]
+    components?: NavItem[]
 };
 
-export type DomainEntityNavItems = DomainEntityNavItem[];
+export type NavItems = NavItem[];
 
-export type DomainEntityNavOptions = {
-    direction?: 'vertical' | 'horizontal',
-    prevLink?: boolean
+export type NavOptions = {
+    direction?: MaybeRef<'vertical' | 'horizontal'>,
+    prevLink?: MaybeRef<boolean>
 };
 
 function buildLink(path: string, link: string) {
@@ -36,20 +36,26 @@ function buildLink(path: string, link: string) {
     return `${path}/${link}`;
 }
 
+type LinkNodeOptions = {
+    clazz?: string
+};
 function buildLinkNode(
-    item: DomainEntityNavItem,
+    item: NavItem,
     path: string,
-    clazz?: string,
+    options: LinkNodeOptions = {},
 ) {
+    const to = buildLink(path, item.urlSuffix);
+
     return h(
         NuxtLink,
         {
-            class: clazz || 'nav-link',
-            to: buildLink(path, item.urlSuffix),
+            class: [unref(options.clazz) || 'nav-link'],
+            to,
         },
         {
             default: () => [
-                h('i', { class: `${item.icon} pe-1` }),
+                h('i', { class: `${item.icon}` }),
+                ' ',
                 item.name,
             ],
         },
@@ -59,7 +65,7 @@ function buildLinkNode(
 const dropdown = defineComponent({
     props: {
         item: {
-            type: Object as PropType<DomainEntityNavItem>,
+            type: Object as PropType<NavItem>,
             required: true,
         },
         path: {
@@ -107,32 +113,47 @@ const dropdown = defineComponent({
                 }],
             }, [
                 ...components.map((component) => h('li', [
-                    buildLinkNode(component, buildLink(refs.path.value, refs.item.value.urlSuffix), 'dropdown-item'),
+                    buildLinkNode(
+                        component,
+                        buildLink(
+                            refs.path.value,
+                            refs.item.value.urlSuffix,
+                        ),
+                        {
+                            clazz: 'dropdown-item',
+                        },
+                    ),
                 ])),
             ]),
         ]);
     },
 });
-export function buildDomainEntityNav(
+
+type RenderFn = () => VNodeChild;
+export function createNavRenderFn(
     path: string,
-    items: DomainEntityNavItem[],
-    options?: DomainEntityNavOptions,
-) {
+    items: NavItem[],
+    options?: NavOptions,
+) : RenderFn {
     const lastIndex = path.lastIndexOf('/');
     const basePath = path.substring(0, lastIndex);
 
     options = options || {};
 
-    const clazz : string[] = [
-        'nav nav-pills',
-    ];
+    const clazz = computed(() => {
+        const output = ['nav nav-pills'];
+        const direction = unref(options?.direction);
+        if (direction === 'vertical') {
+            output.push('flex-column');
+        }
 
-    if (options.direction === 'vertical') {
-        clazz.push('flex-column');
-    }
+        return output;
+    });
+
+    const prevLinkEnabled = unref(options.prevLink);
 
     let prevLink : VNodeChild = [];
-    if (options.prevLink) {
+    if (prevLinkEnabled) {
         prevLink = h('li', { class: 'nav-item' }, [
             h(
                 NuxtLink,
@@ -149,9 +170,9 @@ export function buildDomainEntityNav(
         ]);
     }
 
-    return h(
+    return () => h(
         'ul',
-        { class: clazz },
+        { class: clazz.value },
         [
             prevLink,
             ...items.map((item) => {
@@ -163,7 +184,7 @@ export function buildDomainEntityNav(
                 }
 
                 return h('li', { class: 'nav-item' }, [
-                    buildLinkNode(item, path),
+                    buildLinkNode(item, path, {}),
                 ]);
             }),
         ],

@@ -89,11 +89,13 @@ export default defineComponent({
 
                 items: {
                     item: {
-                        textFn: (item) => h(TrainListItem, {
-                            entity: item,
-                            onDeleted: handleDeleted,
-                            onUpdated: handleUpdated,
-                        }),
+                        fn(item) {
+                            return h(TrainListItem, {
+                                entity: item,
+                                onDeleted: handleDeleted,
+                                onUpdated: handleUpdated,
+                            });
+                        },
                     },
                 },
 
