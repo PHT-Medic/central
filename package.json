@@ -29,7 +29,7 @@
         "rimraf": "^5.0.1",
         "rollup": "^3.19.1",
         "ts-jest": "^29.1.0",
-        "typescript": "5.0.4"
+        "typescript": "5.1.3"
     },
     "scripts": {
         "commit": "npx git-cz",
