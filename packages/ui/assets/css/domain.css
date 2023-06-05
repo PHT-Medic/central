@@ -45,6 +45,11 @@
     overflow-y: scroll;
 }
 
+.log-container .list-no-more {
+    color: #d0d7de;
+    margin: 0;
+}
+
 .log-container .log-header {
     position: sticky;
     top: 0;
@@ -58,7 +63,7 @@
 }
 
 .log-container .log-body {
-    padding: 1rem 0;
+    padding: 0.25rem 0;
 }
 
 .log-body .line {

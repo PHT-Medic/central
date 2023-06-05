@@ -24,9 +24,6 @@ export default defineNuxtComponent({
                 id: ServiceID.SYSTEM, name: 'System', icon: 'fa-solid fa-atom', version: 'v1.0.0-alpha.0',
             },
             {
-                id: ServiceID.EMAIL_SERVICE, name: 'E-Mail Service', icon: 'fas fa-envelope', version: 'v1.0.0-alpha.0',
-            },
-            {
                 id: ServiceID.STATION_REGISTRY, name: 'Station Registry', icon: 'fa-solid fa-box-archive', version: 'v1.0.0-alpha.0',
             },
         ];
@@ -34,12 +31,6 @@ export default defineNuxtComponent({
         const thirdPartyItems = [
             {
                 id: ServiceID.REGISTRY, name: 'Image Registry', icon: 'fab fa-docker', version: 'v2.4.0',
-            },
-            {
-                id: ServiceID.SECRET_STORAGE, name: 'Secret Storage', icon: 'fas fa-key', version: 'v1.8.4',
-            },
-            {
-                id: ServiceID.GITHUB, name: 'Github', icon: 'fab fa-github', version: 'v1.0.0',
             },
         ];
 

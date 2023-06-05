@@ -85,12 +85,7 @@ Content
 }
 
 .list-no-more {
-    margin-top: 0.5rem;
-    color: #856404;
-    background-color: #fff3cd;
     padding: 0.4rem 0.7rem;
     position: relative;
-    margin-bottom: 1rem;
-    border: 1px solid #ffeeba;
-    border-radius: 0.25rem;
+    margin: 1rem 0;
 }

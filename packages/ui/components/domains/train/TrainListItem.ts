@@ -7,7 +7,6 @@
 
 import { Timeago } from '@vue-layout/timeago';
 import { DomainEventName } from '@authup/core';
-import { merge } from 'smob';
 import type { PropType, VNodeArrayChildren } from 'vue';
 import { defineComponent, onMounted, onUnmounted } from 'vue';
 import type {
@@ -25,6 +24,7 @@ import { NuxtLink } from '#components';
 import { realmIdForSocket } from '../../../composables/domain/realm';
 import { useSocket } from '../../../composables/socket';
 import { useAuthStore } from '../../../store/auth';
+import { updateObjectProperties } from '../../../utils';
 import TrainPipeline from './TrainPipeline.vue';
 import TrainStationsProgress from '../train-station/TrainStationsProgress.vue';
 import TrainName from './TrainName';
@@ -52,7 +52,7 @@ export default defineComponent({
         let lockId : string | undefined;
 
         const handleUpdated = (data: Train) => {
-            entity.value = merge({}, data, entity.value);
+            updateObjectProperties(entity, data);
 
             emit('updated', entity.value);
         };
@@ -160,7 +160,7 @@ export default defineComponent({
                                 {
                                     entityId: entity.value.id,
                                     entityName: entity.value.name,
-                                    withEdit: true,
+                                    editable: true,
                                     onUpdated(item: Train) {
                                         handleUpdated(item);
                                     },
@@ -180,9 +180,10 @@ export default defineComponent({
                                                 ),
                                             ];
                                         }
+
                                         return [
                                             h('i', { class: 'fa-solid fa-train-tram me-1' }),
-                                            h('nuxt-link', {
+                                            h(NuxtLink, {
                                                 to: `/trains/${props.entityId}`,
                                             }, [
                                                 props.nameDisplay,

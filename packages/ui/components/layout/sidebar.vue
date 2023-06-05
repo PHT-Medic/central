@@ -60,9 +60,7 @@ export default defineNuxtComponent({
                 v-if="loggedIn"
                 class="font-weight-light d-flex flex-column ms-3 me-3 mb-1 mt-auto"
             >
-                <small
-                    class="text-muted"
-                >
+                <small class="countdown-text">
                     <Countdown
                         :time="tokenExpiresIn"
                     >
@@ -70,7 +68,7 @@ export default defineNuxtComponent({
                             <i class="fa fa-clock pe-1" /> The session expires in
                             <span class="text-success">
                                 {{ props.minutes }} minute(s), {{ props.seconds }} second(s)
-                            </span>.
+                            </span>
                         </template>
                     </Countdown>
                 </small>
@@ -118,3 +116,8 @@ export default defineNuxtComponent({
         </div>
     </div>
 </template>
+<style scoped>
+.countdown-text {
+    color: #aeb2b7;
+}
+</style>

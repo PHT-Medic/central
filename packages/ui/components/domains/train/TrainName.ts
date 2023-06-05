@@ -1,6 +1,7 @@
-import type { PropType, VNodeArrayChildren } from 'vue';
+import type { PropType, VNodeArrayChildren, VNodeChild } from 'vue';
 import { computed, defineComponent } from 'vue';
 import { hasNormalizedSlot, normalizeSlot } from '../../../core';
+import { wrapFnWithBusyState } from '../../../core/busy';
 
 export default defineComponent({
     name: 'TrainName',
@@ -13,8 +14,10 @@ export default defineComponent({
             type: String as PropType<string | null>,
             default: undefined,
         },
-
-        withEdit: Boolean,
+        editable: {
+            type: Boolean,
+            default: false,
+        },
     },
     emits: ['updated', 'failed'],
     setup(props, { emit, slots }) {
@@ -49,11 +52,7 @@ export default defineComponent({
             editing.value = !editing.value;
         };
 
-        const save = async (close = false) => {
-            if (busy.value) return;
-
-            busy.value = true;
-
+        const save = wrapFnWithBusyState(busy, async () => {
             try {
                 const train = await useAPI().train.update(refs.entityId.value, {
                     name: name.value,
@@ -61,54 +60,61 @@ export default defineComponent({
 
                 emit('updated', train);
 
-                if (close) {
-                    editing.value = false;
-                }
+                editing.value = false;
             } catch (e) {
                 if (e instanceof Error) {
                     emit('failed', e);
                 }
             }
-
-            busy.value = false;
-        };
-
-        if (editing.value) {
-            return () => h('input', {
-                value: name.value,
-                onInput($event: any) {
-                    name.value = $event.target.value;
-                },
-                disabled: busy.value,
-                class: 'form-control',
-                placeholder: '...',
-                onKeyupEnter($event: any) {
-                    $event.preventDefault();
-                    return save();
-                },
-            });
-        }
+        });
 
         return () => {
-            let text : VNodeArrayChildren = [];
+            if (editing.value) {
+                return h('div', { class: 'input-group' }, [
+                    h('input', {
+                        value: name.value,
+                        onInput($event: any) {
+                            $event.preventDefault();
+                            name.value = $event.target.value;
+                        },
+                        disabled: busy.value,
+                        class: 'form-control',
+                        placeholder: '...',
+                    }),
+                    h('button', {
+                        class: 'btn btn-xs btn-primary',
+                        onClick($event: any) {
+                            $event.preventDefault();
+
+                            return save();
+                        },
+                    }, [
+                        h('i', { class: 'fa fa-save' }),
+                    ]),
+                ]);
+            }
+
+            let text : VNodeChild;
+
             if (hasNormalizedSlot('default', slots)) {
-                text = [normalizeSlot('default', {
+                text = normalizeSlot('default', {
                     entityId: refs.entityId.value,
                     entityName: refs.entityName.value,
                     nameDisplay: nameDisplay.value,
-                })];
+                }, slots);
             } else {
                 text = [
                     nameDisplay.value,
                     ...(refs.entityName.value ? [
-                        h('small', { class: 'text-muted' }, [refs.entityId.value]),
+                        ' ',
+                        h('small', { class: 'text-muted' }, [`${refs.entityId.value}`]),
                     ] : []),
                 ];
             }
 
             return h('span', [
-                ...text,
-                ...(editing.value ? [
+                text,
+                ...(!editing.value && !!refs.editable.value ? [
                     h('a', {
                         class: 'ms-1',
                         // eslint-disable-next-line no-script-url

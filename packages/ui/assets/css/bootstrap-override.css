@@ -83,6 +83,14 @@ a:focus{
     border-radius: 3px;
 }
 
+.btn-md,
+.btn-group-md > .btn {
+    --bs-btn-padding-y: 0.25rem;
+    --bs-btn-padding-x: 0.5rem;
+    --bs-btn-font-size: 1rem;
+    --bs-btn-border-radius: var(--bs-border-radius-sm);
+}
+
 .dropdown-xs>.btn,
 .btn-group-xs>.btn,
 .btn-xs {
