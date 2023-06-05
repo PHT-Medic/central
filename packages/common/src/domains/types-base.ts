@@ -23,8 +23,8 @@ export interface DomainAPISlim<
     T extends Record<string, any> = Record<string, any>,
     ID extends keyof T = 'id',
     > {
-    getMany(record?: BuildInput<T>);
-    getOne(id: T[ID], record?: BuildInput<T>);
+    getMany(record?: BuildInput<T>) : Promise<CollectionResourceResponse<T>>;
+    getOne(id: T[ID], record?: BuildInput<T>) : Promise<SingleResourceResponse<T>>;
     delete(id: T[ID]) : Promise<SingleResourceResponse<T>>;
     create(data: Partial<T>) : Promise<SingleResourceResponse<T>>;
 }

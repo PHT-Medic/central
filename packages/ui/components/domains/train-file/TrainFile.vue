@@ -36,7 +36,7 @@ export default defineComponent({
             type: String,
         },
     },
-    emits: ['toggle', 'check', 'updated', 'deleted'],
+    emits: ['toggle', 'check', 'updated', 'deleted', 'failed'],
     setup(props, { emit }) {
         const refs = toRefs(props);
 

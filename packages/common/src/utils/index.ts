@@ -9,7 +9,6 @@ export * from './error';
 export * from './has-own-property';
 export * from './hex-checker';
 export * from './hostname';
-export * from './merge-deep';
 export * from './nanoid';
 export * from './object-properties';
 export * from './proxy-connection-string';

@@ -126,12 +126,12 @@ export default defineComponent({
             }
         });
 
-        const fileListNode = ref<null | TrainFileList>(null);
+        const fileListNode = ref<null | typeof TrainFileList>(null);
 
         const selectAllFiles = () => {
             if (selectAll.value) {
                 if (fileListNode.value) {
-                    selected.value = fileListNode.value.data
+                    selected.value = (fileListNode.value.data as TrainFile[])
                         .map((file) => file.id)
                         .filter((id) => id !== form.entrypoint_file_id);
                 }

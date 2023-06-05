@@ -14,7 +14,8 @@
         "build": "nuxi build",
         "start": "nuxi start",
         "generate": "nuxi generate",
-        "prepare": "nuxi prepare"
+        "prepare": "nuxi prepare",
+        "typecheck": "nuxi typecheck"
     },
     "devDependencies": {
         "@authup/client-vue": "^0.37.0",

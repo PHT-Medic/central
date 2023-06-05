@@ -19,7 +19,7 @@ export default defineComponent({
             { id: 6, name: 'Kontaktinformationen' },
         ]);
 
-        const change = (id) => {
+        const change = (id: number) => {
             current.value = id;
         };
 

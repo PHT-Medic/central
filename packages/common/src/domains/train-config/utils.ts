@@ -6,10 +6,10 @@
  */
 
 import type { TrainConfig, TrainConfigRouteItem } from './type';
-import { hasOwnProperty } from '../../utils';
+import { hasOwnProperty, isObject } from '../../utils';
 
 export function isTrainConfigRoute(value: unknown) : value is TrainConfigRouteItem {
-    if (typeof value !== 'object') {
+    if (isObject(value)) {
         return false;
     }
 
