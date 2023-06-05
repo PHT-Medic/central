@@ -71,17 +71,17 @@ export default defineComponent({
                 },
                 items: {
                     item: {
-                        fn(item, slots) {
+                        fn(item, slotProps) {
                             return h(
                                 TrainLogComponent,
                                 {
                                     entity: item,
-                                    index: slots.index,
+                                    index: slotProps.index,
                                     onDeleted() {
-                                        slots.deleted();
+                                        slotProps.deleted();
                                     },
                                     onUpdated(e: TrainLog) {
-                                        slots.updated(e);
+                                        slotProps.updated(e);
                                     },
                                 },
                             );

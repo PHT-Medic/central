@@ -89,38 +89,40 @@ export default defineComponent({
             });
         }
 
-        let text : VNodeArrayChildren = [];
-        if (hasNormalizedSlot('default', slots)) {
-            text = [normalizeSlot('default', {
-                entityId: refs.entityId,
-                entityName: refs.entityName,
-                nameDisplay,
-            })];
-        } else {
-            text = [
-                nameDisplay.value,
-                ...(refs.entityName.value ? [
-                    h('small', { class: 'text-muted' }, [refs.entityId.value]),
-                ] : []),
-            ];
-        }
+        return () => {
+            let text : VNodeArrayChildren = [];
+            if (hasNormalizedSlot('default', slots)) {
+                text = [normalizeSlot('default', {
+                    entityId: refs.entityId.value,
+                    entityName: refs.entityName.value,
+                    nameDisplay: nameDisplay.value,
+                })];
+            } else {
+                text = [
+                    nameDisplay.value,
+                    ...(refs.entityName.value ? [
+                        h('small', { class: 'text-muted' }, [refs.entityId.value]),
+                    ] : []),
+                ];
+            }
 
-        return () => h('span', [
-            ...text,
-            ...(editing.value ? [
-                h('a', {
-                    class: 'ms-1',
-                    // eslint-disable-next-line no-script-url
-                    href: 'javascript:void(0)',
-                    disabled: busy.value,
-                    onClick($event: any) {
-                        $event.preventDefault();
-                        return toggle();
-                    },
-                }, [
-                    h('i', { class: 'fa fa-pencil-alt' }),
-                ]),
-            ] : []),
-        ]);
+            return h('span', [
+                ...text,
+                ...(editing.value ? [
+                    h('a', {
+                        class: 'ms-1',
+                        // eslint-disable-next-line no-script-url
+                        href: 'javascript:void(0)',
+                        disabled: busy.value,
+                        onClick($event: any) {
+                            $event.preventDefault();
+                            return toggle();
+                        },
+                    }, [
+                        h('i', { class: 'fa fa-pencil-alt' }),
+                    ]),
+                ] : []),
+            ]);
+        };
     },
 });

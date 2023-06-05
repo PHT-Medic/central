@@ -7,13 +7,14 @@
 <script lang="ts">
 
 import { TrainResultStatus } from '@personalhealthtrain/central-common';
-import { computed, defineComponent } from 'vue';
+import type { PropType } from 'vue';
+import { computed, defineComponent, toRefs } from 'vue';
 
 export default defineComponent({
     name: 'TrainResultStausText',
     props: {
         status: {
-            type: TrainResultStatus,
+            type: Object as PropType<TrainResultStatus>,
             default: null,
         },
     },

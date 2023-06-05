@@ -43,7 +43,14 @@ export default defineComponent({
         });
 
         if (hasNormalizedSlot('default', slots)) {
-            return () => normalizeSlot('default', { classSuffix, statusText }, slots);
+            return () => normalizeSlot(
+                'default',
+                {
+                    classSuffix: classSuffix.value,
+                    statusText: statusText.value,
+                },
+                slots,
+            );
         }
 
         return () => h('span', {
