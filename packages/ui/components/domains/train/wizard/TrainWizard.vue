@@ -7,7 +7,7 @@
 <script lang="ts">
 import { FormWizard, TabContent, WizardButton } from 'vue3-form-wizard';
 import { initFormAttributesFromSource } from '@authup/client-vue';
-import type { PropType } from 'vue';
+import type { PropType, Ref } from 'vue';
 import {
     computed,
     defineComponent, reactive, ref, toRefs, watch,
@@ -16,7 +16,6 @@ import type { Train, TrainFile } from '@personalhealthtrain/central-common';
 import {
     TrainConfigurationStatus,
 } from '@personalhealthtrain/central-common';
-import { useNuxtApp } from '#app';
 import { useAPI } from '#imports';
 import TrainWizardStepBase from './TrainWizardStepBase';
 import TrainFileManager from '../../train-file/TrainFileManager';
@@ -111,7 +110,7 @@ export default defineComponent({
             handleUpdated(item);
         };
 
-        const wizardNode = ref<null | Record<string, any>>(null);
+        const wizardNode : Ref<typeof FormWizard> = ref(null);
 
         const canPassBaseWizardStep = async () => {
             if (!form.master_image_id) {
@@ -248,7 +247,7 @@ export default defineComponent({
         const setFhirQuery = (query: string) => {
             updateForm({ query });
         };
-        const setEntrypointFile = (item: TrainFile) => {
+        const setEntrypointFile = (item?: TrainFile) => {
             updateForm({ entrypoint_file_id: item ? item.id : null as string });
         };
 
@@ -275,7 +274,7 @@ export default defineComponent({
             emit('finished');
         };
 
-        const hashStepNode = ref<{ reset() : void } | null>(null);
+        const hashStepNode : Ref<typeof TrainWizardStepHash> = ref();
         const handleFilesChanged = () => {
             if (hashStepNode.value) {
                 hashStepNode.value.reset();

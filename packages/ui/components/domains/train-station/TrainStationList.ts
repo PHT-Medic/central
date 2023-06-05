@@ -20,9 +20,10 @@ import {
     buildDomainEventFullName,
     buildDomainEventSubscriptionFullName,
 } from '@personalhealthtrain/central-common';
+import type { ListItemSlotProps } from '@vue-layout/list-controls';
 import type { BuildInput, FiltersBuildInput } from 'rapiq';
 
-import type { PropType } from 'vue';
+import type { PropType, SlotsType } from 'vue';
 import { computed, defineComponent } from 'vue';
 import type { Socket } from 'socket.io-client';
 import { realmIdForSocket } from '../../../composables/domain/realm';
@@ -87,6 +88,9 @@ export default defineComponent({
             default: Direction.OUT,
         },
     },
+    slots: Object as SlotsType<{
+        item: ListItemSlotProps<TrainStation>
+    }>,
     async setup(props, ctx) {
         const refs = toRefs(props);
 

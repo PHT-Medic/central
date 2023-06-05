@@ -125,7 +125,7 @@ export default defineComponent({
                     </proposal-station-list>
                 </div>
                 <div class="col-12 col-xl-6">
-                    <train-station-list
+                    <TrainStationList
                         ref="trainStationList"
                         :realm-id="train.realm_id"
                         :direction="'out'"
@@ -134,7 +134,7 @@ export default defineComponent({
                         <template #header-title>
                             <span>Stations <span class="text-success">selected</span></span>
                         </template>
-                    </train-station-list>
+                    </TrainStationList>
                 </div>
             </div>
         </div>

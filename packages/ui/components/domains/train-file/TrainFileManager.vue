@@ -62,6 +62,8 @@ export default defineComponent({
             }
         };
 
+        initFromProperties();
+
         const updatedAt = computed(() => (refs.entity.value ?
             refs.entity.value.updated_at :
             undefined));
@@ -129,7 +131,9 @@ export default defineComponent({
         const selectAllFiles = () => {
             if (selectAll.value) {
                 if (fileListNode.value) {
-                    selected.value = fileListNode.value.data.map((file) => file.id).filter((id) => id !== form.entrypoint_file_id);
+                    selected.value = fileListNode.value.data
+                        .map((file) => file.id)
+                        .filter((id) => id !== form.entrypoint_file_id);
                 }
             } else {
                 selected.value = [];
@@ -137,7 +141,7 @@ export default defineComponent({
         };
 
         const toggleFile = (file: TrainFile) => {
-            const index = selected.value.findIndex((file) => file === file.id);
+            const index = selected.value.findIndex((el) => el === file.id);
             if (index === -1) {
                 selected.value.push(file.id);
             } else {
@@ -184,6 +188,8 @@ export default defineComponent({
                 entryPointFile.value = file;
             }
 
+            refs.entity.value.entrypoint_file_id = form.entrypoint_file_id;
+
             // do not allow deletion of entrypoint file.
             if (form.entrypoint_file_id) {
                 const index = selected.value.findIndex((file) => file === form.entrypoint_file_id);
@@ -192,7 +198,7 @@ export default defineComponent({
                 }
             }
 
-            emit('setEntrypointFile', entryPointFile);
+            emit('setEntrypointFile', entryPointFile.value);
         };
 
         return {

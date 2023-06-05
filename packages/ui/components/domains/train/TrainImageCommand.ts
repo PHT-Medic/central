@@ -85,6 +85,8 @@ export default defineComponent({
             }
         });
 
+        await loadMasterImage();
+
         watch(refs.masterImageId, async (value, oldValue) => {
             if (value && value !== oldValue) {
                 await loadMasterImage();
@@ -103,9 +105,15 @@ export default defineComponent({
             }
         });
 
+        await loadTrainFile();
+
         watch(refs.trainFileId, async (value, oldValue) => {
-            if (value && value !== oldValue) {
-                await loadTrainFile();
+            if (value) {
+                if (value !== oldValue) {
+                    await loadTrainFile();
+                }
+            } else {
+                trainFileEntity.value = null;
             }
         });
 

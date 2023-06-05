@@ -66,6 +66,7 @@ export default defineComponent({
                 headerTitle: false,
 
                 noMore: {
+                    class: { presets: { bootstrap: false }, value: 'list-no-more' },
                     textContent: 'No more logs available...',
                 },
                 items: {

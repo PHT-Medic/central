@@ -30,7 +30,7 @@ export default defineComponent({
         },
         filesSelected: {
             type: Array,
-            default: () => [],
+            required: true,
         },
         fileSelectedId: {
             type: String,
@@ -55,11 +55,11 @@ export default defineComponent({
         const isMatch = computed(() => refs.fileSelectedId.value === refs.file.value.id);
 
         const toggle = () => {
-            emit('toggle', refs.file);
+            emit('toggle', refs.file.value);
         };
 
         const markToggle = () => {
-            emit('check', refs.file);
+            emit('check', refs.file.value);
         };
 
         const handleSocketUpdated = (context: SocketServerToClientEventContext<TrainFileEventContext>) => {
