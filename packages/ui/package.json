@@ -31,7 +31,7 @@
         "@vue-layout/gravatar": "^2.3.0",
         "@vue-layout/list-controls": "^2.6.1",
         "@vue-layout/navigation": "^2.3.1",
-        "@vue-layout/pagination": "^2.3.0",
+        "@vue-layout/pagination": "^2.7.0",
         "@vue-layout/preset-bootstrap-v5": "^2.6.0",
         "@vue-layout/preset-font-awesome": "^2.0.0",
         "@vue-layout/timeago": "^2.4.0",
