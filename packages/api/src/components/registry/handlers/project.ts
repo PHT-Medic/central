@@ -7,13 +7,11 @@
 
 import {
     Ecosystem,
-    REGISTRY_PROJECT_SECRET_ENGINE_KEY,
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
-import { useClient as useVaultClient } from '@hapic/vault';
 import os from 'node:os';
 import { useDataSource } from 'typeorm-extension';
-import { RegistryEntity, RegistryProjectEntity } from '../../../domains';
+import { RegistryEntity, RegistryProjectEntity, removeRegistryProjectFromVault } from '../../../domains';
 import { RegistryCommand } from '../constants';
 import type { RegistryProjectLinkPayload, RegistryProjectUnlinkPayload } from '../type';
 import { ensureRemoteRegistryProjectAccount } from './helpers/remote-robot-account';
@@ -194,8 +192,7 @@ export async function unlinkRegistryProject(
     }
 
     try {
-        await useVaultClient()
-            .keyValueV1.delete({ mount: REGISTRY_PROJECT_SECRET_ENGINE_KEY, path: payload.externalName });
+        await removeRegistryProjectFromVault(payload.externalName);
     } catch (e) {
         useLogger()
             .warn('Vault project representation could not be deleted.', {

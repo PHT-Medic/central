@@ -7,7 +7,6 @@
 
 export * from './permission';
 export * from './realm';
-export * from './robot';
 export * from './user';
 export * from './ecosystem';
 export * from './master-image-group';

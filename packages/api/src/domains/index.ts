@@ -13,6 +13,7 @@ export * from './proposal-station';
 export * from './realm';
 export * from './registry';
 export * from './registry-project';
+export * from './robot';
 export * from './station';
 export * from './train';
 export * from './train-file';

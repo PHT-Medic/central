@@ -7,37 +7,8 @@
 
 import { buildRobotPermissionForAllResources, isClientErrorWithStatusCode } from '@hapic/harbor';
 import type { HarborClient, Robot } from '@hapic/harbor';
-import { useClient as useVaultClient } from '@hapic/vault';
-import type { RegistryProjectSecretStoragePayload } from '@personalhealthtrain/central-common';
-import {
-    REGISTRY_PROJECT_SECRET_ENGINE_KEY,
-} from '@personalhealthtrain/central-common';
-import { isObject } from 'locter';
-
-async function saveRegistryProject(name: string, data: RegistryProjectSecretStoragePayload) {
-    try {
-        await useVaultClient()
-            .keyValueV1.create({
-                mount: REGISTRY_PROJECT_SECRET_ENGINE_KEY,
-                path: name,
-                data,
-            });
-    } catch (e) {
-        if (isClientErrorWithStatusCode(e, 404)) {
-            await useVaultClient().mount.create({
-                path: REGISTRY_PROJECT_SECRET_ENGINE_KEY,
-                data: {
-                    type: 'kv',
-                    options: {
-                        version: 1,
-                    },
-                },
-            });
-
-            await saveRegistryProject(name, data);
-        }
-    }
-}
+import type { RegistryProjectVaultPayload } from '../../../../domains';
+import { findRegistryProjectInVault, saveRegistryProjectToVault } from '../../../../domains';
 
 export async function ensureRemoteRegistryProjectAccount(
     httpClient: HarborClient,
@@ -48,7 +19,7 @@ export async function ensureRemoteRegistryProjectAccount(
 ) : Promise<Robot> {
     let robotAccount : Robot | undefined;
 
-    let secretStorageData : RegistryProjectSecretStoragePayload | undefined;
+    let secretStorageData : RegistryProjectVaultPayload | undefined;
 
     if (
         !context.account.id ||
@@ -62,32 +33,9 @@ export async function ensureRemoteRegistryProjectAccount(
             });
         } catch (e) {
             if (isClientErrorWithStatusCode(e, 409)) {
-                try {
-                    const response = await useVaultClient()
-                        .keyValueV1
-                        .getOne<RegistryProjectSecretStoragePayload>({
-                            mount: REGISTRY_PROJECT_SECRET_ENGINE_KEY,
-                            path: context.name,
-                        });
+                secretStorageData = await findRegistryProjectInVault(context.name);
 
-                    if (
-                        response &&
-                        response.data
-                    ) {
-                        secretStorageData = response.data;
-                    }
-                } catch (e) {
-                    if (!isClientErrorWithStatusCode(e, 404)) {
-                        throw e;
-                    }
-                }
-
-                if (
-                    isObject(secretStorageData) &&
-                    !!secretStorageData.account_id &&
-                    !!secretStorageData.account_name &&
-                    !!secretStorageData.account_secret
-                ) {
+                if (secretStorageData) {
                     robotAccount = {
                         id: parseInt(secretStorageData.account_id, 10),
                         name: secretStorageData.account_name,
@@ -114,6 +62,7 @@ export async function ensureRemoteRegistryProjectAccount(
                         const { secret } = await httpClient.robot.updateSecret(
                             robotAccount.id,
                         );
+
                         secretStorageData = {
                             account_id: `${robotAccount.id}`,
                             account_name: robotAccount.name,
@@ -122,7 +71,7 @@ export async function ensureRemoteRegistryProjectAccount(
                     }
                 }
 
-                await saveRegistryProject(context.name, secretStorageData);
+                await saveRegistryProjectToVault(context.name, secretStorageData);
             } else {
                 throw e;
             }
@@ -152,7 +101,7 @@ export async function ensureRemoteRegistryProjectAccount(
                 account_secret: robotAccount.secret,
             };
 
-            await saveRegistryProject(context.name, secretStorageData);
+            await saveRegistryProjectToVault(context.name, secretStorageData);
         } catch (e) {
             if (isClientErrorWithStatusCode(e, 404)) {
                 return ensureRemoteRegistryProjectAccount(httpClient, {
