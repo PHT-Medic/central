@@ -27,7 +27,7 @@
         "@pinia/nuxt": "^0.4.11",
         "@types/moment": "^2.13.0",
         "@vue-layout/countdown": "^2.4.0",
-        "@vue-layout/form-controls": "^2.8.0",
+        "@vue-layout/form-controls": "^2.8.3",
         "@vue-layout/gravatar": "^2.3.0",
         "@vue-layout/list-controls": "^2.8.0",
         "@vue-layout/navigation": "^2.8.0",
