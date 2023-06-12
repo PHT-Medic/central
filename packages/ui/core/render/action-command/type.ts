@@ -5,10 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export type ActionCommandMethods = {
-    do(): Promise<void>
-};
-
 export type ActionCommandProperties = {
     elementType: 'button' | 'link' | 'dropDownItem',
     withIcon: boolean,

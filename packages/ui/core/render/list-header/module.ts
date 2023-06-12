@@ -7,7 +7,7 @@
 
 import type { FormInputBuildOptionsInput } from '@vue-layout/form-controls';
 import { buildFormInputText } from '@vue-layout/form-controls';
-import type { VNodeArrayChildren } from 'vue';
+import type { VNodeArrayChildren, VNodeChild } from 'vue';
 import { h } from 'vue';
 import type { DomainListHeaderSearchOptions, DomainListHeaderTitleOptions, ListHeaderOptions } from './type';
 
@@ -46,16 +46,23 @@ export function buildDomainListHeaderSearch(
 export function buildDomainListHeaderTitle<T>(
     ctx: DomainListHeaderTitleOptions,
 ) {
-    let icon : VNodeArrayChildren = [];
+    let icon : VNodeChild = [];
     if (typeof ctx.icon === 'string') {
         icon = [h('i', { class: ctx.icon })];
     } else if (typeof ctx.icon === 'boolean' && ctx.icon) {
         icon = [h('i', { class: 'fa-solid fa-list pe-1' })];
     }
 
+    let content : VNodeChild;
+    if (typeof ctx.content === 'function') {
+        content = ctx.content();
+    } else {
+        content = ctx.content || 'Overview';
+    }
+
     return h(ctx.tag || 'h6', [
         icon,
-        ctx.content || 'Overview',
+        content,
     ]);
 }
 

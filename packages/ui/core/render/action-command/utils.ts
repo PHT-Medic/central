@@ -67,7 +67,7 @@ export function renderActionCommand(ctx: Context) {
     }
 
     if (hasNormalizedSlot('default', ctx.slots)) {
-        normalizeSlot('default', {
+        return normalizeSlot('default', {
             commandText: ctx.commandText,
             isDisabled: ctx.isDisabled,
             isAllowed: ctx.isAllowed,

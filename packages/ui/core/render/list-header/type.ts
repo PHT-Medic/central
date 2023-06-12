@@ -5,12 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Ref, VNode, VNodeArrayChildren } from 'vue';
+import type {
+    Ref, VNode, VNodeArrayChildren, VNodeChild,
+} from 'vue';
 
 export type DomainListHeaderTitleOptionsInput = {
     icon?: boolean | string,
     tag?: string,
-    content?: string | VNodeArrayChildren | VNode | (() => VNode | VNodeArrayChildren)
+    content?: string | VNodeChild | (() => VNode | VNodeArrayChildren)
 };
 export type DomainListHeaderTitleOptions = DomainListHeaderTitleOptionsInput;
 
