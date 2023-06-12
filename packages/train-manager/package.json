@@ -24,7 +24,7 @@
         "@authup/core": "^0.37.0",
         "@authup/server-adapter": "^0.37.0",
         "@ebec/http": "^1.1.0",
-        "@hapic/harbor": "^2.0.0-alpha.10",
+        "@hapic/harbor": "^2.0.0",
         "@personalhealthtrain/central-common": "2.3.3",
         "@personalhealthtrain/central-server-common": "2.3.3",
         "amqp-extension": "^2.0.0",
