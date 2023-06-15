@@ -60,7 +60,7 @@ export async function transferInterRegistry(context: TransferContext) {
     const httpClient = createBasicHarborAPIClient(connectionString);
 
     try {
-        await httpClient.projectArtifact
+        await httpClient.projectRepositoryArtifact
             .delete({
                 projectName: context.source.project.external_name,
                 repositoryName: context.source.repositoryName,

@@ -23,10 +23,10 @@ export async function findRobotCredentialsInVault(
     const client = useClient();
 
     try {
-        const response = await client.keyValueV1.getOne({
-            mount: 'robots',
-            path: name,
-        });
+        const response = await client.keyValueV1.getOne(
+            'robots',
+            name,
+        );
 
         if (
             response &&

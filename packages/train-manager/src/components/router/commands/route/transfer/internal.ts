@@ -57,7 +57,7 @@ export async function transferInternal(context: TransferContext) {
     // --------------------------------------------------------------
 
     if (context.destination.project.type === RegistryProjectType.STATION) {
-        await httpClient.projectArtifact.copy(
+        await httpClient.projectRepositoryArtifact.copy(
             {
                 projectName: context.destination.project.external_name,
                 repositoryName: context.destination.repositoryName,
@@ -70,7 +70,7 @@ export async function transferInternal(context: TransferContext) {
         );
 
         try {
-            await httpClient.projectArtifact
+            await httpClient.projectRepositoryArtifact
                 .delete({
                     projectName: context.source.project.external_name,
                     repositoryName: context.source.repositoryName,
@@ -85,7 +85,7 @@ export async function transferInternal(context: TransferContext) {
 
     // --------------------------------------------------------------
 
-    await httpClient.projectArtifact.copy(
+    await httpClient.projectRepositoryArtifact.copy(
         {
             projectName: context.destination.project.external_name,
             repositoryName: context.destination.repositoryName,
@@ -98,7 +98,7 @@ export async function transferInternal(context: TransferContext) {
     );
 
     try {
-        await httpClient.projectArtifact
+        await httpClient.projectRepositoryArtifact
             .delete({
                 projectName: context.source.project.external_name,
                 repositoryName: context.source.repositoryName,

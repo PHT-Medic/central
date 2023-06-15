@@ -20,15 +20,15 @@ export async function creteRegistryProjectVaultEngine() {
 
     const client = useClient();
 
-    await client.mount.create({
-        path: 'registry-project',
-        data: {
+    await client.mount.create(
+        'registry-project',
+        {
             type: 'kv',
             options: {
                 version: 1,
             },
         },
-    });
+    );
 }
 
 export async function removeRegistryProjectFromVault(name: string) {
@@ -39,10 +39,10 @@ export async function removeRegistryProjectFromVault(name: string) {
     const client = useClient();
 
     try {
-        await client.keyValueV1.delete({
-            mount: 'registry-project',
-            path: name,
-        });
+        await client.keyValueV1.delete(
+            'registry-project',
+            name,
+        );
     } catch (e) {
         if (isClientErrorWithStatusCode(e, 404)) {
             return;
@@ -55,11 +55,11 @@ export async function removeRegistryProjectFromVault(name: string) {
 export async function saveRegistryProjectToVault(name: string, data: RegistryProjectVaultPayload) {
     try {
         await useClient()
-            .keyValueV1.create({
-                mount: 'registry-project',
-                path: name,
+            .keyValueV1.create(
+                'registry-project',
+                name,
                 data,
-            });
+            );
     } catch (e) {
         if (isClientErrorWithStatusCode(e, 404)) {
             await creteRegistryProjectVaultEngine();
@@ -78,10 +78,10 @@ export async function findRegistryProjectInVault(
     const client = useClient();
 
     try {
-        const response = await client.keyValueV1.getOne({
-            mount: 'registry-project',
-            path: name,
-        });
+        const response = await client.keyValueV1.getOne(
+            'registry-project',
+            name,
+        );
 
         if (
             response &&
