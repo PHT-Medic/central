@@ -16,7 +16,7 @@
     },
     "dependencies": {
         "@socket.io/redis-emitter": "^5.1.0",
-        "@authup/core": "^0.37.0",
+        "@authup/core": "^0.37.1",
         "@ebec/http": "^1.1.0",
         "@personalhealthtrain/central-common": "2.3.3"
     },

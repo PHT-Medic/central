@@ -18,8 +18,8 @@
         "typecheck": "nuxi typecheck"
     },
     "devDependencies": {
-        "@authup/client-vue": "^0.37.0",
-        "@authup/core": "^0.37.0",
+        "@authup/client-vue": "^0.37.1",
+        "@authup/core": "^0.37.1",
         "@bootstrap-vue-next/nuxt": "^0.1.0",
         "@fortawesome/fontawesome-free": "^6.4.0",
         "@nuxtjs/google-fonts": "^3.0.1",
@@ -42,7 +42,7 @@
         "bootstrap-vue-next": "^0.9.4",
         "browser-storage-adapter": "^1.1.2",
         "events": "^3.3.0",
-        "hapic": "^2.0.0-alpha.10",
+        "hapic": "^2.0.0",
         "ilingo": "^3.0.0",
         "moment": "^2.29.4",
         "nuxt": "^3.5.3",
@@ -50,7 +50,6 @@
         "rapiq": "^0.8.1",
         "smob": "^1.4.0",
         "socket.io-client": "^4.6.2",
-        "tsconfig-paths-webpack-plugin": "^4.0.1",
         "vue": "^3.3.4",
         "vue3-form-wizard": "^0.2.1"
     },
