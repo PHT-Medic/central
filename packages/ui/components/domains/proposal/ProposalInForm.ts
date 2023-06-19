@@ -11,6 +11,7 @@ import { ProposalStationApprovalStatus } from '@personalhealthtrain/central-comm
 import { buildFormInput, buildFormSelect, buildFormSubmit } from '@vue-layout/form-controls';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
+import { ref } from 'vue';
 import type { PropType } from 'vue';
 import { buildValidationTranslator } from '../../../composables/ilingo';
 import { wrapFnWithBusyState } from '../../../core/busy';
@@ -65,53 +66,57 @@ export default defineComponent({
             }
         });
 
-        const comment = buildFormInput({
-            validationTranslator: buildValidationTranslator(),
-            validationResult: $v.value.comment,
-            label: true,
-            labelContent: 'Comment',
-            value: form.comment,
-            onChange(input) {
-                form.comment = input;
-            },
-            props: {
-                placeholder: 'Write a comment why you want to approve or either reject the proposal...',
-            },
-        });
+        return () => {
+            const comment = buildFormInput({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.comment,
+                label: true,
+                labelContent: 'Comment',
+                value: form.comment,
+                onChange(input) {
+                    form.comment = input;
+                },
+                props: {
+                    placeholder: 'Write a comment why you want to approve or either reject the proposal...',
+                },
+            });
 
-        const status = buildFormSelect({
-            validationTranslator: buildValidationTranslator(),
-            validationResult: $v.value.approval_status,
-            label: true,
-            labelContent: 'Status',
-            value: form.approval_status,
-            onChange(input) {
-                form.approval_status = input;
-            },
-            options: options.map((option) => ({
-                id: option,
-                value: option,
-            })),
-        });
+            const status = buildFormSelect({
+                validationTranslator: buildValidationTranslator(),
+                validationResult: $v.value.approval_status,
+                label: true,
+                labelContent: 'Status',
+                value: form.approval_status,
+                onChange(input) {
+                    form.approval_status = input;
+                },
+                options: options.map((option) => ({
+                    id: option,
+                    value: option,
+                })),
+            });
 
-        const submitNode = buildFormSubmit({
-            submit,
-            busy,
-            updateText: 'Update',
-            createText: 'Create',
-        });
+            const submitNode = buildFormSubmit({
+                submit,
+                busy: busy.value,
+                updateText: 'Update',
+                createText: 'Create',
+                isEditing: true,
+                validationResult: $v.value,
+            });
 
-        return () => h(
-            'div',
-            [
-                h('div', { class: 'alert alert-sm alert-info' }, [
-                    'You have to approve the proposal, so the proposal owner can target you as a station for the train route.',
-                ]),
-                comment,
-                status,
-                h('hr'),
-                submitNode,
-            ],
-        );
+            return h(
+                'div',
+                [
+                    h('div', { class: 'alert alert-sm alert-info' }, [
+                        'You have to approve the proposal, so the proposal owner can target you as a station for the train route.',
+                    ]),
+                    comment,
+                    status,
+                    h('hr'),
+                    submitNode,
+                ],
+            );
+        };
     },
 });

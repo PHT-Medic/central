@@ -93,16 +93,14 @@ export default defineNuxtComponent({
             // do nothing :)
         }
 
-        const modalNode = ref<null | BModal>(null);
+        const modalNode = ref<boolean>(false);
 
         const entity = ref<null | ProposalStation>(null);
 
         const edit = (item: ProposalStation) => {
             entity.value = item;
 
-            if (modalNode.value) {
-                modalNode.value.show();
-            }
+            modalNode.value = true;
         };
 
         const listNode = ref<null | ProposalStationList>(null);
@@ -112,19 +110,24 @@ export default defineNuxtComponent({
                 listNode.value.handleUpdated(item);
             }
 
-            if (modalNode.value) {
-                modalNode.value.hide();
-            }
+            modalNode.value = false;
+        };
+
+        const handleFailed = (e: Error) => {
+            // todo: handle error
         };
 
         return {
             realmId,
             stationId,
             entity,
+            handleFailed,
             handleUpdated,
             canManage,
             edit,
             fields,
+            listNode,
+            modalNode,
         };
     },
 });
@@ -155,7 +158,7 @@ export default defineNuxtComponent({
                         outlined
                     >
                         <template #cell(realm)="data">
-                            <span class="badge-dark badge">{{ data.item.proposal_realm_id }}</span>
+                            <span class="bg-dark badge">{{ data.item.proposal_realm_id }}</span>
                         </template>
 
                         <template #cell(approval_status)="data">
@@ -165,7 +168,7 @@ export default defineNuxtComponent({
                                 <template #default="slotProps">
                                     <span
                                         class="badge"
-                                        :class="'badge-'+slotProps.classSuffix"
+                                        :class="'bg-'+slotProps.classSuffix"
                                     >
                                         {{ slotProps.statusText }}
                                     </span>
@@ -181,7 +184,7 @@ export default defineNuxtComponent({
                         </template>
                         <template #cell(options)="data">
                             <nuxt-link
-                                class="btn btn-primary btn-xs"
+                                class="btn btn-primary btn-xs me-1"
                                 :to="'/proposals/'+data.item.proposal_id+'?refPath=/proposals/in'"
                             >
                                 <i class="fa fa-arrow-right" />
@@ -235,18 +238,26 @@ export default defineNuxtComponent({
         </div>
 
         <BModal
-            ref="modalNode"
+            v-model="modalNode"
             size="lg"
             button-size="sm"
-            :title-html="'<i class=\'fas fa-file-import\'></i> Proposal' + (entity ? ': '+entity.proposal.title : '')"
             :no-close-on-backdrop="true"
             :no-close-on-esc="true"
             :hide-footer="true"
         >
-            <ProposalInForm
-                :entity="entity"
-                @updated="handleUpdated"
-            />
+            <template #title>
+                <i class="fas fa-file-import" /> Proposal {{ entity ? entity.proposal.title : '' }}
+            </template>
+            <template v-if="entity">
+                <ProposalInForm
+                    :entity="entity"
+                    @updated="handleUpdated"
+                    @failed="handleFailed"
+                />
+            </template>
+            <template v-else>
+                ...
+            </template>
         </BModal>
     </div>
 </template>

@@ -159,33 +159,31 @@ export default {
                         <label>Proposals</label>
                     </template>
                     <template #item="props">
-                        <div class="list-item">
-                            <proposal-item
-                                :entity="props.data"
-                                @updated="props.handleUpdated"
-                                @deleted="props.handleDeleted"
-                            >
-                                <template #item-actions="itemActionProps">
-                                    <button
-                                        :disabled="itemActionProps.busy"
-                                        type="button"
-                                        class="btn btn-xs"
+                        <proposal-item
+                            :entity="props.data"
+                            @updated="props.handleUpdated"
+                            @deleted="props.handleDeleted"
+                        >
+                            <template #item-actions="itemActionProps">
+                                <button
+                                    :disabled="itemActionProps.busy"
+                                    type="button"
+                                    class="btn btn-xs"
+                                    :class="{
+                                        'btn-dark': form.proposal_id !== itemActionProps.data.id,
+                                        'btn-warning': form.proposal_id === itemActionProps.data.id
+                                    }"
+                                    @click.prevent="toggle('proposal_id', itemActionProps.data.id)"
+                                >
+                                    <i
                                         :class="{
-                                            'btn-dark': form.proposal_id !== itemActionProps.data.id,
-                                            'btn-warning': form.proposal_id === itemActionProps.data.id
+                                            'fa fa-plus': form.proposal_id !== itemActionProps.data.id,
+                                            'fa fa-minus': form.proposal_id === itemActionProps.data.id
                                         }"
-                                        @click.prevent="toggle('proposal_id', itemActionProps.data.id)"
-                                    >
-                                        <i
-                                            :class="{
-                                                'fa fa-plus': form.proposal_id !== itemActionProps.data.id,
-                                                'fa fa-minus': form.proposal_id === itemActionProps.data.id
-                                            }"
-                                        />
-                                    </button>
-                                </template>
-                            </proposal-item>
-                        </div>
+                                    />
+                                </button>
+                            </template>
+                        </proposal-item>
                     </template>
                 </proposal-list>
 

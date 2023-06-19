@@ -76,7 +76,7 @@ export default defineNuxtComponent({
         const download = (item: TrainStation) => {
             const app = useRuntimeConfig();
 
-            window.open(new URL(useAPI().train.getFilesDownloadPath(item.train_id), app.$config.public.apiUrl).href, '_blank');
+            window.open(new URL(useAPI().train.getFilesDownloadPath(item.train_id), app.public.apiUrl).href, '_blank');
         };
 
         const listNode = ref<null | TrainStationList>(null);
@@ -159,7 +159,7 @@ export default defineNuxtComponent({
                         <template #cell(options)="data">
                             <button
                                 type="button"
-                                class="btn btn-dark btn-xs"
+                                class="btn btn-dark btn-xs me-1"
                                 @click.prevent="download(data.item)"
                             >
                                 <i class="fa fa-file-download" />

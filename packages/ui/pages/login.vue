@@ -181,30 +181,21 @@ export default defineNuxtComponent({
                         :query="identityProviderQuery"
                     >
                         <template #header>
-                            <h6 class="mb-0">
+                            <h6 class="mb-2">
                                 <i class="fa-solid fa-atom" /> Providers
                             </h6>
                         </template>
-                        <template #items="props">
-                            <div class="d-flex flex-column">
-                                <template
-                                    v-for="(item, key) in props.data"
-                                    :key="key"
+                        <template #item="props">
+                            <div>
+                                <strong>{{ props.data.name }}</strong>
+                            </div>
+                            <div class="ms-auto">
+                                <a
+                                    :href="buildIdentityProviderURL(props.data.id)"
+                                    class="btn btn-primary btn-xs"
                                 >
-                                    <div class="d-flex flex-wrap flex-row">
-                                        <div>
-                                            <strong>{{ item.name }}</strong>
-                                        </div>
-                                        <div class="ms-auto">
-                                            <a
-                                                :href="buildIdentityProviderURL(item.id)"
-                                                class="btn btn-primary btn-xs"
-                                            >
-                                                {{ item.name }}
-                                            </a>
-                                        </div>
-                                    </div>
-                                </template>
+                                    {{ props.data.name }}
+                                </a>
                             </div>
                         </template>
                     </IdentityProviderList>
