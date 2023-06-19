@@ -49,23 +49,27 @@ export default defineComponent({
 
         return () => h(BModal, {
             ref: modalRef,
-            props: {
-                titleHtml: '<i class="fa-solid fa-file-contract"></i> License Agreement',
-                size: 'lg',
-                buttonSize: 'sm',
-                noCloseOnBackdrop: true,
-                noCloseOnEsc: true,
-                hideFooter: true,
-            },
-        }, [
-            h(LicenseAgreementForm, {
-                onAccepted() {
-                    handleAccepted();
-                },
-                onDeclined() {
-                    handleDeclined();
-                },
-            }),
-        ]);
+            size: 'lg',
+            buttonSize: 'sm',
+            noCloseOnBackdrop: true,
+            noCloseOnEsc: true,
+            hideFooter: true,
+        }, {
+            default: () => [
+                h(LicenseAgreementForm, {
+                    onAccepted() {
+                        handleAccepted();
+                    },
+                    onDeclined() {
+                        handleDeclined();
+                    },
+                }),
+            ],
+            title: () => [
+                h('i', { class: 'fa-solid fa-file-contract' }),
+                ' ',
+                'License Agreement',
+            ],
+        });
     },
 });

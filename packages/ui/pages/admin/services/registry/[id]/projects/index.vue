@@ -7,8 +7,7 @@
 <script lang="ts">
 import type { Registry, RegistryProject } from '@personalhealthtrain/central-common';
 import { PermissionID } from '@personalhealthtrain/central-common';
-import type { BModal } from 'bootstrap-vue-next';
-import { BTable, useToast } from 'bootstrap-vue-next';
+import { BModal, BTable, useToast } from 'bootstrap-vue-next';
 import type { BuildInput } from 'rapiq';
 import { computed, ref, toRefs } from 'vue';
 import type { PropType, Ref } from 'vue';
@@ -21,6 +20,7 @@ import { useAuthStore } from '../../../../../../store/auth';
 
 export default {
     components: {
+        BModal,
         BTable,
         EntityDelete,
         RegistryProjectDetails,
@@ -86,15 +86,13 @@ export default {
             }
         };
 
-        const modalNode = ref<null | BModal>(null);
+        const modalShow = ref<boolean>(false);
         const item : Ref<RegistryProject | null> = ref(null);
 
         const showDetails = (el: RegistryProject) => {
             item.value = el;
 
-            if (modalNode.value) {
-                modalNode.value.show();
-            }
+            modalShow.value = true;
         };
 
         return {
@@ -104,7 +102,7 @@ export default {
             fields,
             query,
             item,
-            modalNode,
+            modalShow,
             listNode,
             showDetails,
         };
@@ -127,7 +125,7 @@ export default {
                     outlined
                 >
                     <template #cell(type)="data">
-                        <span class="badge badge-dark">
+                        <span class="badge bg-dark">
                             {{ data.item.type }}
                         </span>
                     </template>
@@ -172,14 +170,16 @@ export default {
         </registry-project-list>
 
         <BModal
-            ref="modalNode"
+            v-model="modalShow"
             size="lg"
             button-size="sm"
-            :title-html="'<i class=\'fa-solid fa-diagram-project pe-1 \'></i> ' + (item ? item.name : 'Unknown') + '-Project'"
             :no-close-on-backdrop="true"
             :no-close-on-esc="true"
             :hide-footer="true"
         >
+            <template #title>
+                <i class="fa-solid fa-diagram-project" /> {{ item ? item.name : 'Unknown' }}
+            </template>
             <RegistryProjectDetails
                 v-if="item"
                 :entity-id="item.id"
