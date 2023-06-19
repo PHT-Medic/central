@@ -49,7 +49,15 @@ export async function packContainerWithTrain(container: Container, context: Cont
         throw new BuilderError('First station in route could not be determined.');
     }
 
-    const stationPublicKeyString = Buffer.from(trainConfig.route[stationFirstIndex].rsa_public_key, 'hex').toString('utf-8');
+    if (typeof trainConfig.route[stationFirstIndex].rsa_public_key !== 'string') {
+        throw new BuilderError('The public key of the first station in the route is not defined.');
+    }
+
+    const stationPublicKeyString = Buffer.from(
+        trainConfig.route[stationFirstIndex].rsa_public_key,
+        'hex',
+    ).toString('utf-8');
+
     const stationPublicKey = crypto.createPublicKey(stationPublicKeyString);
 
     const symmetricKeyEncrypted = crypto.publicEncrypt({

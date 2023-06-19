@@ -50,6 +50,13 @@
     margin: 0;
 }
 
+.log-container .list-item {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    background-color: inherit;
+}
+
 .log-container .log-header {
     position: sticky;
     top: 0;
@@ -69,15 +76,18 @@
 .log-body .line {
     line-height: 20px;
     color: #d0d7de;
-    display: flex;
-    flex-direction: row;
+    width: 100%;
+}
+
+.log-body .line-status-message {
+    margin-left: 48px;
 }
 
 .log-body .line-number {
     width: 48px;
     overflow: hidden;
     color: rgba(140,149,159,0.75);
-    text-align: right;
+    text-align: center;
     text-decoration: none;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -95,7 +105,6 @@
 .log-body .line-content {
     overflow-x: auto;
     display: inline-block;
-    margin-left: 0.75rem;
     width: 100%;
     margin-right: 1rem;
 }

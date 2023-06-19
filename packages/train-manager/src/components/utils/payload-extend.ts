@@ -9,7 +9,7 @@ import { hasOwnProperty } from '@personalhealthtrain/central-common';
 import type {
     APIClient, Registry, Train,
 } from '@personalhealthtrain/central-common';
-import { useClient } from 'hapic';
+import { isClientErrorWithStatusCode, useClient } from 'hapic';
 import { BaseError } from '../error';
 import type { ComponentPayloadExtended } from '../type';
 
@@ -29,9 +29,13 @@ export async function extendPayload<T extends Partial<ComponentPayloadExtended<{
         try {
             train = await client.train.getOne(data.id);
         } catch (e) {
-            throw BaseError.notFound({
-                previous: e,
-            });
+            if (isClientErrorWithStatusCode(e, 404)) {
+                throw BaseError.notFound({
+                    previous: e,
+                });
+            }
+
+            throw e;
         }
     }
 
@@ -43,9 +47,13 @@ export async function extendPayload<T extends Partial<ComponentPayloadExtended<{
                 fields: ['+account_secret'],
             });
         } catch (e) {
-            throw BaseError.registryNotFound({
-                previous: e,
-            });
+            if (isClientErrorWithStatusCode(e, 404)) {
+                throw BaseError.registryNotFound({
+                    previous: e,
+                });
+            }
+
+            throw e;
         }
     }
 

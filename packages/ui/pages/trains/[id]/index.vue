@@ -20,13 +20,13 @@ export default defineNuxtComponent({
             required: true,
         },
     },
-    setup() {
+    setup(props, { emit }) {
         const handleUpdated = (train: Train) => {
-            this.$emit('updated', train);
+            emit('updated', train);
         };
 
         const handleFailed = (e: Error) => {
-            this.$emit('failed', e);
+            emit('failed', e);
         };
 
         return {
@@ -64,7 +64,7 @@ export default defineNuxtComponent({
                 <div class="panel-box">
                     <h6><i class="fa fa-history" /> Logs</h6>
 
-                    <train-logs :entity="entity" />
+                    <TrainLogs :entity-id="entity.id" />
                 </div>
             </div>
         </div>

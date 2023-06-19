@@ -44,7 +44,12 @@ export async function handleTrainManagerBuilderEvent(
 
     switch (context.event) {
         case BuilderEvent.NONE:
-            entity.build_status = null;
+            if (
+                entity.run_status === null &&
+                entity.result_status === null
+            ) {
+                entity.build_status = null;
+            }
             break;
         case BuilderEvent.BUILDING:
             entity.build_status = TrainBuildStatus.STARTED;
@@ -86,7 +91,6 @@ export async function handleTrainManagerBuilderEvent(
     ) {
         entity.run_status = null;
         entity.run_station_index = null;
-        entity.run_status = null;
         entity.result_status = null;
     }
 

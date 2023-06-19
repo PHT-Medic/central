@@ -7,10 +7,11 @@
 <script lang="ts">
 import { Timeago } from '@vue-layout/timeago';
 import type { TrainLog } from '@personalhealthtrain/central-common';
-import {
-    defineComponent, h, toRefs,
+import { defineComponent, h, toRefs } from 'vue';
+import type {
+    PropType, VNode, VNodeArrayChildren,
+    VNodeChild,
 } from 'vue';
-import type { PropType, VNode, VNodeArrayChildren } from 'vue';
 
 export default defineComponent({
     name: 'TrainLog',
@@ -61,26 +62,39 @@ export default defineComponent({
             ]);
         }
 
-        return h(
-            'div',
-            {
-                class: `line line-${refs.index.value + 1}`,
-            },
-            [
-                h('div', { class: 'line-number' }, [refs.index.value + 1]),
-                h('div', { class: 'line-content d-flex flex-row' }, [
-                    h('div', { class: `line-component ${refs.entity.value.component}` }, [
-                        `${refs.entity.value.component}/${refs.entity.value.command}`,
+        return () => {
+            let statusMessage : VNodeChild | undefined;
+
+            if (refs.entity.value.status_message) {
+                statusMessage = h('div', { class: 'line-status-message' }, [
+                    refs.entity.value.status_message.replace(/\n/g, '\t'),
+                ]);
+            }
+
+            return h(
+                'div',
+                {
+                    class: `line line-${refs.index.value + 1}`,
+                },
+                [
+                    h('div', { class: 'd-flex flex-row' }, [
+                        h('div', { class: 'line-number' }, [refs.index.value + 1]),
+                        h('div', { class: 'line-content d-flex flex-row' }, [
+                            h('div', { class: `line-component ${refs.entity.value.component}` }, [
+                                `${refs.entity.value.component}/${refs.entity.value.command}`,
+                            ]),
+                            h('div', { class: ['line-message', { error: refs.entity.value.error }] }, [
+                                message,
+                            ]),
+                            h('div', { class: 'ms-auto' }, [
+                                h(Timeago, { datetime: refs.entity.value.created_at }),
+                            ]),
+                        ]),
                     ]),
-                    h('div', { class: ['line-message', { error: refs.entity.value.error }] }, [
-                        message,
-                    ]),
-                    h('div', { class: 'ms-auto' }, [
-                        h(Timeago, { datetime: refs.entity.value.created_at }),
-                    ]),
-                ]),
-            ],
-        );
+                    statusMessage,
+                ],
+            );
+        };
     },
 });
 </script>
