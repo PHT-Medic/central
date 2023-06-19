@@ -126,6 +126,7 @@ export async function setupRegistry(payload: RegistrySetupPayload) {
             public: false,
         });
     }
+
     await projectRepository.save(masterImagesEntity);
 
     // -----------------------------------------------

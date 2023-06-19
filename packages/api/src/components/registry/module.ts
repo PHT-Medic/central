@@ -28,7 +28,6 @@ export async function executeRegistryCommand(context: RegistryCommandContext) {
                 useLogger()
                     .info('registry setup completed', { component: 'registry', id: context.data.id });
             } catch (e) {
-                console.log(e);
                 useLogger()
                     .error('registry setup failed', { component: 'registry', id: context.data.id });
             }
