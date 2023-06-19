@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.0](https://github.com/PHT-Medic/central/compare/v2.3.6...v2.4.0-alpha.0) (2023-06-19)
+
+
+### Bug Fixes
+
+* **deps:** bump [@socket](https://github.com/socket).io/redis-adapter from 8.1.0 to 8.2.1 ([#975](https://github.com/PHT-Medic/central/issues/975)) ([6281ebd](https://github.com/PHT-Medic/central/commit/6281ebdca105fd2500af09d954ee04de843a7966))
+* **deps:** bump authup,routup,locter,smob & typeorm-extension ([894b1f4](https://github.com/PHT-Medic/central/commit/894b1f4f5c069aee30dea9a9236ac279a0c4241e))
+* **deps:** bump dotenv from 16.0.3 to 16.1.3 ([#976](https://github.com/PHT-Medic/central/issues/976)) ([9e667eb](https://github.com/PHT-Medic/central/commit/9e667eb3c98264e9da7ecb614f00963343bc1628))
+* **deps:** bump dotenv from 16.1.3 to 16.1.4 ([#1005](https://github.com/PHT-Medic/central/issues/1005)) ([8781920](https://github.com/PHT-Medic/central/commit/878192097e1a37a862ea4a4a9a4c66e5219cbeb2))
+* **deps:** bump dotenv from 16.1.4 to 16.3.1 ([#1021](https://github.com/PHT-Medic/central/issues/1021)) ([61164b2](https://github.com/PHT-Medic/central/commit/61164b2c49446e703afe19b485e5491e84de18e4))
+* **deps:** bump socket.io from 4.6.1 to 4.6.2 ([#979](https://github.com/PHT-Medic/central/issues/979)) ([58321cc](https://github.com/PHT-Medic/central/commit/58321ccffa464eb9e60b990ac38b5e1934b55030))
+* **deps:** bump winston from 3.8.2 to 3.9.0 ([#987](https://github.com/PHT-Medic/central/issues/987)) ([1054a64](https://github.com/PHT-Medic/central/commit/1054a64ec9fc777ed4824a459688f65e63c41163))
+* generic argument for realtime socket/namespace configuration ([7d91565](https://github.com/PHT-Medic/central/commit/7d915652c35de6530f78aca1de94fb763979fc82))
+* proposal- & registry-form, master-image-picker & some minor issues ([2540be5](https://github.com/PHT-Medic/central/commit/2540be5ee3fab263ec389f447b8aeabf6cc20a25))
+* registry, registry-project- & station-form ([1cd1ecf](https://github.com/PHT-Medic/central/commit/1cd1ecf3f81ebd3a4194c52e263c75c4bde71fa6))
+* updated hapic, authup & lerna dependency + adjusted monorepo configuration ([a2a3759](https://github.com/PHT-Medic/central/commit/a2a37596390da2682c89db520a8f7ec1650fcdbe))
+
+
+### Features
+
+* implemented new api client + bump authup ([6f3bb54](https://github.com/PHT-Medic/central/commit/6f3bb547b03b8f9fcad37f8810fa3b3238491aae))
+* socket & raw event distribution + schema refactoring ([#941](https://github.com/PHT-Medic/central/issues/941)) ([500170c](https://github.com/PHT-Medic/central/commit/500170cf8b4e36ffbdfc734db04291af8900454f))
+* split station form + automatic token refreshing ([bb6f9dc](https://github.com/PHT-Medic/central/commit/bb6f9dca60fc6151bc4284f9fe32a180aef06821))
+
+
+
+
+
 ## [2.3.4](https://github.com/PHT-Medic/central/compare/v2.3.3...v2.3.4) (2023-04-05)
 
 

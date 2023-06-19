@@ -3,6 +3,76 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.0](https://github.com/PHT-Medic/central/compare/v2.3.6...v2.4.0-alpha.0) (2023-06-19)
+
+
+### Bug Fixes
+
+* access to slot prop data ([79cd963](https://github.com/PHT-Medic/central/commit/79cd963d4d74a5469fa9821f64a0099a36e24422))
+* adjusted hapic vault & harbor usage ([0735a7c](https://github.com/PHT-Medic/central/commit/0735a7cdbb530dbef849b8cf725bf36b40a30b11))
+* adjusted settings page components ([90af30d](https://github.com/PHT-Medic/central/commit/90af30dfe34d935462966123c64d14b3b3e1bddd))
+* api plugin + interceptor registration & layout navigation rendering ([cc323bf](https://github.com/PHT-Medic/central/commit/cc323bf297940bd0dee2ea4d1e028bf0ab9d5671))
+* common socket(server,client) types + server common publish typings ([502ee32](https://github.com/PHT-Medic/central/commit/502ee32faab477d920d94d26431707d4ea22ce9b))
+* component rendering with default and preset override + action command rendering ([58dc770](https://github.com/PHT-Medic/central/commit/58dc77053079444db7e9befce3fc93e149153c89))
+* **deps:** bump [@socket](https://github.com/socket).io/redis-adapter from 8.1.0 to 8.2.1 ([#975](https://github.com/PHT-Medic/central/issues/975)) ([6281ebd](https://github.com/PHT-Medic/central/commit/6281ebdca105fd2500af09d954ee04de843a7966))
+* **deps:** bump authup,routup,locter,smob & typeorm-extension ([894b1f4](https://github.com/PHT-Medic/central/commit/894b1f4f5c069aee30dea9a9236ac279a0c4241e))
+* **deps:** bump dotenv from 16.0.3 to 16.1.3 ([#976](https://github.com/PHT-Medic/central/issues/976)) ([9e667eb](https://github.com/PHT-Medic/central/commit/9e667eb3c98264e9da7ecb614f00963343bc1628))
+* **deps:** bump dotenv from 16.1.3 to 16.1.4 ([#1005](https://github.com/PHT-Medic/central/issues/1005)) ([8781920](https://github.com/PHT-Medic/central/commit/878192097e1a37a862ea4a4a9a4c66e5219cbeb2))
+* **deps:** bump dotenv from 16.1.4 to 16.3.1 ([#1021](https://github.com/PHT-Medic/central/issues/1021)) ([61164b2](https://github.com/PHT-Medic/central/commit/61164b2c49446e703afe19b485e5491e84de18e4))
+* **deps:** bump minio and @types/minio ([#997](https://github.com/PHT-Medic/central/issues/997)) ([d0f9377](https://github.com/PHT-Medic/central/commit/d0f93778a5ca3f6333fdf45543968f4e4bde21f7))
+* **deps:** bump pg from 8.10.0 to 8.11.0 ([#977](https://github.com/PHT-Medic/central/issues/977)) ([2ed0dac](https://github.com/PHT-Medic/central/commit/2ed0dacef40cb42cff691a993974f0541d8e322a))
+* **deps:** bump socket.io from 4.6.1 to 4.6.2 ([#979](https://github.com/PHT-Medic/central/issues/979)) ([58321cc](https://github.com/PHT-Medic/central/commit/58321ccffa464eb9e60b990ac38b5e1934b55030))
+* **deps:** bump tar and @types/tar ([#984](https://github.com/PHT-Medic/central/issues/984)) ([f589254](https://github.com/PHT-Medic/central/commit/f589254d165391fe21410de37202285a2da8bb26))
+* **deps:** bump typeorm from 0.3.12 to 0.3.15 ([#940](https://github.com/PHT-Medic/central/issues/940)) ([fd94f24](https://github.com/PHT-Medic/central/commit/fd94f2485a5f4ef1f7012e7892a87856f350d5c6))
+* **deps:** bump typeorm from 0.3.15 to 0.3.16 ([#998](https://github.com/PHT-Medic/central/issues/998)) ([8459abe](https://github.com/PHT-Medic/central/commit/8459abe12a2695915b9efa00c954d250cad4a147))
+* **deps:** bump winston from 3.8.2 to 3.9.0 ([#987](https://github.com/PHT-Medic/central/issues/987)) ([1054a64](https://github.com/PHT-Medic/central/commit/1054a64ec9fc777ed4824a459688f65e63c41163))
+* dynamic route parameters ([cbfa362](https://github.com/PHT-Medic/central/commit/cbfa36204261e8a1191a88ea97c3466552b8d8ba))
+* ensure failed event emits error instance ([0be333c](https://github.com/PHT-Medic/central/commit/0be333caaf3e300d02b5892ad721045b60fd8d0a))
+* ensure slot properties are passed by value ([208a23c](https://github.com/PHT-Medic/central/commit/208a23c024574e23275f46a1fe8c60a4291faf2c))
+* ensure vault engine exists for domain entity + better abstraction ([bdbc3d0](https://github.com/PHT-Medic/central/commit/bdbc3d007071d53d73d305376cb6858a7e0f9188))
+* epliciit import for vue-bootstrap components ([1e34c13](https://github.com/PHT-Medic/central/commit/1e34c131879f9333e367531efe9ad52676f880a4))
+* events train-file & train-file-manager component ([30597a1](https://github.com/PHT-Medic/central/commit/30597a19b611cd9c85f35855b07a6406ea4397fc))
+* generic argument for realtime socket/namespace configuration ([7d91565](https://github.com/PHT-Medic/central/commit/7d915652c35de6530f78aca1de94fb763979fc82))
+* language pluing + replaced this. with useAPI() ([e4a9213](https://github.com/PHT-Medic/central/commit/e4a92134453a006c0d425f4f3f8fe4e95f500e2a))
+* middleware base-url typing ([6631270](https://github.com/PHT-Medic/central/commit/6631270a7851ad06d73bd1249fe288e8f32fb659))
+* minor cleanup of utitlity fns/types ([d603afa](https://github.com/PHT-Medic/central/commit/d603afa21dc20be7ac097c695b317ae18d38ba4b))
+* nav builder return render fn ([9fc1cae](https://github.com/PHT-Medic/central/commit/9fc1caedab50c65a4c7eddb59538cad018d61ee0))
+* proposal- & registry-form, master-image-picker & some minor issues ([2540be5](https://github.com/PHT-Medic/central/commit/2540be5ee3fab263ec389f447b8aeabf6cc20a25))
+* reading browser stream + minor master-image picker/sync fixes ([cac653b](https://github.com/PHT-Medic/central/commit/cac653bd351a78174315b33db3d988a0b81c8184))
+* refactor station form + template v-for bug + query sort direction ([38e394f](https://github.com/PHT-Medic/central/commit/38e394fb7df0c39a54236fc9a1e09222b8907e41))
+* registry, registry-project- & station-form ([1cd1ecf](https://github.com/PHT-Medic/central/commit/1cd1ecf3f81ebd3a4194c52e263c75c4bde71fa6))
+* rendering for svg components + proposal form ([b346554](https://github.com/PHT-Medic/central/commit/b346554c07099a6d39b206bcfc1e27b49b0c2c0e))
+* replace bootstrap classes pl,pr,ml, ... with new class names ([8db65d3](https://github.com/PHT-Medic/central/commit/8db65d3c2ded17769f3cd2ba627bb4587ec79439))
+* replace build-validation-translator ([83b5c08](https://github.com/PHT-Medic/central/commit/83b5c08a70b9a0bb4b35c6838be653617a89a2a8))
+* replace component prop static-class with class ([c61e2ef](https://github.com/PHT-Medic/central/commit/c61e2ef4ff813ade8b420f1c6b59ff04409a3e61))
+* replace nuxt-child with nuxt-page ([dae96c2](https://github.com/PHT-Medic/central/commit/dae96c2b48f413bb82e4b83900c3ead7d3b12d45))
+* replace-all usage + switch to node v18 as default version ([cdcaa0d](https://github.com/PHT-Medic/central/commit/cdcaa0dc83c954a19272d97a1271a8891db53002))
+* train-name edit component + minor style adjustments ([c92da06](https://github.com/PHT-Medic/central/commit/c92da06cf5b3953046296fa7848a0e55339a5b46))
+* train-wizard & user-secret components + some minor component issues ([28d37a7](https://github.com/PHT-Medic/central/commit/28d37a79a7e7740852cfa77d4a61907b4fafa51a))
+* transform master-image picker component + created master-image-group-list component ([7998004](https://github.com/PHT-Medic/central/commit/799800430ffffffe646679dc92d424ba63159aca))
+* transformed train, train-file, proposal-staion components ([d73dce7](https://github.com/PHT-Medic/central/commit/d73dce7b64a5f7c5f28b3a8f1fdbba6a1c449d6e))
+* typescript target version + switch to named export for node stream ([c219f6c](https://github.com/PHT-Medic/central/commit/c219f6c419c2d029ed0ba08602c33d192cfb438a))
+* updated hapic, authup & lerna dependency + adjusted monorepo configuration ([a2a3759](https://github.com/PHT-Medic/central/commit/a2a37596390da2682c89db520a8f7ec1650fcdbe))
+
+
+### Features
+
+* enhance and optimize token- & user-resolving ([2a7ec87](https://github.com/PHT-Medic/central/commit/2a7ec87a750b2c72e23708b76acce66768274ad7))
+* implemented new api client + bump authup ([6f3bb54](https://github.com/PHT-Medic/central/commit/6f3bb547b03b8f9fcad37f8810fa3b3238491aae))
+* implemented timeago replacement ([2446f8c](https://github.com/PHT-Medic/central/commit/2446f8c924ec4aad9584f5b938c66185a24652e4))
+* implemented train/proposal-station-details components ([d7ad529](https://github.com/PHT-Medic/central/commit/d7ad529d2dfb8879f8fb2da5c417b2ebc03cfee0))
+* optimized validation error message details ([09c0ce3](https://github.com/PHT-Medic/central/commit/09c0ce3d4896535e28b3d1c1685a5ee1f6f5448d))
+* refactored & adjusted admin page components ([59837d8](https://github.com/PHT-Medic/central/commit/59837d862d4fdee5c6f4c8b6e2f9ca3813dc40df))
+* refactored store, plugins, components + add composables & core utilities ([e07403c](https://github.com/PHT-Medic/central/commit/e07403c08ef3dfaea28ac96ee8521bbbddc1d622))
+* refactored trains & proposal page components ([c13507a](https://github.com/PHT-Medic/central/commit/c13507acf67aedba99aadd17250dde058e4ca110))
+* socket & raw event distribution + schema refactoring ([#941](https://github.com/PHT-Medic/central/issues/941)) ([500170c](https://github.com/PHT-Medic/central/commit/500170cf8b4e36ffbdfc734db04291af8900454f))
+* split station form + automatic token refreshing ([bb6f9dc](https://github.com/PHT-Medic/central/commit/bb6f9dca60fc6151bc4284f9fe32a180aef06821))
+* start refactoring (base) pages ([4756b16](https://github.com/PHT-Medic/central/commit/4756b161f7e745ca6c30a049c5bcf9f3ba6592b8))
+
+
+
+
+
 ## [2.3.6](https://github.com/PHT-Medic/central/compare/v2.3.5...v2.3.6) (2023-04-05)
 
 

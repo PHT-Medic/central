@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.0](https://github.com/PHT-Medic/central/compare/v2.3.6...v2.4.0-alpha.0) (2023-06-19)
+
+
+### Bug Fixes
+
+* common socket(server,client) types + server common publish typings ([502ee32](https://github.com/PHT-Medic/central/commit/502ee32faab477d920d94d26431707d4ea22ce9b))
+* **deps:** bump authup,routup,locter,smob & typeorm-extension ([894b1f4](https://github.com/PHT-Medic/central/commit/894b1f4f5c069aee30dea9a9236ac279a0c4241e))
+* proposal- & registry-form, master-image-picker & some minor issues ([2540be5](https://github.com/PHT-Medic/central/commit/2540be5ee3fab263ec389f447b8aeabf6cc20a25))
+* registry, registry-project- & station-form ([1cd1ecf](https://github.com/PHT-Medic/central/commit/1cd1ecf3f81ebd3a4194c52e263c75c4bde71fa6))
+* updated hapic, authup & lerna dependency + adjusted monorepo configuration ([a2a3759](https://github.com/PHT-Medic/central/commit/a2a37596390da2682c89db520a8f7ec1650fcdbe))
+
+
+### Features
+
+* implemented new api client + bump authup ([6f3bb54](https://github.com/PHT-Medic/central/commit/6f3bb547b03b8f9fcad37f8810fa3b3238491aae))
+* refactored store, plugins, components + add composables & core utilities ([e07403c](https://github.com/PHT-Medic/central/commit/e07403c08ef3dfaea28ac96ee8521bbbddc1d622))
+* socket & raw event distribution + schema refactoring ([#941](https://github.com/PHT-Medic/central/issues/941)) ([500170c](https://github.com/PHT-Medic/central/commit/500170cf8b4e36ffbdfc734db04291af8900454f))
+* split station form + automatic token refreshing ([bb6f9dc](https://github.com/PHT-Medic/central/commit/bb6f9dca60fc6151bc4284f9fe32a180aef06821))
+
+
+
+
+
 ## [2.3.3](https://github.com/PHT-Medic/central/compare/v2.3.2...v2.3.3) (2023-04-05)
 
 
