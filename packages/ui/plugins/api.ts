@@ -7,10 +7,7 @@
 
 import { setAPIClient } from '@authup/client-vue';
 import type {
-    TokenCreator,
-    TokenCreatorCreatedHook,
-    TokenCreatorFailedHook,
-    TokenCreatorOptions,
+    ClientResponseErrorTokenHookOptions,
 } from '@authup/core';
 import {
     APIClient as AuthAPIClient,
@@ -20,7 +17,7 @@ import { APIClient, ErrorCode } from '@personalhealthtrain/central-common';
 import { HookName, isObject } from 'hapic';
 import type { Pinia } from 'pinia';
 import { storeToRefs } from 'pinia';
-import { LicenseAgreementCommand, useLicenseAgreementEventEmitter } from '../domains/license-agreement';
+import { LicenseAgreementEvent, useLicenseAgreementEventEmitter } from '../domains/license-agreement';
 import { useAuthStore } from '../store/auth';
 
 declare module '#app' {
@@ -36,35 +33,6 @@ declare module '@vue/runtime-core' {
         $authupAPI: AuthAPIClient;
     }
 }
-
-// todo: import this in v0.37.0
-type TokenHookOptions = {
-    /**
-     * The URL of the api service.
-     *
-     * default: client.baseURL
-     */
-    baseURL?: string,
-    /**
-     * Whether to set a timer to refresh the access token?
-     *
-     * default: true
-     */
-    timer?: boolean,
-    /**
-     * Fn to create a new token, if the previous token expired.
-     */
-    tokenCreator: TokenCreatorOptions | TokenCreator,
-    /**
-     * Called when the token creator created a new token.
-     */
-    tokenCreated?: TokenCreatorCreatedHook,
-    /**
-     * Called when the token creator could not create a new token.
-     */
-    tokenFailed?: TokenCreatorFailedHook,
-};
-
 export default defineNuxtPlugin((ctx) => {
     let { apiUrl } = ctx.$config.public;
 
@@ -76,7 +44,17 @@ export default defineNuxtPlugin((ctx) => {
         ) {
             if (error.response.data.code === ErrorCode.LICENSE_AGREEMENT) {
                 const eventEmitter = useLicenseAgreementEventEmitter();
-                eventEmitter.emit(LicenseAgreementCommand.ACCEPT);
+                eventEmitter.emit(LicenseAgreementEvent.ACCEPT);
+
+                return new Promise((resolve, reject) => {
+                    eventEmitter.on(LicenseAgreementEvent.ACCEPTED, () => {
+                        resolve(resourceAPI.request(error.request));
+                    });
+
+                    eventEmitter.on(LicenseAgreementEvent.DECLINED, () => {
+                        reject(error);
+                    });
+                });
             }
         }
 
@@ -98,7 +76,7 @@ export default defineNuxtPlugin((ctx) => {
 
     const store = useAuthStore(ctx.$pinia as Pinia);
 
-    const tokenHookOptions : TokenHookOptions = {
+    const tokenHookOptions : ClientResponseErrorTokenHookOptions = {
         baseURL: ctx.$config.public.apiUrl,
         tokenCreator: () => {
             const { refreshToken } = storeToRefs(store);

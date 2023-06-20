@@ -7,64 +7,58 @@
 
 import { BModal } from 'bootstrap-vue-next';
 import { defineComponent } from 'vue';
-import { LicenseAgreementCommand, useLicenseAgreementEventEmitter } from '../../../domains/license-agreement';
+import { LicenseAgreementEvent, useLicenseAgreementEventEmitter } from '../../../domains/license-agreement';
 import LicenseAgreementForm from './LicenseAgreementForm';
 
 export default defineComponent({
     name: 'LicenseAgreement',
     setup() {
-        const modalRef = ref<null | Record<string, any>>(null);
+        const modalShow = ref<boolean>(false);
+        const eventEmitter = useLicenseAgreementEventEmitter();
 
         const handleAcceptLicenseAgreementAction = () => {
-            if (modalRef.value) {
-                modalRef.value.show();
-            }
+            modalShow.value = true;
         };
 
         const handleAccepted = () => {
-            if (modalRef.value) {
-                modalRef.value.hide();
-            }
+            modalShow.value = false;
 
-            // todo: reload current route
+            eventEmitter.emit(LicenseAgreementEvent.ACCEPTED);
         };
 
         const handleDeclined = () => {
-            if (modalRef.value) {
-                modalRef.value.hide();
-            }
+            modalShow.value = false;
 
-            // todo: redirect logout
+            eventEmitter.emit(LicenseAgreementEvent.DECLINED);
         };
 
         onMounted(() => {
-            const eventEmitter = useLicenseAgreementEventEmitter();
-            eventEmitter.on(LicenseAgreementCommand.ACCEPT, handleAcceptLicenseAgreementAction);
+            eventEmitter.on(LicenseAgreementEvent.ACCEPT, handleAcceptLicenseAgreementAction);
         });
 
         onUnmounted(() => {
-            const eventEmitter = useLicenseAgreementEventEmitter();
-            eventEmitter.off(LicenseAgreementCommand.ACCEPT, handleAcceptLicenseAgreementAction);
+            eventEmitter.off(LicenseAgreementEvent.ACCEPT, handleAcceptLicenseAgreementAction);
         });
 
         return () => h(BModal, {
-            ref: modalRef,
+            modelValue: modalShow.value,
             size: 'lg',
             buttonSize: 'sm',
             noCloseOnBackdrop: true,
             noCloseOnEsc: true,
             hideFooter: true,
+            onClose() {
+                handleDeclined();
+            },
         }, {
-            default: () => [
-                h(LicenseAgreementForm, {
-                    onAccepted() {
-                        handleAccepted();
-                    },
-                    onDeclined() {
-                        handleDeclined();
-                    },
-                }),
-            ],
+            default: () => h(LicenseAgreementForm, {
+                onAccepted() {
+                    handleAccepted();
+                },
+                onDeclined() {
+                    handleDeclined();
+                },
+            }),
             title: () => [
                 h('i', { class: 'fa-solid fa-file-contract' }),
                 ' ',

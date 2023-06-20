@@ -28,7 +28,7 @@ export default defineComponent({
 <template>
     <div>
         <div class="page-footer">
-            <license-agreement />
+            <LicenseAgreement />
 
             <div class="copyright">
                 &copy; {{ year }}
