@@ -32,12 +32,22 @@ export default defineComponent({
             required: true,
         },
     },
-    setup(props, { slots }) {
+    emits: ['updated', 'failed', 'deleted'],
+    setup(props, { slots, emit }) {
         const store = useAuthStore();
         const canDrop = computed(() => store.has(PermissionID.PROPOSAL_DROP));
 
         return () => h(ProposalDetails, {
             entity: props.entity,
+            onDeleted(entity) {
+                emit('deleted', entity);
+            },
+            onUpdated(entity) {
+                emit('updated', entity);
+            },
+            onFailed(e) {
+                emit('failed', e);
+            },
         }, {
             default: (props: ProposalDetailsSlotProps) => {
                 let deleteAction : VNode | undefined;

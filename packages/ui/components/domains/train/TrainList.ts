@@ -28,7 +28,7 @@ import type {
 import {
     createDomainListBuilder, isQuerySortedDescByDate,
 } from '../../../core';
-import TrainListItem from './TrainListItem';
+import TrainItem from './TrainItem';
 
 export default defineComponent({
     props: {
@@ -90,7 +90,7 @@ export default defineComponent({
                 items: {
                     item: {
                         fn(item) {
-                            return h(TrainListItem, {
+                            return h(TrainItem, {
                                 entity: item,
                                 onDeleted: handleDeleted,
                                 onUpdated: handleUpdated,

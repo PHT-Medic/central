@@ -12,8 +12,10 @@ import {
     buildDomainEventFullName, buildDomainEventSubscriptionFullName,
 } from '@personalhealthtrain/central-common';
 import type {
-    Proposal, ProposalEventContext, SocketClientToServerEvents,
+    SocketClientToServerEvents,
     SocketServerToClientEvents,
+    Train,
+    TrainEventContext,
 } from '@personalhealthtrain/central-common';
 import type { Socket } from 'socket.io-client';
 import {
@@ -25,20 +27,20 @@ import { useSocket } from '../../../composables/socket';
 import { hasNormalizedSlot, normalizeSlot } from '../../../core';
 import { updateObjectProperties } from '../../../utils';
 
-export type ProposalDetailsSlotProps = {
+export type TrainDetailsSlotProps = {
     busy: boolean,
-    data: Proposal,
-    update(entity: Partial<Proposal>) : Promise<void>,
-    updated(entity: Proposal) : void,
+    data: Train,
+    update(entity: Partial<Train>) : Promise<void>,
+    updated(entity: Train) : void,
     delete() : Promise<void>,
-    deleted(entity?: Proposal) : void;
+    deleted(entity?: Train) : void;
     failed(e: Error) : void;
 };
 export default defineComponent({
-    name: 'ProposalDetails',
+    name: 'TrainDetails',
     props: {
         entity: {
-            type: Object as PropType<Proposal>,
+            type: Object as PropType<Train>,
         },
         entityId: {
             type: String,
@@ -49,12 +51,12 @@ export default defineComponent({
         const refs = toRefs(props);
 
         const lockId = ref<string | null>(null);
-        let entity : Ref<Proposal | undefined> = ref(undefined);
+        let entity : Ref<Train | undefined> = ref(undefined);
         let error : Error | undefined;
 
         if (typeof refs.entityId.value !== 'undefined') {
             try {
-                entity.value = await useAPI().proposal.getOne(refs.entityId.value);
+                entity.value = await useAPI().train.getOne(refs.entityId.value);
             } catch (e) {
                 if (e instanceof Error) {
                     error = e;
@@ -74,15 +76,15 @@ export default defineComponent({
             return () => h('div', []);
         }
 
-        const handleUpdated = (value: Proposal) => {
-            updateObjectProperties(entity as Ref<Proposal>, value);
+        const handleUpdated = (value: Train) => {
+            updateObjectProperties(entity as Ref<Train>, value);
             emit('updated', entity);
         };
-        const handleDeleted = (value: Proposal) => emit('deleted', value || entity.value);
+        const handleDeleted = (value?: Train) => emit('deleted', value || entity.value);
 
         const handleFailed = (error: Error) => emit('failed', error);
 
-        const handleSocketUpdated = (context: ProposalEventContext) => {
+        const handleSocketUpdated = (context: TrainEventContext) => {
             if (
                 entity.value &&
                 entity.value.id === context.data.id &&
@@ -92,7 +94,7 @@ export default defineComponent({
             }
         };
 
-        const handleSocketDeleted = (context: ProposalEventContext) => {
+        const handleSocketDeleted = (context: TrainEventContext) => {
             if (
                 entity.value &&
                 entity.value.id === context.data.id &&
@@ -110,17 +112,17 @@ export default defineComponent({
         onMounted(() => {
             if (entity.value) {
                 socket.emit(buildDomainEventSubscriptionFullName(
-                    DomainType.PROPOSAL,
+                    DomainType.TRAIN,
                     DomainEventSubscriptionName.SUBSCRIBE,
                 ), entity.value.id);
 
                 socket.on(buildDomainEventFullName(
-                    DomainType.PROPOSAL,
+                    DomainType.TRAIN,
                     DomainEventName.UPDATED,
                 ), handleSocketUpdated);
 
                 socket.on(buildDomainEventFullName(
-                    DomainType.PROPOSAL,
+                    DomainType.TRAIN,
                     DomainEventName.DELETED,
                 ), handleSocketDeleted);
             }
@@ -129,17 +131,17 @@ export default defineComponent({
         onUnmounted(() => {
             if (entity.value) {
                 socket.emit(buildDomainEventSubscriptionFullName(
-                    DomainType.PROPOSAL,
+                    DomainType.TRAIN,
                     DomainEventSubscriptionName.UNSUBSCRIBE,
                 ));
 
                 socket.off(buildDomainEventFullName(
-                    DomainType.PROPOSAL,
+                    DomainType.TRAIN,
                     DomainEventName.UPDATED,
                 ), handleSocketUpdated);
 
                 socket.off(buildDomainEventFullName(
-                    DomainType.PROPOSAL,
+                    DomainType.TRAIN,
                     DomainEventName.DELETED,
                 ), handleSocketDeleted);
             }
@@ -147,7 +149,7 @@ export default defineComponent({
 
         const busy = ref(false);
 
-        const update = async (data: Partial<Proposal>) => {
+        const update = async (data: Partial<Train>) => {
             if (busy.value || !entity.value) {
                 return;
             }
@@ -156,7 +158,7 @@ export default defineComponent({
             lockId.value = entity.value.id;
 
             try {
-                const response = await useAPI().proposal.update(
+                const response = await useAPI().train.update(
                     entity.value.id,
                     data,
                 );
@@ -181,7 +183,7 @@ export default defineComponent({
             lockId.value = entity.value.id;
 
             try {
-                const response = await useAPI().proposal.delete(
+                const response = await useAPI().train.delete(
                     entity.value.id,
                 );
 
@@ -199,13 +201,13 @@ export default defineComponent({
         if (hasNormalizedSlot('default', slots)) {
             return () => normalizeSlot('default', {
                 busy: busy.value,
-                data: entity.value as Proposal,
+                data: entity.value as Train,
                 update,
                 updated: handleUpdated,
                 delete: remove,
                 deleted: handleDeleted,
                 failed: handleFailed,
-            } satisfies ProposalDetailsSlotProps, slots);
+            } satisfies TrainDetailsSlotProps, slots);
         }
 
         return () => h('div', []);
