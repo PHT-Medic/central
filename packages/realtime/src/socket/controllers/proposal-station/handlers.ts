@@ -12,10 +12,10 @@ import {
     PermissionID,
     buildDomainChannelName,
     buildDomainEventSubscriptionFullName,
-    isSocketClientToServerEventCallback, isSocketClientToServerEventErrorCallback,
+    isSocketClientToServerEventCallback,
+    isSocketClientToServerEventErrorCallback,
 } from '@personalhealthtrain/central-common';
 import { UnauthorizedError } from '@ebec/http';
-import { buildDomainEventChannelName } from '@personalhealthtrain/central-server-common/src/domain-event/utils';
 import type {
     SocketInterface,
     SocketNamespaceInterface,
@@ -86,7 +86,7 @@ export function registerProposalStationForRealmSocketHandlers(
 
             incrSocketRoomConnections(
                 socket,
-                buildDomainEventChannelName(DomainSubType.PROPOSAL_STATION_IN, target),
+                buildDomainChannelName(DomainSubType.PROPOSAL_STATION_IN, target),
             );
 
             if (isSocketClientToServerEventCallback(cb)) {
@@ -100,7 +100,7 @@ export function registerProposalStationForRealmSocketHandlers(
         (target) => {
             decrSocketRoomConnections(
                 socket,
-                buildDomainEventChannelName(DomainSubType.PROPOSAL_STATION_IN, target),
+                buildDomainChannelName(DomainSubType.PROPOSAL_STATION_IN, target),
             );
         },
     );
@@ -122,7 +122,7 @@ export function registerProposalStationForRealmSocketHandlers(
 
             incrSocketRoomConnections(
                 socket,
-                buildDomainEventChannelName(DomainSubType.PROPOSAL_STATION_OUT, target),
+                buildDomainChannelName(DomainSubType.PROPOSAL_STATION_OUT, target),
             );
 
             if (isSocketClientToServerEventCallback(cb)) {
@@ -136,7 +136,7 @@ export function registerProposalStationForRealmSocketHandlers(
         (target) => {
             decrSocketRoomConnections(
                 socket,
-                buildDomainEventChannelName(DomainSubType.PROPOSAL_STATION_OUT, target),
+                buildDomainChannelName(DomainSubType.PROPOSAL_STATION_OUT, target),
             );
         },
     );
