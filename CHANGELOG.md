@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.1](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.0...v2.4.0-alpha.1) (2023-06-20)
+
+
+### Bug Fixes
+
+* **deps:** bump tar-stream from 3.0.0 to 3.1.2 ([#1022](https://github.com/PHT-Medic/central/issues/1022)) ([f28cd6f](https://github.com/PHT-Medic/central/commit/f28cd6f3dc516cf3d848db05e6e5e447763c6fc9))
+* minor change to train-log(s) component definition ([724e0b9](https://github.com/PHT-Medic/central/commit/724e0b9df60eb8f05fb969840f6c734eb12ca198))
+* proposal in management with modal dialog and table view ([675a470](https://github.com/PHT-Medic/central/commit/675a470c0d544d2eb569af8b3d75530f9110c34f))
+* registry-project && license-agreement modal view ([1f1771e](https://github.com/PHT-Medic/central/commit/1f1771e81501ace070a0c4777c6619d01406ec4b))
+* remove console.log statement ([171825c](https://github.com/PHT-Medic/central/commit/171825c9975ff31233c20cd4abc391b7e698ba83))
+* set socket data from token verifier data ([285beed](https://github.com/PHT-Medic/central/commit/285beed14ebd65c61952d128491ae1c178bb9bcb))
+
+
+### Features
+
+* add train-details component for better socket/update handling ([9846bcb](https://github.com/PHT-Medic/central/commit/9846bcb2312bb730936df76aa036344d7b24b3f7))
+* enhance license-agreement managmeent + reqrequest api call on accept ([d2f6300](https://github.com/PHT-Medic/central/commit/d2f6300a7a335bb22a41baa7500b94f4b7ec4d5b))
+* enhance train-manager logs + better train log view ([8a4b9ed](https://github.com/PHT-Medic/central/commit/8a4b9ed392101ef5058d683283ebdcccd646da40))
+
+
+
+
+
 # [2.4.0-alpha.0](https://github.com/PHT-Medic/central/compare/v2.3.6...v2.4.0-alpha.0) (2023-06-19)
 
 

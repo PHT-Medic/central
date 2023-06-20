@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.1](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.0...v2.4.0-alpha.1) (2023-06-20)
+
+
+### Bug Fixes
+
+* proposal in management with modal dialog and table view ([675a470](https://github.com/PHT-Medic/central/commit/675a470c0d544d2eb569af8b3d75530f9110c34f))
+
+
+
+
+
 # [2.4.0-alpha.0](https://github.com/PHT-Medic/central/compare/v2.3.6...v2.4.0-alpha.0) (2023-06-19)
 
 

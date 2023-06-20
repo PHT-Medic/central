@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.1](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.0...v2.4.0-alpha.1) (2023-06-20)
+
+
+### Bug Fixes
+
+* **deps:** bump tar-stream from 3.0.0 to 3.1.2 ([#1022](https://github.com/PHT-Medic/central/issues/1022)) ([f28cd6f](https://github.com/PHT-Medic/central/commit/f28cd6f3dc516cf3d848db05e6e5e447763c6fc9))
+* registry-project && license-agreement modal view ([1f1771e](https://github.com/PHT-Medic/central/commit/1f1771e81501ace070a0c4777c6619d01406ec4b))
+* remove console.log statement ([171825c](https://github.com/PHT-Medic/central/commit/171825c9975ff31233c20cd4abc391b7e698ba83))
+
+
+### Features
+
+* enhance train-manager logs + better train log view ([8a4b9ed](https://github.com/PHT-Medic/central/commit/8a4b9ed392101ef5058d683283ebdcccd646da40))
+
+
+
+
+
 # [2.4.0-alpha.0](https://github.com/PHT-Medic/central/compare/v2.3.6...v2.4.0-alpha.0) (2023-06-19)
 
 

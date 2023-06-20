@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.1](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.0...v2.4.0-alpha.1) (2023-06-20)
+
+
+### Bug Fixes
+
+* set socket data from token verifier data ([285beed](https://github.com/PHT-Medic/central/commit/285beed14ebd65c61952d128491ae1c178bb9bcb))
+
+
+
+
+
 # [2.4.0-alpha.0](https://github.com/PHT-Medic/central/compare/v2.3.6...v2.4.0-alpha.0) (2023-06-19)
 
 
