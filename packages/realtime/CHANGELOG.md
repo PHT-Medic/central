@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.3](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.2...v2.4.0-alpha.3) (2023-06-20)
+
+
+### Bug Fixes
+
+* domain channel name building ([c91ec09](https://github.com/PHT-Medic/central/commit/c91ec09f19539e11f42c2ba551a4cf50e4bc1a5f))
+
+
+
+
+
 # [2.4.0-alpha.1](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.0...v2.4.0-alpha.1) (2023-06-20)
 
 
