@@ -1,10 +1,9 @@
-<!--
-  Copyright (c) 2022.
-  Author Peter Placzek (tada5hi)
-  For the full copyright and license information,
-  view the LICENSE file that was distributed with this source code.
-  -->
-<script lang="ts">
+/*
+* Copyright (c) 2022.
+* Author Peter Placzek (tada5hi)
+* For the full copyright and license information,
+* view the LICENSE file that was distributed with this source code.
+*/
 import { Timeago } from '@vue-layout/timeago';
 import type { TrainLog } from '@personalhealthtrain/central-common';
 import { defineComponent, h, toRefs } from 'vue';
@@ -50,14 +49,14 @@ export default defineComponent({
         } else if (refs.entity.value.status) {
             message = h('span', [
                 'Event ',
-                h('strong', refs.entity.value.event),
+                h('strong', refs.entity.value.event as string),
                 ' triggered and status changed to ',
                 h('strong', refs.entity.value.status),
             ]);
         } else {
             message = h('span', [
                 'Event ',
-                h('strong', refs.entity.value.event),
+                h('strong', refs.entity.value.event as string),
                 ' triggered',
             ]);
         }
@@ -97,4 +96,3 @@ export default defineComponent({
         };
     },
 });
-</script>

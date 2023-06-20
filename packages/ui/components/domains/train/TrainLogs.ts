@@ -20,7 +20,7 @@ import { defineComponent, ref, toRefs } from 'vue';
 import { useAPI, useSocket } from '#imports';
 import { realmIdForSocket } from '../../../composables/domain/realm';
 import { createDomainListBuilder } from '../../../core';
-import TrainLogComponent from './TrainLog.vue';
+import TrainLogComponent from './TrainLog';
 
 export default defineComponent({
     name: 'TrainLogs',

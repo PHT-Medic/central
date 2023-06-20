@@ -1,4 +1,11 @@
-import type { PropType, VNodeArrayChildren, VNodeChild } from 'vue';
+/*
+ * Copyright (c) 2023.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
+import type { PropType, VNodeChild } from 'vue';
 import { computed, defineComponent } from 'vue';
 import { hasNormalizedSlot, normalizeSlot } from '../../../core';
 import { wrapFnWithBusyState } from '../../../core/busy';
