@@ -19,7 +19,7 @@ import { buildValidationTranslator } from '../../../composables/ilingo';
 import { wrapFnWithBusyState } from '../../../core/busy';
 import MasterImagePicker from '../master-image/MasterImagePicker';
 import StationList from '../station/StationList';
-import { AssignmentToggleButton } from '../../AssignmentToggleButton';
+import AssignmentToggleButton from '../../AssignmentToggleButton';
 import ProposalStationAssignAction from '../proposal-station/ProposalStationAssignAction';
 
 export default defineComponent({

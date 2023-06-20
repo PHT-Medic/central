@@ -7,14 +7,16 @@
 
 import { computed, defineComponent } from 'vue';
 
-export const AssignmentToggleButton = defineComponent({
+export default defineComponent({
     name: 'AssignmentToggleButton',
     props: {
         id: {
             type: [String, Number],
             default: undefined,
         },
-        ids: Array,
+        ids: {
+            type: Array,
+        },
         disabled: {
             type: Boolean,
             default: false,
@@ -24,8 +26,8 @@ export const AssignmentToggleButton = defineComponent({
     setup(props, { emit }) {
         const refs = toRefs(props);
 
-        const isSelected = computed(() => (Array.isArray(refs.ids) ?
-            refs.ids.indexOf(refs.id) !== -1 : false));
+        const isSelected = computed(() => (Array.isArray(refs.ids.value) ?
+            refs.ids.value.indexOf(refs.id.value) !== -1 : false));
 
         const toggle = () => {
             emit('toggle', refs.id);
@@ -40,7 +42,7 @@ export const AssignmentToggleButton = defineComponent({
             onClick($event: any) {
                 $event.preventDefault();
 
-                return toggle.apply(null);
+                return toggle();
             },
         }, [
             h('i', {
