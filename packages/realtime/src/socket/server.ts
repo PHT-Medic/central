@@ -9,7 +9,9 @@ import type { Server as HTTPServer } from 'node:http';
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { ForbiddenError, UnauthorizedError } from '@ebec/http';
-import { REALM_MASTER_NAME, ROBOT_SYSTEM_NAME } from '@authup/core';
+import {
+    AbilityManager, OAuth2SubKind, REALM_MASTER_NAME, ROBOT_SYSTEM_NAME,
+} from '@authup/core';
 import { createSocketMiddleware } from '@authup/server-adapter';
 import { useEnv } from '../config';
 import { useLogger } from '../core';
@@ -48,11 +50,21 @@ export function createSocketServer(context : SocketServerContext) : Server {
                 client: context.config.redisDatabase,
             },
         },
-        tokenVerifierHandler: (socket, data) => {
-            const keys = Object.keys(data);
-            for (let i = 0; i < keys.length; i++) {
-                socket.data[keys[i]] = data[keys[i]];
+        tokenVerifierHandler: (socket: SocketInterface, data) => {
+            switch (data.sub_kind) {
+                case OAuth2SubKind.USER: {
+                    socket.data.userId = data.sub;
+                    break;
+                }
+                case OAuth2SubKind.ROBOT: {
+                    socket.data.robotId = data.sub;
+                    break;
+                }
             }
+
+            socket.data.realmId = data.realm_id;
+            socket.data.realmName = data.realm_name;
+            socket.data.ability = new AbilityManager(data.permissions);
         },
     });
 
