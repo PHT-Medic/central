@@ -14,7 +14,7 @@ import {
     TrainResultStatus,
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
-import { useAPI } from '#imports';
+import { useAPI, useRuntimeConfig } from '#imports';
 import { wrapFnWithBusyState } from '../../../../core/busy';
 import { useAuthStore } from '../../../../store/auth';
 import type { TrainCommandProperties } from './type';
@@ -49,6 +49,7 @@ export default defineNuxtComponent({
         const refs = toRefs(props);
         const busy = ref(false);
 
+        const runtimeConfig = useRuntimeConfig();
         const toast = useToast();
 
         const store = useAuthStore();
@@ -118,11 +119,10 @@ export default defineNuxtComponent({
 
         const execute = wrapFnWithBusyState(busy, async () => {
             if (refs.command.value === 'resultDownload') {
-                const app = useRuntimeConfig();
                 window.open(
                     new URL(
                         useAPI().train.getResultDownloadPath(refs.entity.value.id),
-                        app.$config.public.apiUrl,
+                        runtimeConfig.public.apiUrl,
                     ).href,
                     '_blank',
                 );

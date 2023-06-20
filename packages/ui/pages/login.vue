@@ -15,7 +15,7 @@ import {
 } from 'vue';
 import type { IdentityProvider } from '@authup/core';
 import type { BuildInput } from 'rapiq';
-import { definePageMeta } from '#imports';
+import { definePageMeta, useRuntimeConfig } from '#imports';
 import {
     defineNuxtComponent, navigateTo, useNuxtApp, useRoute,
 } from '#app';
@@ -35,6 +35,8 @@ export default defineNuxtComponent({
             [LayoutKey.REQUIRED_LOGGED_OUT]: true,
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
         });
+
+        const runtimeConfig = useRuntimeConfig();
 
         const form = reactive({
             name: '',
@@ -114,11 +116,9 @@ export default defineNuxtComponent({
             .then(store.logout);
 
         const buildIdentityProviderURL = (id: string) => {
-            const app = useNuxtApp();
-
             const apiClient = useAuthupAPI();
             return apiClient.identityProvider.getAuthorizeUri(
-                app.$config.public.authupApiUrl,
+                runtimeConfig.public.authupApiUrl,
                 id,
             );
         };

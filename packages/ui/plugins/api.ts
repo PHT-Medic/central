@@ -19,6 +19,7 @@ import type { Pinia } from 'pinia';
 import { storeToRefs } from 'pinia';
 import { LicenseAgreementEvent, useLicenseAgreementEventEmitter } from '../domains/license-agreement';
 import { useAuthStore } from '../store/auth';
+import { useRuntimeConfig } from '#imports';
 
 declare module '#app' {
     interface NuxtApp {
@@ -34,7 +35,9 @@ declare module '@vue/runtime-core' {
     }
 }
 export default defineNuxtPlugin((ctx) => {
-    let { apiUrl } = ctx.$config.public;
+    const runtimeConfig = useRuntimeConfig();
+
+    let { apiUrl } = runtimeConfig.public;
 
     const resourceAPI = new APIClient({ baseURL: apiUrl });
     resourceAPI.on(HookName.RESPONSE_ERROR, (error) => {
@@ -64,7 +67,7 @@ export default defineNuxtPlugin((ctx) => {
 
     // -----------------------------------------------------------------------------------
 
-    apiUrl = ctx.$config.public.authupApiUrl;
+    apiUrl = runtimeConfig.public.authupApiUrl;
 
     const authupAPI = new AuthAPIClient({ baseURL: apiUrl });
 
@@ -77,7 +80,7 @@ export default defineNuxtPlugin((ctx) => {
     const store = useAuthStore(ctx.$pinia as Pinia);
 
     const tokenHookOptions : ClientResponseErrorTokenHookOptions = {
-        baseURL: ctx.$config.public.apiUrl,
+        baseURL: runtimeConfig.public.apiUrl,
         tokenCreator: () => {
             const { refreshToken } = storeToRefs(store);
 

@@ -5,7 +5,7 @@ import type { IdentityProvider } from '@authup/core';
 import { PermissionName } from '@authup/core';
 import type { PropType } from 'vue';
 import { useNuxtApp } from '#app';
-import { defineNuxtComponent, definePageMeta } from '#imports';
+import { defineNuxtComponent, definePageMeta, useRuntimeConfig } from '#imports';
 import { LayoutKey } from '~/config/layout';
 
 export default defineNuxtComponent({
@@ -27,6 +27,7 @@ export default defineNuxtComponent({
             ],
         });
 
+        const runtimeConfig = useRuntimeConfig();
         const handleUpdated = (e: IdentityProvider) => {
             emit('updated', e);
         };
@@ -35,10 +36,8 @@ export default defineNuxtComponent({
             emit('failed', e);
         };
 
-        const app = useNuxtApp();
-
         return {
-            apiUrl: app.$config.public.authupApiUrl as string,
+            apiUrl: runtimeConfig.public.authupApiUrl as string,
             entity: props.entity,
             handleUpdated,
             handleFailed,

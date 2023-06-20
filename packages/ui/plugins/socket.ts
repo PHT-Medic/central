@@ -6,6 +6,7 @@
  */
 
 import { SocketModule } from '../core';
+import { useRuntimeConfig } from '#imports';
 
 declare module '#app' {
     interface NuxtApp {
@@ -20,12 +21,13 @@ declare module '@vue/runtime-core' {
 }
 
 export default defineNuxtPlugin((ctx) => {
-    const url = ctx.$config.public.realtimeUrl ??
+    const runtimeConfig = useRuntimeConfig();
+    const url = runtimeConfig.public.realtimeUrl ??
         'http://localhost:3001/';
 
     let transports : string[] = [];
 
-    const rawTransports = ctx.$config.public.realtimeTransports;
+    const rawTransports = runtimeConfig.public.realtimeTransports;
 
     if (
         rawTransports &&
