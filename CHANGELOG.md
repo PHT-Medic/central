@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.6](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.5...v2.4.0-alpha.6) (2023-06-22)
+
+
+### Bug Fixes
+
+* cleanup for unused registry projects ([b2bbbe2](https://github.com/PHT-Medic/central/commit/b2bbbe24edbb016f18ebcad95eec61a944d7b7fe))
+
+
+
+
+
 # [2.4.0-alpha.5](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.4...v2.4.0-alpha.5) (2023-06-22)
 
 
