@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.5](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.4...v2.4.0-alpha.5) (2023-06-22)
+
+
+### Features
+
+* write detailed/pretty error stack trace to error.log ([8343336](https://github.com/PHT-Medic/central/commit/8343336f8d8ad031c2608d79dab3792bf88d7a16))
+
+
+
+
+
 # [2.4.0-alpha.4](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.3...v2.4.0-alpha.4) (2023-06-22)
 
 
