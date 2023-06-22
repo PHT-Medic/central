@@ -54,6 +54,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
 
     switch (command) {
         case RegistryAPICommand.SETUP:
+        case RegistryAPICommand.CLEANUP:
         case RegistryAPICommand.DELETE: {
             const repository = dataSource.getRepository(RegistryEntity);
             const entity = await repository.createQueryBuilder('registry')
@@ -74,11 +75,22 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                 });
 
                 await publish(queueMessage);
-            } else {
+            } else if (command === RegistryAPICommand.DELETE) {
                 useLogger().info('Submitting delete registry command.');
 
                 const queueMessage = buildRegistryPayload({
                     command: RegistryCommand.DELETE,
+                    data: {
+                        id: entity.id,
+                    },
+                });
+
+                await publish(queueMessage);
+            } else {
+                useLogger().info('Submitting cleanup registry command.');
+
+                const queueMessage = buildRegistryPayload({
+                    command: RegistryCommand.CLEANUP,
                     data: {
                         id: entity.id,
                     },

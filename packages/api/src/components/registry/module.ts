@@ -14,6 +14,7 @@ import {
     setupRegistry,
     unlinkRegistryProject,
 } from './handlers';
+import { cleanupRegistry } from './handlers/cleanup';
 import type { RegistryCommandContext } from './type';
 
 export async function executeRegistryCommand(context: RegistryCommandContext) {
@@ -30,6 +31,21 @@ export async function executeRegistryCommand(context: RegistryCommandContext) {
             } catch (e) {
                 useLogger()
                     .error('registry setup failed', { component: 'registry', id: context.data.id });
+            }
+            break;
+        }
+        case RegistryCommand.CLEANUP: {
+            useLogger()
+                .info('registry cleanup initialised', { component: 'registry', id: context.data.id });
+
+            try {
+                await cleanupRegistry(context.data);
+
+                useLogger()
+                    .info('registry cleanup completed', { component: 'registry', id: context.data.id });
+            } catch (e) {
+                useLogger()
+                    .error('registry cleanup failed', { component: 'registry', id: context.data.id });
             }
             break;
         }

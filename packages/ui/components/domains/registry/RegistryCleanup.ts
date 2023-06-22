@@ -7,9 +7,10 @@
 
 import { useToast } from 'bootstrap-vue-next';
 import type { PropType } from 'vue';
-import { defineComponent } from 'vue';
+import { defineComponent, h, ref } from 'vue';
 import type { Registry } from '@personalhealthtrain/central-common';
 import { RegistryAPICommand } from '@personalhealthtrain/central-common';
+import { useAPI } from '../../../composables/api';
 import EntityDelete from '../EntityDelete';
 import MasterImageList from '../master-image/MasterImageList';
 
@@ -26,18 +27,18 @@ export default defineComponent({
 
         const busy = ref(false);
 
-        const setup = async () => {
+        const execute = async () => {
             if (busy.value) return;
 
             busy.value = true;
 
             try {
-                await useAPI().service.runRegistryCommand(RegistryAPICommand.SETUP, {
+                await useAPI().service.runRegistryCommand(RegistryAPICommand.CLEANUP, {
                     id: props.entityId,
                 });
 
                 if (toast) {
-                    toast.success({ body: 'You successfully executed the setup routine.' }, {
+                    toast.success({ body: 'You successfully executed the cleanup routine.' }, {
                         pos: 'top-center',
                     });
                 }
@@ -53,40 +54,8 @@ export default defineComponent({
         };
 
         return () => h('div', [
-            h('h6', [
-                h('i', { class: 'fa fa-sign-in-alt me-1' }),
-                'Incoming',
-            ]),
             h('p', { class: 'mb-1' }, [
-                'The incoming project is required for the',
-                h('i', { class: 'ps-1 pe-1' }, ['TrainBuilder']),
-                'to work properly. When the TrainBuilder ' +
-                'is finished with building the train, the train will be pushed to the incoming project. ' +
-                'From there the TrainRouter can move it to the first station project of the route.',
-            ]),
-
-            h('hr'),
-
-            h('h6', [
-                h('i', { class: 'fa fa-sign-out-alt me-1' }),
-                'Outgoing',
-            ]),
-            h('p', { class: 'mb-1' }, [
-                'The outgoing project is required for the',
-                h('i', { class: 'ps-1 pe-1' }, 'ResultService'),
-                'to pull the train from the',
-                'outgoing project and extract the results of the journey.',
-            ]),
-
-            h('hr'),
-
-            h('h6', [
-                h('i', { class: 'fa fa-info me-1' }),
-                'Info',
-            ]),
-            h('p', [
-                'To setup or ensure the existence of all projects (incoming, outgoing, ...) and ',
-                'the corresponding webhooks run the setup routine.',
+                'This command will remove any registry project which is not present in the current instance.',
             ]),
 
             h('button', {
@@ -96,7 +65,7 @@ export default defineComponent({
                 onClick(event: any) {
                     event.preventDefault();
 
-                    return setup();
+                    return execute();
                 },
             }, [
                 'Execute',

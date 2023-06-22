@@ -48,9 +48,14 @@ export default defineNuxtComponent({
                 name: 'General', icon: 'fas fa-bars', urlSuffix: '',
             },
             ...(entity.value.ecosystem === Ecosystem.DEFAULT ?
-                [{
-                    name: 'Setup', icon: 'fa-solid fa-cog', urlSuffix: 'setup',
-                }] : []
+                [
+                    {
+                        name: 'Cleanup', icon: 'fa-solid fa-hands-bubbles', urlSuffix: 'cleanup',
+                    },
+                    {
+                        name: 'Setup', icon: 'fa-solid fa-cog', urlSuffix: 'setup',
+                    },
+                ] : []
             ),
             {
                 name: 'Projects',

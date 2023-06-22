@@ -13,7 +13,7 @@ import {
     ServiceID,
 } from '@personalhealthtrain/central-common';
 import os from 'node:os';
-import { useEnv } from '../../../../config';
+import { useEnv, useLogger } from '../../../../config';
 import { useAuthupClient } from '../../../../core';
 import { findRobotCredentialsInVault } from '../../../../domains';
 import { buildRegistryWebhookTarget } from '../utils';
@@ -30,6 +30,7 @@ export async function saveRemoteRegistryProjectWebhook(
     const engineData = await findRobotCredentialsInVault(ServiceID.REGISTRY);
 
     if (!engineData) {
+        useLogger().warn('No robot credentials could be found in vault for the registry project.');
         return undefined;
     }
 

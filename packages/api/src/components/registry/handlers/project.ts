@@ -9,6 +9,7 @@ import {
     Ecosystem,
     buildRegistryClientConnectionStringFromRegistry,
 } from '@personalhealthtrain/central-common';
+import http from 'node:http';
 import os from 'node:os';
 import { useDataSource } from 'typeorm-extension';
 import { RegistryEntity, RegistryProjectEntity, removeRegistryProjectFromVault } from '../../../domains';
@@ -166,6 +167,27 @@ export async function unlinkRegistryProject(
 
     const connectionString = buildRegistryClientConnectionStringFromRegistry(registryEntity);
     const httpClient = createBasicHarborAPIClient(connectionString);
+
+    try {
+        const { data: repositories } = await httpClient.projectRepository.getAll({
+            projectName: payload.externalName,
+        });
+
+        const promises : Promise<any>[] = [];
+
+        for (let i = 0; i < repositories.length; i++) {
+            useLogger().debug(`Deleting registry project repository ${repositories[i].name}`);
+            promises.push(httpClient.projectRepository.delete(repositories[i].name));
+        }
+
+        await Promise.all(promises);
+    } catch (e) {
+        useLogger()
+            .warn('Project repositories could not be deleted.', {
+                component: 'registry',
+                command: RegistryCommand.PROJECT_UNLINK,
+            });
+    }
 
     try {
         await httpClient.project

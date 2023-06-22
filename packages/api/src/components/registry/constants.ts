@@ -6,6 +6,7 @@
  */
 
 export enum RegistryCommand {
+    CLEANUP = 'CLEANUP',
     SETUP = 'SETUP',
     DELETE = 'DELETE',
 

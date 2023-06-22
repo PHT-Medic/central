@@ -7,6 +7,7 @@
 
 export enum RegistryAPICommand {
     SETUP = 'setup',
+    CLEANUP = 'cleanup',
     DELETE = 'delete',
 
     PROJECT_LINK = 'projectLink',

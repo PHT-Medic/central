@@ -34,6 +34,10 @@ export type RegistrySetupPayload = {
     id: Registry['id']
 };
 
+export type RegistryCleanupPayload = {
+    id: Registry['id']
+};
+
 export type RegistryProjectLinkPayload = {
     id: RegistryProject['id']
 };
@@ -71,6 +75,11 @@ export type RegistryDeleteCommandContext = {
     data: RegistrySetupPayload
 };
 
+export type RegistryCleanupCommandContext = {
+    command: `${RegistryCommand.CLEANUP}`,
+    data: RegistryCleanupPayload
+};
+
 export type RegistryProjectLinkCommandContext = {
     command: `${RegistryCommand.PROJECT_LINK}`,
     data: RegistryProjectLinkPayload
@@ -89,6 +98,7 @@ export type RegistryProjectRelinkCommandContext = {
 export type RegistryCommandContext = RegistryEventCommandContext |
 RegistrySetupCommandContext |
 RegistryDeleteCommandContext |
+RegistryCleanupCommandContext |
 RegistryProjectLinkCommandContext |
 RegistryProjectUnlinkCommandContext |
 RegistryProjectRelinkCommandContext;
