@@ -125,8 +125,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                         id: entity.id,
                         registryId: entity.registry_id,
                         externalName: entity.external_name,
-                        accountId: entity.account_id,
-                        updateDatabase: true,
+                        accountId: entity.account_id
                     },
                 });
                 await publish(queueMessage);

@@ -43,11 +43,14 @@ export type RegistryProjectLinkPayload = {
 };
 
 export type RegistryProjectUnlinkPayload = {
-    id: RegistryProject['id'],
+    id?: RegistryProject['id'],
     registryId: Registry['id'],
     externalName: RegistryProject['external_name'],
-    accountId: RegistryProject['account_id'],
-    updateDatabase?: boolean
+    accountId?: RegistryProject['account_id']
+};
+
+export type RegistryProjectRelinkPayload = RegistryProjectUnlinkPayload & {
+    id: RegistryProject['id']
 };
 
 export type RegistryEventPayload = {
@@ -92,7 +95,7 @@ export type RegistryProjectUnlinkCommandContext = {
 
 export type RegistryProjectRelinkCommandContext = {
     command: `${RegistryCommand.PROJECT_RELINK}`,
-    data: RegistryProjectUnlinkPayload
+    data: RegistryProjectRelinkPayload
 };
 
 export type RegistryCommandContext = RegistryEventCommandContext |

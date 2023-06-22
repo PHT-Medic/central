@@ -71,11 +71,8 @@ export async function cleanupRegistry(payload: RegistryCleanupPayload) {
         const queueMessage = buildRegistryPayload({
             command: RegistryCommand.PROJECT_UNLINK,
             data: {
-                id: projectEntities[i].id,
                 registryId: entity.id,
-                externalName: projectEntities[i].external_name,
-                accountId: projectEntities[i].account_id,
-                updateDatabase: true,
+                externalName: projects[i].name,
             },
         });
 

@@ -5,17 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { RegistryProjectUnlinkPayload } from '../../type';
+import type { RegistryProjectRelinkPayload } from '../../type';
 import { linkRegistryProject } from './link';
 import { unlinkRegistryProject } from './unlink';
 
 export async function relinkRegistryProject(
-    payload: RegistryProjectUnlinkPayload,
+    payload: RegistryProjectRelinkPayload,
 ) {
-    await unlinkRegistryProject({
-        ...payload,
-        updateDatabase: true,
-    });
+    await unlinkRegistryProject(payload);
 
     await linkRegistryProject(payload);
 }

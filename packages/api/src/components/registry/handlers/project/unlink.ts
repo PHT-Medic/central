@@ -88,7 +88,7 @@ export async function unlinkRegistryProject(
         throw e;
     }
 
-    if (payload.updateDatabase) {
+    if (payload.id) {
         const projectRepository = dataSource.getRepository(RegistryProjectEntity);
         const project = await projectRepository.findOneBy({ id: payload.id });
 
@@ -105,6 +105,4 @@ export async function unlinkRegistryProject(
             await projectRepository.save(project);
         }
     }
-
-    throw new Error('Just for testing');
 }
