@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.4](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.3...v2.4.0-alpha.4) (2023-06-22)
+
+
+### Bug Fixes
+
+* **deps:** bump tar-stream from 3.1.2 to 3.1.4 ([#1031](https://github.com/PHT-Medic/central/issues/1031)) ([09ee05a](https://github.com/PHT-Medic/central/commit/09ee05a53f4991a245734cb9e4eaccebfef418fa))
+
+
+### Features
+
+* add regsitry cleanup command ([964d01b](https://github.com/PHT-Medic/central/commit/964d01b7d75e8c5e4ff446f4ca10ecc688104667))
+
+
+
+
+
 # [2.4.0-alpha.1](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.0...v2.4.0-alpha.1) (2023-06-20)
 
 
