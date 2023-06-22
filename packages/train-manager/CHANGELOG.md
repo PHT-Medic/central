@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.7](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.6...v2.4.0-alpha.7) (2023-06-22)
+
+
+### Bug Fixes
+
+* apply extend payload for update project-webhook-policy fn ([0bb515a](https://github.com/PHT-Medic/central/commit/0bb515add94a7b87a482b27a86e739d076f18756))
+
+
+
+
+
 # [2.4.0-alpha.4](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.3...v2.4.0-alpha.4) (2023-06-22)
 
 
