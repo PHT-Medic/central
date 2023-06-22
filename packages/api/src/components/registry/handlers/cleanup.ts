@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { HarborClient } from '@hapic/harbor';
 import {
     REGISTRY_MASTER_IMAGE_PROJECT_NAME,
     buildRegistryClientConnectionStringFromRegistry,
@@ -14,6 +13,7 @@ import { publish } from 'amqp-extension';
 import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '../../../config';
 import { RegistryEntity, RegistryProjectEntity } from '../../../domains';
+import { ComponentName } from '../../constants';
 import { RegistryCommand } from '../constants';
 import type { RegistryCleanupPayload } from '../type';
 import { buildRegistryPayload } from '../utils/queue';
@@ -23,8 +23,8 @@ export async function cleanupRegistry(payload: RegistryCleanupPayload) {
     if (!payload.id) {
         useLogger()
             .warn('No registry specified.', {
-                component: 'registry',
-                command: RegistryCommand.SETUP,
+                component: ComponentName.REGISTRY,
+                command: RegistryCommand.CLEANUP,
             });
 
         return;
@@ -42,8 +42,8 @@ export async function cleanupRegistry(payload: RegistryCleanupPayload) {
     if (!entity) {
         useLogger()
             .error('Registry not found.', {
-                component: 'registry',
-                command: RegistryCommand.PROJECT_LINK,
+                component: ComponentName.REGISTRY,
+                command: RegistryCommand.CLEANUP,
             });
 
         return;
