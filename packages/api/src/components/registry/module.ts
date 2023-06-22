@@ -30,7 +30,9 @@ export async function executeRegistryCommand(context: RegistryCommandContext) {
                     .info('registry setup completed', { component: 'registry', id: context.data.id });
             } catch (e) {
                 useLogger()
-                    .error('registry setup failed', { component: 'registry', id: context.data.id });
+                    .warn('registry setup failed', { component: 'registry', id: context.data.id });
+
+                useLogger().error(e);
             }
             break;
         }
@@ -46,6 +48,8 @@ export async function executeRegistryCommand(context: RegistryCommandContext) {
             } catch (e) {
                 useLogger()
                     .error('registry cleanup failed', { component: 'registry', id: context.data.id });
+
+                useLogger().error(e);
             }
             break;
         }
@@ -63,7 +67,9 @@ export async function executeRegistryCommand(context: RegistryCommandContext) {
                     .info('registry project link completed', { component: 'registry', id: context.data.id });
             } catch (e) {
                 useLogger()
-                    .error('registry project link failed', { component: 'registry', id: context.data.id });
+                    .warn('registry project link failed', { component: 'registry', id: context.data.id });
+
+                useLogger().error(e);
             }
             break;
         }
@@ -78,7 +84,9 @@ export async function executeRegistryCommand(context: RegistryCommandContext) {
                     .info('registry project unlink completed', { component: 'registry', id: context.data.id });
             } catch (e) {
                 useLogger()
-                    .error('registry project unlink failed', { component: 'registry', id: context.data.id });
+                    .warn('registry project unlink failed', { component: 'registry', id: context.data.id });
+
+                useLogger().error(e);
             }
             break;
         }
@@ -93,7 +101,9 @@ export async function executeRegistryCommand(context: RegistryCommandContext) {
                     .info('registry project relink completed', { component: 'registry', id: context.data.id });
             } catch (e) {
                 useLogger()
-                    .error('registry project relink failed', { component: 'registry', id: context.data.id });
+                    .warn('registry project relink failed', { component: 'registry', id: context.data.id });
+
+                useLogger().error(e);
             }
 
             break;
@@ -105,7 +115,9 @@ export async function executeRegistryCommand(context: RegistryCommandContext) {
                     .info('registry project event handled.', { component: 'registry', id: context.data.event });
             } catch (e) {
                 useLogger()
-                    .info('registry project event handle failed.', { component: 'registry', id: context.data.event });
+                    .warn('registry project event handle failed.', { component: 'registry', id: context.data.event });
+
+                useLogger().error(e);
             }
         }
     }

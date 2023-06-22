@@ -85,7 +85,7 @@ export async function linkRegistryProject(
                 command: RegistryCommand.PROJECT_LINK,
             });
 
-        return;
+        throw e;
     }
 
     await repository.save(entity);
@@ -116,7 +116,7 @@ export async function linkRegistryProject(
                 command: RegistryCommand.PROJECT_LINK,
             });
 
-        return;
+        throw e;
     }
 
     await repository.save(entity);
@@ -136,7 +136,7 @@ export async function linkRegistryProject(
                 command: RegistryCommand.PROJECT_LINK,
             });
 
-        return;
+        throw e;
     }
 
     await repository.save(entity);

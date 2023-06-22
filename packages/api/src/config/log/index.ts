@@ -51,7 +51,11 @@ export function useLogger() : Logger {
             }),
             new transports.File({
                 filename: path.join(getWritableDirPath(), 'error.log'),
-                level: 'warn',
+                level: 'error',
+                format: format.combine(
+                    format.errors({ stack: true }),
+                    format.prettyPrint(),
+                ),
             }),
             new transports.File({
                 filename: path.join(getWritableDirPath(), 'combined.log'),

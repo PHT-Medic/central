@@ -46,6 +46,8 @@ export async function unlinkRegistryProject(
                 component: 'registry',
                 command: RegistryCommand.PROJECT_UNLINK,
             });
+
+        throw e;
     }
 
     try {
@@ -57,6 +59,8 @@ export async function unlinkRegistryProject(
                 component: 'registry',
                 command: RegistryCommand.PROJECT_UNLINK,
             });
+
+        throw e;
     }
 
     if (payload.accountId) {
@@ -80,6 +84,8 @@ export async function unlinkRegistryProject(
                 component: 'registry',
                 command: RegistryCommand.PROJECT_UNLINK,
             });
+
+        throw e;
     }
 
     if (payload.updateDatabase) {
@@ -99,4 +105,6 @@ export async function unlinkRegistryProject(
             await projectRepository.save(project);
         }
     }
+
+    throw new Error('Just for testing');
 }
