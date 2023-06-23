@@ -43,7 +43,7 @@ export default defineComponent({
             required: true,
         },
     },
-    emits: ['finished', 'failed'],
+    emits: ['finished', 'failed', 'updated'],
     async setup(props, { emit }) {
         const refs = toRefs(props);
 
@@ -96,6 +96,8 @@ export default defineComponent({
         });
 
         const handleUpdated = (entity: Train) => {
+            updateForm(entity);
+
             emit('updated', entity);
         };
 
