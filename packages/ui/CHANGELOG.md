@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.8](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.7...v2.4.0-alpha.8) (2023-06-23)
+
+
+### Bug Fixes
+
+* train-file upload view ([6c6afaf](https://github.com/PHT-Medic/central/commit/6c6afafc88ab845e5eefbc137d0f41fd249e81b2))
+* train-wizard user secret picker ([9fc297f](https://github.com/PHT-Medic/central/commit/9fc297f7b2b0f04e132176fd2852075164976217))
+
+
+### Features
+
+* allow specifying registry project robot secret ([7cc7fd0](https://github.com/PHT-Medic/central/commit/7cc7fd0f440e30dd626b479506e9a790801f3175))
+
+
+
+
+
 # [2.4.0-alpha.4](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.3...v2.4.0-alpha.4) (2023-06-22)
 
 

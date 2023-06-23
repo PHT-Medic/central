@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.8](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.7...v2.4.0-alpha.8) (2023-06-23)
+
+
+### Bug Fixes
+
+* make webhook name static since only one instance is connected to a project ([7e94ede](https://github.com/PHT-Medic/central/commit/7e94edef341f7b28d9627f28b6ae705a71f9471e))
+* train-file upload view ([6c6afaf](https://github.com/PHT-Medic/central/commit/6c6afafc88ab845e5eefbc137d0f41fd249e81b2))
+* train-wizard user secret picker ([9fc297f](https://github.com/PHT-Medic/central/commit/9fc297f7b2b0f04e132176fd2852075164976217))
+
+
+### Features
+
+* allow specifying registry project robot secret ([7cc7fd0](https://github.com/PHT-Medic/central/commit/7cc7fd0f440e30dd626b479506e9a790801f3175))
+
+
+
+
+
 # [2.4.0-alpha.7](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.6...v2.4.0-alpha.7) (2023-06-22)
 
 

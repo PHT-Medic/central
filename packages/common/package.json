@@ -1,6 +1,6 @@
 {
     "name": "@personalhealthtrain/central-common",
-    "version": "2.4.0-alpha.4",
+    "version": "2.4.0-alpha.8",
     "description": "",
     "exports": {
         "./package.json": "./package.json",
