@@ -9,10 +9,8 @@ import {
     PermissionID, RegistryAPICommand,
 } from '@personalhealthtrain/central-common';
 import {
-    BadRequestError,
     ForbiddenError,
 } from '@ebec/http';
-import { useRequestBody } from '@routup/body';
 import { publish } from 'amqp-extension';
 import type { Request, Response } from 'routup';
 import { sendAccepted } from 'routup';
@@ -23,10 +21,8 @@ import { useEnv, useLogger } from '../../../../../../config';
 import {
     RegistryCommand,
 } from '../../../../../../components';
-import { RegistryProjectEntity } from '../../../../../../domains/registry-project/entity';
-import { RegistryEntity } from '../../../../../../domains/registry/entity';
-
-const commands = Object.values(RegistryAPICommand);
+import { RegistryEntity, RegistryProjectEntity } from '../../../../../../domains';
+import { runServiceRegistryValidation } from '../../utils/validation';
 
 export async function handleRegistryCommandRouteHandler(req: Request, res: Response) : Promise<any> {
     const ability = useRequestEnv(req, 'ability');
@@ -35,15 +31,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
         throw new ForbiddenError('You are not permitted to manage the registry.');
     }
 
-    const { id, command } = useRequestBody(req);
-
-    if (commands.indexOf(command) === -1) {
-        throw new BadRequestError('The registry command is not valid.');
-    }
-
-    if (typeof id !== 'string') {
-        throw new BadRequestError(`An ID parameter is required for the registry command ${command}`);
-    }
+    const { data: result } = await runServiceRegistryValidation(req);
 
     if (useEnv('env') === 'test') {
         sendAccepted(res);
@@ -52,7 +40,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
 
     const dataSource = await useDataSource();
 
-    switch (command) {
+    switch (result.command) {
         case RegistryAPICommand.SETUP:
         case RegistryAPICommand.CLEANUP:
         case RegistryAPICommand.DELETE: {
@@ -61,10 +49,10 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                 .addSelect([
                     'registry.account_secret',
                 ])
-                .where('registry.id = :id', { id })
+                .where('registry.id = :id', { id: result.id })
                 .getOne();
 
-            if (command === RegistryAPICommand.SETUP) {
+            if (result.command === RegistryAPICommand.SETUP) {
                 useLogger().info('Submitting setup registry command.');
 
                 const queueMessage = buildRegistryPayload({
@@ -75,7 +63,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                 });
 
                 await publish(queueMessage);
-            } else if (command === RegistryAPICommand.DELETE) {
+            } else if (result.command === RegistryAPICommand.DELETE) {
                 useLogger().info('Submitting delete registry command.');
 
                 const queueMessage = buildRegistryPayload({
@@ -107,14 +95,15 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                 .addSelect([
                     'registryProject.account_secret',
                 ])
-                .where('registryProject.id = :id', { id })
+                .where('registryProject.id = :id', { id: result.id })
                 .getOne();
 
-            if (command === RegistryAPICommand.PROJECT_LINK) {
+            if (result.command === RegistryAPICommand.PROJECT_LINK) {
                 const queueMessage = buildRegistryPayload({
                     command: RegistryCommand.PROJECT_LINK,
                     data: {
                         id: entity.id,
+                        secret: result.secret,
                     },
                 });
                 await publish(queueMessage);
@@ -125,7 +114,7 @@ export async function handleRegistryCommandRouteHandler(req: Request, res: Respo
                         id: entity.id,
                         registryId: entity.registry_id,
                         externalName: entity.external_name,
-                        accountId: entity.account_id
+                        accountId: entity.account_id,
                     },
                 });
                 await publish(queueMessage);

@@ -12,3 +12,4 @@ export * from './hostname';
 export * from './nanoid';
 export * from './object-properties';
 export * from './proxy-connection-string';
+export * from './regex-patterns';

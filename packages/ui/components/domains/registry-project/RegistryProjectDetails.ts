@@ -17,12 +17,18 @@ import {
     RegistryAPICommand,
     ServiceID,
     buildDomainEventFullName,
-    buildDomainEventSubscriptionFullName,
+    buildDomainEventSubscriptionFullName, registryRobotSecretRegex,
 } from '@personalhealthtrain/central-common';
+import { buildFormInput } from '@vue-layout/form-controls';
+import useVuelidate from '@vuelidate/core';
+import {
+    helpers, maxLength, minLength, required,
+} from '@vuelidate/validators';
 import { merge } from 'smob';
 import type { PropType } from 'vue';
-import { computed } from 'vue';
+import { computed, reactive } from 'vue';
 import { realmIdForSocket } from '../../../composables/domain/realm';
+import { buildValidationTranslator } from '../../../composables/ilingo';
 import { useSocket } from '../../../composables/socket';
 import { wrapFnWithBusyState } from '../../../core/busy';
 
@@ -41,36 +47,28 @@ export default defineComponent({
         const busy = ref(false);
         const entity = ref<null | RegistryProject>(null);
 
-        const name = computed(() => {
-            if (!entity.value) {
-                return '';
-            }
-
-            return entity.value.external_name;
+        const form = reactive({
+            secret: '',
         });
 
-        const accountName = computed(() => {
+        const vuelidate = useVuelidate({
+            secret: {
+                registryRobotSecret: helpers.regex(registryRobotSecretRegex),
+            },
+        }, form);
+
+        const init = () => {
             if (!entity.value) {
-                return '';
+                return;
             }
 
-            return entity.value.account_name;
-        });
+            form.secret = entity.value.account_secret || '';
+        };
 
-        const accountSecret = computed(() => {
-            if (!entity.value) {
-                return '';
-            }
+        init();
 
-            return entity.value.account_secret;
-        });
-
-        const webhookExists = computed(() => {
-            if (!entity.value) {
-                return false;
-            }
-
-            return !!entity.value.webhook_exists;
+        watch(entity, () => {
+            init();
         });
 
         const resolve = wrapFnWithBusyState(busy, async () => {
@@ -146,6 +144,7 @@ export default defineComponent({
             try {
                 await useAPI().service.runCommand(ServiceID.REGISTRY, command, {
                     id: entity.value.id,
+                    secret: form.secret,
                 });
 
                 emit('updated', entity.value);
@@ -175,7 +174,7 @@ export default defineComponent({
                     h('input', {
                         class: 'form-control',
                         type: 'text',
-                        value: name.value,
+                        value: entity.value?.external_name || '',
                         disabled: true,
                     }),
                 ]),
@@ -186,29 +185,32 @@ export default defineComponent({
                         h('input', {
                             class: 'form-control',
                             type: 'text',
-                            value: accountName.value,
+                            value: entity.value?.account_name || '',
                             placeholder: '...',
                             disabled: true,
                         }),
                     ]),
-                    h('div', { class: 'form-group' }, [
-                        h('label', { class: 'pe-1' }, 'Secret'),
-                        h('input', {
-                            class: 'form-control',
-                            type: 'text',
-                            value: accountSecret.value,
-                            disabled: true,
+                    buildFormInput({
+                        label: true,
+                        labelContent: 'Secret',
+                        props: {
                             placeholder: '...',
-                        }),
-                    ]),
+                        },
+                        value: form.secret,
+                        onChange(value) {
+                            form.secret = value;
+                        },
+                        validationResult: vuelidate.value.secret,
+                        validationTranslator: buildValidationTranslator(),
+                    }),
                 ]),
 
                 h('div', [
                     h('strong', { class: 'pe-1' }, 'Webhook:'),
                     h('i', {
                         class: {
-                            'fa fa-check text-success': webhookExists.value,
-                            'fa fa-times text-danger': !webhookExists.value,
+                            'fa fa-check text-success': entity.value?.webhook_exists,
+                            'fa fa-times text-danger': !entity.value?.webhook_exists,
                         },
                     }),
                 ]),
@@ -219,7 +221,7 @@ export default defineComponent({
                     h('div', {
                         class: 'alert alert-sm alert-info',
                     }, [
-                        'The link trigger will spin up the remote registry representation.',
+                        'Connect the database entity to the registry.',
                     ]),
                     h('div', { class: 'text-center' }, [
                         h('button', {
@@ -232,8 +234,8 @@ export default defineComponent({
                                 return execute(RegistryAPICommand.PROJECT_LINK);
                             },
                         }, [
-                            h('i', { class: 'fa-solid fa-link pe-1' }),
-                            'Link',
+                            h('i', { class: 'fa-solid fa-plug pe-1' }),
+                            'Connect',
                         ]),
                     ]),
                 ]),
@@ -241,7 +243,7 @@ export default defineComponent({
                     h('div', {
                         class: 'alert alert-sm alert-warning',
                     }, [
-                        'The unlink trigger will remove the remote registry representation.',
+                        'Disconnect the database entity of the registry.',
                     ]),
                     h('div', { class: 'text-center' }, [
                         h('button', {
@@ -253,8 +255,8 @@ export default defineComponent({
                                 return execute(RegistryAPICommand.PROJECT_UNLINK);
                             },
                         }, [
-                            h('i', { class: 'fa-solid fa-link-slash pe-1' }),
-                            'Unlink',
+                            h('i', { class: 'fa-solid fa-power-off pe-1' }),
+                            'Disconnect',
                         ]),
                     ]),
                 ]),

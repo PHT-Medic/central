@@ -95,7 +95,7 @@ export async function linkRegistryProject(
             account: {
                 id: parseInt(entity.account_id, 10),
                 name: entity.account_name,
-                secret: entity.account_secret,
+                secret: payload.secret || entity.account_secret,
             },
         });
 

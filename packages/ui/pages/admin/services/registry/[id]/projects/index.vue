@@ -182,6 +182,7 @@ export default {
             </template>
             <RegistryProjectDetails
                 v-if="item"
+                :key="item.id"
                 :entity-id="item.id"
                 :realm-id="item.realm_id"
             />

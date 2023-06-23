@@ -39,7 +39,8 @@ export type RegistryCleanupPayload = {
 };
 
 export type RegistryProjectLinkPayload = {
-    id: RegistryProject['id']
+    id: RegistryProject['id'],
+    secret?: string
 };
 
 export type RegistryProjectUnlinkPayload = {

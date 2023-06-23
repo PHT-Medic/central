@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { registryRobotSecretRegex } from '@personalhealthtrain/central-common';
 import { Ilingo } from 'ilingo';
 
 declare module '#app' {
@@ -45,6 +46,7 @@ export default defineNuxtPlugin((ctx) => {
                 alphaNumHyphenUnderscore: 'Der Eingabewert darf nur aus folgenden Zeichen bestehen: [0-9a-z-_]+',
                 alphaWithUpperNumHyphenUnderscore: 'Der Eingabewert darf nur aus folgenden Zeichen bestehen: [0-9a-zA-Z-_]+',
                 url: 'Die URL ist nicht gültig.',
+                registryRobotSecret: 'Die Eingabe muss größer als 8 Zeichen, min. 1 Großbuchstaben, 1 Kleinbuchstaben und 1 Zahl enthalten.',
             },
         },
         en: {
@@ -69,6 +71,7 @@ export default defineNuxtPlugin((ctx) => {
                 alphaNumHyphenUnderscore: 'The input value is only allowed to consist of the following characters: [0-9a-z-_]+',
                 alphaWithUpperNumHyphenUnderscore: 'The input value is only allowed to consist of the following characters: [0-9a-zA-Z-_]+',
                 url: 'The URL is invalid.',
+                registryRobotSecret: 'The input value must be larger than 8 letters, contain at least 1 uppercase letter, 1 lowercase letter and 1 number.',
             },
         },
     });

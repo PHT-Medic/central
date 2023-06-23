@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { nullifyEmptyObjectProperties } from '../../utils';
 import { BaseAPI } from '../base';
 import type { RegistryAPICommand } from './registry';
 import { ServiceID } from './constants';
@@ -21,7 +22,7 @@ export class ServiceAPI extends BaseAPI {
     ): Promise<SingleResourceResponse<Record<string, any>>> {
         data = data || {};
 
-        const { data: resultData } = await this.client.post(`services/${id}/command`, { command, ...data });
+        const { data: resultData } = await this.client.post(`services/${id}/command`, nullifyEmptyObjectProperties({ command, ...data }));
 
         return resultData;
     }

@@ -8,7 +8,9 @@
 import { RealmList, initFormAttributesFromSource } from '@authup/client-vue';
 import type { Registry, Station } from '@personalhealthtrain/central-common';
 import {
-    Ecosystem, isHex,
+    Ecosystem,
+    alphaNumHyphenUnderscoreRegex,
+    isHex,
 } from '@personalhealthtrain/central-common';
 import {
     buildFormInput, buildFormSelect, buildFormSubmit, buildFormTextarea,
@@ -30,10 +32,6 @@ import { buildValidationTranslator } from '../../../composables/ilingo';
 import { useAPI } from '#imports';
 import { wrapFnWithBusyState } from '../../../core/busy';
 import RegistryList from '../registry/RegistryList';
-import StationRegistryProjectDetails from './StationRegistryProjectDetails';
-import StationRobotDetails from './StationRobotDetails';
-
-const alphaNumHyphenUnderscore = helpers.regex(/^[a-z0-9-_]*$/);
 
 export default defineComponent({
     name: 'StationForm',
@@ -83,7 +81,7 @@ export default defineComponent({
 
             },
             external_name: {
-                alphaNumHyphenUnderscore,
+                alphaNumHyphenUnderscore: helpers.regex(alphaNumHyphenUnderscoreRegex),
                 minLength: minLength(3),
                 maxLength: maxLength(64),
             },
