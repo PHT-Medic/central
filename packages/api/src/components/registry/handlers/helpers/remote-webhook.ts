@@ -7,12 +7,11 @@
 
 import { isClientErrorWithStatusCode } from '@hapic/harbor';
 import type {
-    HarborClient, ProjectWebhookPolicyCreateContext, ProjectWebhookPolicyCreateResponse,
+    HarborClient, ProjectWebhookPolicyCreateContext,
 } from '@hapic/harbor';
 import {
     ServiceID,
 } from '@personalhealthtrain/central-common';
-import os from 'node:os';
 import { useEnv, useLogger } from '../../../../config';
 import { useAuthupClient } from '../../../../core';
 import { findRobotCredentialsInVault } from '../../../../domains';
@@ -21,10 +20,10 @@ import { buildRegistryWebhookTarget } from '../utils';
 export async function saveRemoteRegistryProjectWebhook(
     httpClient: HarborClient,
     context: {
-        idOrName: string | number,
-        isName?: boolean
+        projectIdOrName: string,
+        isProjectName?: boolean
     },
-) : Promise<ProjectWebhookPolicyCreateResponse | undefined> {
+) : Promise<{ id: number } | undefined> {
     await useAuthupClient().robot.integrity(ServiceID.REGISTRY);
 
     const engineData = await findRobotCredentialsInVault(ServiceID.REGISTRY);
@@ -36,8 +35,8 @@ export async function saveRemoteRegistryProjectWebhook(
 
     const webhookData: ProjectWebhookPolicyCreateContext = {
         data: {
-            enabled: true, // todo: maybe add more event_types
-            name: os.hostname(),
+            enabled: true,
+            name: 'api',
             targets: [
                 buildRegistryWebhookTarget({
                     url: useEnv('apiUrl'),
@@ -48,8 +47,8 @@ export async function saveRemoteRegistryProjectWebhook(
                 }),
             ],
         },
-        projectIdOrName: context.idOrName,
-        isProjectName: context.isName,
+        projectIdOrName: context.projectIdOrName,
+        isProjectName: context.isProjectName,
     };
 
     try {
@@ -63,9 +62,9 @@ export async function saveRemoteRegistryProjectWebhook(
     } catch (e) {
         if (isClientErrorWithStatusCode(e, 409)) {
             const webhook = await httpClient.projectWebhookPolicy.findOne({
-                name: os.hostname(),
-                projectIdOrName: context.idOrName,
-                isProjectName: context.isName,
+                name: 'api',
+                projectIdOrName: context.projectIdOrName,
+                isProjectName: context.isProjectName,
             });
 
             await httpClient.projectWebhookPolicy.update({

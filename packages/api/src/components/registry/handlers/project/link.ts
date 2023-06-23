@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import { Ecosystem, buildRegistryClientConnectionStringFromRegistry } from '@personalhealthtrain/central-common';
-import os from 'node:os';
 import { useDataSource } from 'typeorm-extension';
 import { useLogger } from '../../../../config';
 import { RegistryEntity, RegistryProjectEntity } from '../../../../domains';
@@ -122,12 +121,16 @@ export async function linkRegistryProject(
     await repository.save(entity);
 
     try {
-        await saveRemoteRegistryProjectWebhook(httpClient, {
-            idOrName: entity.external_name,
-            isName: true,
-        });
+        const webhook = await saveRemoteRegistryProjectWebhook(
+            httpClient,
+            {
+                projectIdOrName: entity.external_name,
+                isProjectName: true,
+            },
+        );
 
-        entity.webhook_name = os.hostname();
+        // webhook.id is also present :)
+        entity.webhook_name = `${webhook.id}`;
         entity.webhook_exists = true;
     } catch (e) {
         useLogger()
