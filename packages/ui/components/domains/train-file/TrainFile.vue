@@ -21,6 +21,7 @@ import {
 } from 'vue';
 import { useAPI } from '../../../composables/api';
 import { useSocket } from '../../../composables/socket';
+import { wrapFnWithBusyState } from '../../../core/busy';
 
 export default defineComponent({
     props: {
@@ -116,11 +117,7 @@ export default defineComponent({
             ), handleSocketDeleted);
         });
 
-        const drop = async () => {
-            if (busy.value) return;
-
-            busy.value = true;
-
+        const drop = wrapFnWithBusyState(busy, async () => {
             try {
                 const file = await useAPI().trainFile.delete(refs.file.value.id);
                 emit('deleted', file);
@@ -129,9 +126,7 @@ export default defineComponent({
                     emit('failed', e);
                 }
             }
-
-            busy.value = false;
-        };
+        });
 
         return {
             drop,

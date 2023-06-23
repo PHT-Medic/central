@@ -45,13 +45,13 @@ export function buildListDeletedHandler<T extends Record<string, any>>(
     items: Ref<T[]>,
     meta: Ref<ListLoadMeta>,
 ) {
-    return (item: T) : T | undefined => {
+    return (item: T) => {
         const index = items.value.findIndex((el: T) => el.id === item.id);
+        console.log(items.value, item);
         if (index !== -1) {
             meta.value.total--;
-            return items.value.splice(index, 1).pop();
+            items.value.splice(index, 1);
+            console.log(meta.value);
         }
-
-        return undefined;
     };
 }

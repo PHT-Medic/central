@@ -29,7 +29,7 @@
         "@vue-layout/countdown": "^2.4.0",
         "@vue-layout/form-controls": "^2.8.3",
         "@vue-layout/gravatar": "^2.3.0",
-        "@vue-layout/list-controls": "^2.8.3",
+        "@vue-layout/list-controls": "^2.8.4",
         "@vue-layout/navigation": "^2.8.3",
         "@vue-layout/pagination": "^2.8.3",
         "@vue-layout/preset-bootstrap-v5": "^2.6.0",

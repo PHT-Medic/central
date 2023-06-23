@@ -74,19 +74,33 @@ export default defineComponent({
             }
         });
 
+        const fileListNode = ref<null | typeof TrainFileList>(null);
+
         const handleCreated = (entity: TrainFile) => {
+            if (fileListNode.value) {
+                fileListNode.value.handleCreated(entity);
+            }
+
             emit('created', entity);
         };
         const handleDeleted = (entity: TrainFile) => {
-            emit('deleted', entity);
+            if (fileListNode.value) {
+                fileListNode.value.handleDeleted(entity);
+            }
 
             const selectedIndex = selected.value.indexOf(entity.id);
             if (selectedIndex !== -1) {
                 selected.value.splice(selectedIndex, 1);
             }
+
+            emit('deleted', entity);
         };
 
         const handleUpdated = (entity: TrainFile) => {
+            if (fileListNode.value) {
+                fileListNode.value.handleUpdated(entity);
+            }
+
             emit('updated', entity);
         };
 
@@ -101,11 +115,14 @@ export default defineComponent({
                     formData.append(`files[${i}]`, form.files[i]);
                 }
 
-                const response = await useAPI().trainFile.upload(formData);
-                response.data.map((item) => handleCreated(item));
-
-                emit('uploaded', form.files);
                 form.files = [];
+
+                const response = await useAPI().trainFile.upload(formData);
+                for (let i = 0; i < response.data.length; i++) {
+                    handleCreated(response.data[i]);
+                }
+
+                emit('uploaded');
             } catch (e) {
                 emit('failed', e);
             }
@@ -125,8 +142,6 @@ export default defineComponent({
                 }
             }
         });
-
-        const fileListNode = ref<null | typeof TrainFileList>(null);
 
         const selectAllFiles = () => {
             if (selectAll.value) {

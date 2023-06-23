@@ -185,22 +185,16 @@ export function createDomainListBuilder<T extends Record<string, any>>(
                 data,
                 total: meta.value.total,
                 onDeleted(value: T) {
+                    meta.value.total--;
+
                     if (context.setup.emit) {
                         context.setup.emit('deleted', value);
                     }
-
-                    if (meta.value.total) {
-                        meta.value.total--;
-                    }
-
-                    handleDeleted(value);
                 },
                 onUpdated(value) {
                     if (context.setup.emit) {
                         context.setup.emit('updated', value);
                     }
-
-                    handleUpdated(value);
                 },
                 slotItems: context.setup.slots || {},
             }),
