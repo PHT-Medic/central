@@ -32,7 +32,7 @@
         "@vue-layout/list-controls": "^2.8.4",
         "@vue-layout/navigation": "^2.8.3",
         "@vue-layout/pagination": "^2.8.3",
-        "@vue-layout/preset-bootstrap-v5": "^2.6.0",
+        "@vue-layout/preset-bootstrap-v5": "^3.0.0",
         "@vue-layout/preset-font-awesome": "^2.0.0",
         "@vue-layout/timeago": "^2.4.0",
         "@vuelidate/core": "^2.0.2",
