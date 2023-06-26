@@ -17,6 +17,7 @@ import type { PropType } from 'vue';
 import {
     computed, defineComponent, reactive, ref, toRefs, watch,
 } from 'vue';
+import type { BuildInput } from 'rapiq';
 import { useAPI } from '#imports';
 import { wrapFnWithBusyState } from '../../../core/busy';
 import TrainFileNode from './TrainFile.vue';
@@ -75,6 +76,11 @@ export default defineComponent({
         });
 
         const fileListNode = ref<null | typeof TrainFileList>(null);
+        const fileListQuery = computed<BuildInput<TrainFile>>(() => ({
+            filters: {
+                train_id: refs.entity.value.id,
+            },
+        }));
 
         const handleCreated = (entity: TrainFile) => {
             if (fileListNode.value) {
@@ -241,6 +247,7 @@ export default defineComponent({
 
             filesNode,
             fileListNode,
+            fileListQuery,
         };
     },
 });
@@ -379,6 +386,7 @@ export default defineComponent({
 
                 <TrainFileList
                     ref="fileListNode"
+                    :query="fileListQuery"
                     :header-search="false"
                     :header-title="false"
                     :footer-pagination="false"
