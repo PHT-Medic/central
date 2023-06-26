@@ -159,13 +159,7 @@ export default defineComponent({
                         fn(
                             item,
                             itemProps,
-                            slotContent,
                         ) {
-                            const slots : Record<string, any> = {};
-                            if (slotContent) {
-                                slots.default = slotContent;
-                            }
-
                             return h(TrainStationDetails, {
                                 entity: item,
                                 direction: refs.direction.value,
@@ -173,18 +167,7 @@ export default defineComponent({
                                 onUpdated: itemProps.updated,
                                 onDeleted: itemProps.deleted,
                                 onFailed: itemProps.failed,
-                            }, slots);
-                        },
-                        textFn(item) {
-                            if (refs.target.value === DomainType.STATION) {
-                                return h('span', [item.station.name]);
-                            }
-
-                            if (refs.target.value === DomainType.TRAIN) {
-                                return h('span', [item.train.name]);
-                            }
-
-                            return h('span', [item.id]);
+                            });
                         },
                     },
                 },

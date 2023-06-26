@@ -165,11 +165,17 @@ export default defineComponent({
                             }, slots);
                         },
                         textFn(item) {
-                            if (refs.target.value === DomainType.STATION) {
+                            if (
+                                refs.target.value === DomainType.STATION &&
+                                item.station
+                            ) {
                                 return h('span', [item.station.name]);
                             }
 
-                            if (refs.target.value === DomainType.PROPOSAL) {
+                            if (
+                                refs.target.value === DomainType.PROPOSAL &&
+                                item.proposal
+                            ) {
                                 return h('span', [item.proposal.title]);
                             }
 

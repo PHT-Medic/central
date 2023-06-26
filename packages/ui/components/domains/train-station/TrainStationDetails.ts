@@ -337,18 +337,18 @@ export default defineComponent({
             entity.value[refs.target.value]
         ) {
             if (refs.target.value === Target.TRAIN) {
-                return () => h('div', [
+                return () => h('span', [
                     entity.value?.train.name || entity.value?.train.id,
                 ]);
             }
             if (refs.target.value === Target.STATION) {
-                return () => h('div', [
+                return () => h('span', [
                     entity.value?.station.name,
                 ]);
             }
         }
 
-        return () => h('div', [
+        return () => h('span', [
             entity.value?.id,
         ]);
     },
