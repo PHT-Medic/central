@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.9](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.8...v2.4.0-alpha.9) (2023-06-26)
+
+
+### Bug Fixes
+
+* only display train-files for specific train ([e90a41b](https://github.com/PHT-Medic/central/commit/e90a41b3278f9581333217cb0f2d5e3d68494273))
+* temporary fix for train-station list rendering ([a2979be](https://github.com/PHT-Medic/central/commit/a2979be62fd6921d7a55d7a9bfc8d83e0e9e78c9))
+
+
+
+
+
 # [2.4.0-alpha.8](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.7...v2.4.0-alpha.8) (2023-06-23)
 
 
