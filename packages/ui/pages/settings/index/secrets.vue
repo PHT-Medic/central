@@ -146,10 +146,10 @@ export default defineNuxtComponent({
                 :query="query"
                 @deleted="handleDeleted"
             >
-                <template #header-title>
+                <template #headerTitle>
                     <h6><i class="fa-solid fa-list pe-1" /> Overview</h6>
                 </template>
-                <template #item-actions="props">
+                <template #itemActions="props">
                     <div class="me-1">
                         <button
                             type="button"

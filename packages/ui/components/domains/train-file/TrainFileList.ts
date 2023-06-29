@@ -16,53 +16,31 @@ import {
     buildDomainEventSubscriptionFullName,
     buildSocketTrainFileRoomName,
 } from '@personalhealthtrain/central-common';
-import type { PropType } from 'vue';
+import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
-import type { BuildInput } from 'rapiq';
 import { DomainEventName } from '@authup/core';
 import { realmIdForSocket } from '../../../composables/domain/realm';
 import { useSocket } from '../../../composables/socket';
 import type {
-    DomainListHeaderSearchOptionsInput,
-    DomainListHeaderTitleOptionsInput,
+    DomainListSlotsType,
 } from '../../../core';
 import {
-    createDomainListBuilder, isQuerySortedDescByDate,
+    createDomainListBuilder,
+    defineDomainListEvents,
+    defineDomainListProps,
+    isQuerySortedDescByDate,
 } from '../../../core';
 
 export default defineComponent({
     props: {
-        loadOnSetup: {
-            type: Boolean,
-            default: true,
-        },
-        query: {
-            type: Object as PropType<BuildInput<TrainFile>>,
-            default() {
-                return {};
-            },
-        },
-        noMore: {
-            type: Boolean,
-            default: true,
-        },
-        footerPagination: {
-            type: Boolean,
-            default: true,
-        },
-        headerTitle: {
-            type: [Boolean, Object] as PropType<boolean | DomainListHeaderTitleOptionsInput>,
-            default: true,
-        },
-        headerSearch: {
-            type: [Boolean, Object] as PropType<boolean | DomainListHeaderSearchOptionsInput>,
-            default: true,
-        },
+        ...defineDomainListProps<TrainFile>(),
         realmId: {
             type: String,
             default: undefined,
         },
     },
+    slots: Object as SlotsType<DomainListSlotsType<TrainFile>>,
+    emits: defineDomainListEvents<TrainFile>(),
     setup(props, ctx) {
         const refs = toRefs(props);
 
@@ -75,7 +53,7 @@ export default defineComponent({
             meta,
             handleCreated,
         } = createDomainListBuilder<TrainFile>({
-            props: refs,
+            props,
             setup: ctx,
             load: (buildInput) => useAPI().trainFile.getMany(buildInput),
             defaults: {
@@ -88,7 +66,7 @@ export default defineComponent({
                 },
 
                 noMore: {
-                    textContent: 'No more train files available...',
+                    content: 'No more train files available...',
                 },
             },
         });

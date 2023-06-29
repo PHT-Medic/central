@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { initFormAttributesFromSource } from '@authup/client-vue';
 import type { Registry, RegistryProject } from '@personalhealthtrain/central-common';
 import { RegistryProjectType, createNanoID } from '@personalhealthtrain/central-common';
 import { buildFormInput, buildFormSelect, buildFormSubmit } from '@vue-layout/form-controls';
@@ -19,6 +18,7 @@ import type { PropType, VNodeArrayChildren } from 'vue';
 import { computed } from 'vue';
 import { buildValidationTranslator } from '../../../composables/ilingo';
 import { wrapFnWithBusyState } from '../../../core/busy';
+import { initFormAttributesFromSource } from '../../../utils';
 import RegistryList from '../registry/RegistryList';
 
 const alphaNumHyphenUnderscore = helpers.regex(

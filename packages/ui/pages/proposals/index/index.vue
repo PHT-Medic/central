@@ -63,7 +63,7 @@ export default defineNuxtComponent({
             <ProposalList
                 :query="query"
             >
-                <template #header-title>
+                <template #headerTitle>
                     <h6><i class="fa-solid fa-list pe-1" /> Overview</h6>
                 </template>
                 <template #item="props">

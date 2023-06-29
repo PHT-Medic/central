@@ -4,51 +4,24 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import type { BuildInput } from 'rapiq';
 import type { RegistryProject } from '@personalhealthtrain/central-common';
-import type { PropType } from 'vue';
+import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
 import type {
-    DomainListHeaderSearchOptionsInput,
-    DomainListHeaderTitleOptionsInput,
+    DomainListSlotsType,
 } from '../../../core';
 import {
-    createDomainListBuilder,
+    createDomainListBuilder, defineDomainListEvents, defineDomainListProps,
 } from '../../../core';
 
 export default defineComponent({
     name: 'RegistryProjectList',
-    props: {
-        loadOnSetup: {
-            type: Boolean,
-            default: true,
-        },
-        query: {
-            type: Object as PropType<BuildInput<RegistryProject>>,
-            default() {
-                return {};
-            },
-        },
-        noMore: {
-            type: Boolean,
-            default: true,
-        },
-        footerPagination: {
-            type: Boolean,
-            default: true,
-        },
-        headerTitle: {
-            type: [Boolean, Object] as PropType<boolean | DomainListHeaderTitleOptionsInput>,
-            default: true,
-        },
-        headerSearch: {
-            type: [Boolean, Object] as PropType<boolean | DomainListHeaderSearchOptionsInput>,
-            default: true,
-        },
-    },
+    props: defineDomainListProps<RegistryProject>(),
+    slots: Object as SlotsType<DomainListSlotsType<RegistryProject>>,
+    emits: defineDomainListEvents<RegistryProject>(),
     setup(props, ctx) {
         const { build } = createDomainListBuilder<RegistryProject>({
-            props: toRefs(props),
+            props,
             setup: ctx,
             load: (buildInput) => useAPI().registryProject.getMany(buildInput),
             defaults: {
@@ -61,7 +34,7 @@ export default defineComponent({
                 },
 
                 noMore: {
-                    textContent: 'No more registry projects available...',
+                    content: 'No more registry projects available...',
                 },
             },
         });

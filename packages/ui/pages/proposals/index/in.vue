@@ -146,10 +146,10 @@ export default defineNuxtComponent({
                 :realm-id="realmId"
                 :source-id="stationId"
             >
-                <template #header-title>
+                <template #headerTitle>
                     <h6><i class="fa-solid fa-list pe-1" /> Overview</h6>
                 </template>
-                <template #items="props">
+                <template #body="props">
                     <BTable
                         :items="props.data"
                         :fields="fields"

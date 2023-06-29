@@ -5,49 +5,26 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { PropType } from 'vue';
+import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
 import type { MasterImage } from '@personalhealthtrain/central-common';
-import type { BuildInput } from 'rapiq';
-import { createDomainListBuilder } from '../../../core';
 import type {
-    DomainListHeaderSearchOptionsInput,
-    DomainListHeaderTitleOptionsInput,
+    DomainListSlotsType,
+} from '../../../core';
+import {
+    createDomainListBuilder,
+    defineDomainListEvents,
+    defineDomainListProps,
 } from '../../../core';
 
 export default defineComponent({
     name: 'MasterImageList',
-    props: {
-        loadOnSetup: {
-            type: Boolean,
-            default: true,
-        },
-        query: {
-            type: Object as PropType<BuildInput<MasterImage>>,
-            default() {
-                return {};
-            },
-        },
-        noMore: {
-            type: Boolean,
-            default: true,
-        },
-        footerPagination: {
-            type: Boolean,
-            default: true,
-        },
-        headerTitle: {
-            type: [Boolean, Object] as PropType<boolean | DomainListHeaderTitleOptionsInput>,
-            default: true,
-        },
-        headerSearch: {
-            type: [Boolean, Object] as PropType<boolean | DomainListHeaderSearchOptionsInput>,
-            default: true,
-        },
-    },
+    props: defineDomainListProps<MasterImage>(),
+    slots: Object as SlotsType<DomainListSlotsType<MasterImage>>,
+    emits: defineDomainListEvents<MasterImage>(),
     setup(props, ctx) {
         const { build } = createDomainListBuilder<MasterImage>({
-            props: toRefs(props),
+            props,
             setup: ctx,
             load: (buildInput) => useAPI().masterImage.getMany(buildInput),
             queryFilter: (q) => ({
@@ -67,14 +44,12 @@ export default defineComponent({
                     icon: 'fa fa-compact-disc',
                 },
 
-                items: {
-                    item: {
-                        textPropName: 'virtual_path',
-                    },
+                item: {
+                    textPropName: 'virtual_path',
                 },
 
                 noMore: {
-                    textContent: 'No more master-images available...',
+                    content: 'No more master-images available...',
                 },
             },
         });

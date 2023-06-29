@@ -152,7 +152,7 @@ export default defineNuxtComponent({
                     :header-search="false"
                     :query="proposalStationQuery"
                 >
-                    <template #items="{ data }">
+                    <template #body="{ data }">
                         <div class="list">
                             <template
                                 v-for="item in data"

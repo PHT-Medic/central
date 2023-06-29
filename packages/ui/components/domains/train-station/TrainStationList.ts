@@ -16,25 +16,24 @@ import {
     DomainEventSubscriptionName,
     DomainSubType,
     DomainType,
-    buildDomainChannelName,
-    buildDomainEventFullName,
-    buildDomainEventSubscriptionFullName,
+    ProposalStation,
+    buildDomainChannelName, buildDomainEventFullName, buildDomainEventSubscriptionFullName,
 } from '@personalhealthtrain/central-common';
 import type { ListItemSlotProps } from '@vue-layout/list-controls';
-import type { BuildInput, FiltersBuildInput } from 'rapiq';
+import type { FiltersBuildInput } from 'rapiq';
 
-import type { PropType, SlotsType } from 'vue';
+import type { PropType, SlotsType, VNodeChild } from 'vue';
 import { computed, defineComponent } from 'vue';
 import type { Socket } from 'socket.io-client';
 import { realmIdForSocket } from '../../../composables/domain/realm';
 import { useSocket } from '../../../composables/socket';
 import type {
-    DomainListHeaderSearchOptionsInput,
-    DomainListHeaderTitleOptionsInput,
+    DomainListSlotsType,
 } from '../../../core';
 import {
-    createDomainListBuilder,
+    createDomainListBuilder, defineDomainListEvents, defineDomainListProps,
 } from '../../../core';
+import type { DomainDetailsSlotProps } from '../type';
 import TrainStationDetails from './TrainStationDetails';
 
 enum Direction {
@@ -45,33 +44,7 @@ enum Direction {
 export default defineComponent({
     name: 'TrainStationList',
     props: {
-        loadOnSetup: {
-            type: Boolean,
-            default: true,
-        },
-        query: {
-            type: Object as PropType<BuildInput<TrainStation>>,
-            default() {
-                return {};
-            },
-        },
-        noMore: {
-            type: Boolean,
-            default: true,
-        },
-        footerPagination: {
-            type: Boolean,
-            default: true,
-        },
-        headerTitle: {
-            type: [Boolean, Object] as PropType<boolean | DomainListHeaderTitleOptionsInput>,
-            default: true,
-        },
-        headerSearch: {
-            type: [Boolean, Object] as PropType<boolean | DomainListHeaderSearchOptionsInput>,
-            default: true,
-        },
-
+        ...defineDomainListProps<TrainStation>(),
         realmId: {
             type: String,
         },
@@ -88,9 +61,8 @@ export default defineComponent({
             default: Direction.OUT,
         },
     },
-    slots: Object as SlotsType<{
-        item: ListItemSlotProps<TrainStation>
-    }>,
+    slots: Object as SlotsType<DomainListSlotsType<TrainStation>>,
+    emits: defineDomainListEvents<TrainStation>(),
     async setup(props, ctx) {
         const refs = toRefs(props);
 
@@ -104,7 +76,7 @@ export default defineComponent({
             build,
             handleCreated,
         } = createDomainListBuilder<TrainStation>({
-            props: refs,
+            props,
             setup: ctx,
             load: (buildInput) => useAPI().trainStation.getMany(buildInput),
             queryFilter: (q) => {
@@ -154,26 +126,53 @@ export default defineComponent({
                         'fa-solid fa-train-tram',
                 },
 
-                items: {
-                    item: {
-                        fn(
-                            item,
-                            itemProps,
-                        ) {
-                            return h(TrainStationDetails, {
-                                entity: item,
-                                direction: refs.direction.value,
-                                target: refs.target.value,
-                                onUpdated: itemProps.updated,
-                                onDeleted: itemProps.deleted,
-                                onFailed: itemProps.failed,
-                            });
-                        },
+                item: {
+                    content(
+                        item,
+                        itemProps,
+                        sections,
+                    ) {
+                        return h(TrainStationDetails, {
+                            entity: item,
+                            direction: refs.direction.value,
+                            target: refs.target.value,
+                            onUpdated: itemProps.updated,
+                            onDeleted: itemProps.deleted,
+                            onFailed: itemProps.failed,
+                        }, {
+                            default: (props: DomainDetailsSlotProps<TrainStation>) => {
+                                if (sections.slot) {
+                                    return sections.slot;
+                                }
+
+                                let text : VNodeChild | undefined;
+
+                                if (
+                                    refs.target.value === DomainType.STATION &&
+                                    props.data.station
+                                ) {
+                                    text = h('div', [props.data.station.name]);
+                                } else if (
+                                    refs.target.value === DomainType.TRAIN &&
+                                    props.data.train
+                                ) {
+                                    text = h('div', [props.data.train.name]);
+                                } else {
+                                    text = h('div', [props.data.id]);
+                                }
+
+                                return [
+                                    sections.icon,
+                                    text,
+                                    sections.actions,
+                                ];
+                            },
+                        });
                     },
                 },
 
                 noMore: {
-                    textContent: `No more ${refs.target.value} available...`,
+                    content: `No more ${refs.target.value} available...`,
                 },
             },
         });

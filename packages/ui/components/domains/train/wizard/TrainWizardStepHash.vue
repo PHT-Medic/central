@@ -5,7 +5,6 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { initFormAttributesFromSource } from '@authup/client-vue';
 import { required } from '@vuelidate/validators';
 import {
     computed,
@@ -15,6 +14,7 @@ import type { Train } from '@personalhealthtrain/central-common';
 import { TrainAPICommand } from '@personalhealthtrain/central-common';
 import useVuelidate from '@vuelidate/core';
 import type { PropType } from 'vue';
+import { initFormAttributesFromSource } from '../../../../utils';
 import { useAPI } from '../../../../composables/api';
 import { wrapFnWithBusyState } from '../../../../core/busy';
 

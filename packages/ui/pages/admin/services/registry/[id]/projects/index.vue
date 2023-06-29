@@ -116,7 +116,7 @@ export default {
             :query="query"
             :load-on-init="true"
         >
-            <template #items="props">
+            <template #body="props">
                 <BTable
                     :items="props.data"
                     :fields="fields"

@@ -4,8 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-
-import { RealmList, initFormAttributesFromSource } from '@authup/client-vue';
+import { RealmList } from '@authup/client-vue';
 import type { Registry, Station } from '@personalhealthtrain/central-common';
 import {
     Ecosystem,
@@ -15,7 +14,7 @@ import {
 import {
     buildFormInput, buildFormSelect, buildFormSubmit, buildFormTextarea,
 } from '@vue-layout/form-controls';
-import type { ListItemSlotProps, ListItemsSlotProps } from '@vue-layout/list-controls';
+import type { ListBodySlotProps, ListItemSlotProps } from '@vue-layout/list-controls';
 import { SlotName } from '@vue-layout/list-controls';
 import useVuelidate from '@vuelidate/core';
 import {
@@ -28,6 +27,7 @@ import type {
 import {
     computed, defineComponent, nextTick, ref,
 } from 'vue';
+import { initFormAttributesFromSource } from '../../../utils';
 import { buildValidationTranslator } from '../../../composables/ilingo';
 import { useAPI } from '#imports';
 import { wrapFnWithBusyState } from '../../../core/busy';
@@ -188,7 +188,7 @@ export default defineComponent({
                             footerPagination: false,
                         },
                         {
-                            [SlotName.ITEMS]: (props: ListItemsSlotProps<Station>) => buildFormSelect({
+                            [SlotName.BODY]: (props: ListBodySlotProps<Station>) => buildFormSelect({
                                 validationTranslator: buildValidationTranslator(),
                                 validationResult: $v.value.realm_id,
                                 label: true,

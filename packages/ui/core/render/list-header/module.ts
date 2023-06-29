@@ -9,11 +9,16 @@ import type { FormInputBuildOptionsInput } from '@vue-layout/form-controls';
 import { buildFormInputText } from '@vue-layout/form-controls';
 import type { VNodeArrayChildren, VNodeChild } from 'vue';
 import { h } from 'vue';
+import { hasNormalizedSlot, normalizeSlot } from '../slot';
 import type { DomainListHeaderSearchOptions, DomainListHeaderTitleOptions, ListHeaderOptions } from './type';
 
 export function buildDomainListHeaderSearch(
     ctx: DomainListHeaderSearchOptions,
 ) {
+    if (hasNormalizedSlot('headerSearch', ctx.slots)) {
+        return normalizeSlot('headerSearch', { load: ctx.load }, ctx.slots);
+    }
+
     ctx.icon = ctx.icon ?? true;
     ctx.iconPosition = ctx.iconPosition ?? 'start';
 
@@ -46,6 +51,10 @@ export function buildDomainListHeaderSearch(
 export function buildDomainListHeaderTitle<T>(
     ctx: DomainListHeaderTitleOptions,
 ) {
+    if (hasNormalizedSlot('headerTitle', ctx.slots)) {
+        return normalizeSlot('headerTitle', {}, ctx.slots);
+    }
+
     let icon : VNodeChild = [];
     if (typeof ctx.icon === 'string') {
         icon = [h('i', { class: ctx.icon })];
@@ -75,11 +84,17 @@ export function buildDomainListHeader<T>(
         const options : DomainListHeaderTitleOptions = typeof ctx.title === 'boolean' ? {} :
             ctx.title;
 
+        options.slots = ctx.slots;
+
         children.push(buildDomainListHeaderTitle(options));
     }
 
     if (ctx.search) {
-        children.push(buildDomainListHeaderSearch(ctx.search));
+        const options : DomainListHeaderSearchOptions = typeof ctx.search === 'boolean' ? {} :
+            ctx.search;
+
+        options.slots = ctx.slots;
+        children.push(buildDomainListHeaderSearch(options));
     }
 
     if (children.length > 0) {

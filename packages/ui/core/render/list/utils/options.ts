@@ -5,32 +5,48 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { unref } from 'vue';
-import type { Ref, ToRefs } from 'vue';
+import { merge } from 'smob';
 import type { DomainListBuilderTemplateOptions, DomainListProps } from '../type';
 
-function merge<T>(primary: T | Ref<T>, secondary: T) : T | undefined {
-    if (typeof primary !== 'undefined') {
-        return unref(primary);
+function mergeOptions<T extends boolean | Record<string, any> | undefined>(
+    primary: T,
+    secondary: T,
+) : T {
+    if (typeof secondary === 'undefined') {
+        return primary;
     }
 
-    return secondary;
+    if (typeof primary === 'undefined') {
+        return secondary;
+    }
+
+    if (typeof primary === 'boolean' && !primary) {
+        return primary;
+    }
+
+    const primaryRecord = typeof primary === 'boolean' ? {} : primary;
+    const secondaryRecord = typeof secondary === 'boolean' ? {} : secondary;
+
+    return merge(primaryRecord, secondaryRecord) as T;
 }
 
 export function mergeDomainListOptions<T extends Record<string, any>>(
-    props: ToRefs<DomainListProps<T>>,
+    props: DomainListProps<T>,
     defaults: Partial<DomainListBuilderTemplateOptions<T>>,
 ) : DomainListBuilderTemplateOptions<T> {
     const output : Partial<DomainListBuilderTemplateOptions<T>> = {
-        items: defaults.items ?? true,
+        body: mergeOptions(props.body, defaults.body),
+        item: mergeOptions(props.item, defaults.item),
     };
 
-    output.headerSearch = merge(props.headerSearch, defaults.headerSearch);
-    output.headerTitle = merge(props.headerTitle, defaults.headerTitle);
+    output.header = mergeOptions(props.header, defaults.header);
+    output.headerSearch = mergeOptions(props.headerSearch, defaults.headerSearch);
+    output.headerTitle = mergeOptions(props.headerTitle, defaults.headerTitle);
 
-    output.noMore = merge(defaults.noMore, defaults.noMore);
+    output.noMore = mergeOptions(props.noMore, defaults.noMore);
 
-    output.footerPagination = merge(props.footerPagination, defaults.footerPagination);
+    output.footer = mergeOptions(props.footer, defaults.footer);
+    output.footerPagination = mergeOptions(props.footerPagination, defaults.footerPagination);
 
     return output as DomainListBuilderTemplateOptions<T>;
 }

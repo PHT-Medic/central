@@ -21,8 +21,8 @@
         "test:coverage": "npm run test -- --coverage"
     },
     "dependencies": {
-        "@authup/core": "^0.37.1",
-        "@authup/server-adapter": "^0.37.1",
+        "@authup/core": "^0.38.0",
+        "@authup/server-adapter": "^0.38.0",
         "@ebec/http": "^1.1.0",
         "@hapic/harbor": "^2.1.1",
         "@personalhealthtrain/central-common": "2.4.0-alpha.8",

@@ -113,10 +113,10 @@ export default defineNuxtComponent({
                 :direction="'in'"
                 :query="query"
             >
-                <template #header-title>
+                <template #headerTitle>
                     <h6><i class="fa-solid fa-list pe-1" /> Overview</h6>
                 </template>
-                <template #items="props">
+                <template #body="props">
                     <BTable
                         :items="props.data"
                         :fields="fields"
@@ -127,14 +127,14 @@ export default defineNuxtComponent({
                         outlined
                     >
                         <template #cell(realm)="data">
-                            <span class="badge-dark badge">{{ data.item.train_realm_id }}</span>
+                            <span class="bg-dark badge">{{ data.item.train_realm_id }}</span>
                         </template>
                         <template #cell(approval_status)="data">
                             <train-station-approval-status :status="data.item.approval_status">
                                 <template #default="statusProps">
                                     <span
                                         class="badge"
-                                        :class="'badge-'+statusProps.classSuffix"
+                                        :class="'bg-'+statusProps.classSuffix"
                                     >{{ statusProps.statusText }}</span>
                                 </template>
                             </train-station-approval-status>
@@ -144,7 +144,7 @@ export default defineNuxtComponent({
                                 <template #default="statusProps">
                                     <span
                                         class="badge"
-                                        :class="'badge-'+statusProps.classSuffix"
+                                        :class="'bg-'+statusProps.classSuffix"
                                     >{{ statusProps.statusText }}</span>
                                 </template>
                             </train-station-run-status>

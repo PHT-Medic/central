@@ -6,19 +6,21 @@
  */
 
 import type {
-    Ref, VNode, VNodeArrayChildren, VNodeChild,
+    Ref, VNodeChild,
 } from 'vue';
 
 export type DomainListHeaderTitleOptionsInput = {
     icon?: boolean | string,
     tag?: string,
-    content?: string | VNodeChild | (() => VNode | VNodeArrayChildren)
+    content?: string | VNodeChild | (() => VNodeChild),
+    slots?: Record<string, any>
 };
 export type DomainListHeaderTitleOptions = DomainListHeaderTitleOptionsInput;
 
 export type DomainListHeaderSearchOptionsInput = {
     icon?: boolean,
-    iconPosition?: 'start' | 'end'
+    iconPosition?: 'start' | 'end',
+    slots?: Record<string, any>
 };
 
 export type DomainListHeaderSearchOptions = DomainListHeaderSearchOptionsInput & {
@@ -28,5 +30,6 @@ export type DomainListHeaderSearchOptions = DomainListHeaderSearchOptionsInput &
 
 export type ListHeaderOptions = {
     title?: DomainListHeaderTitleOptions | boolean,
-    search?: DomainListHeaderSearchOptions
+    search?: DomainListHeaderSearchOptions | boolean,
+    slots?: Record<string, any>
 };

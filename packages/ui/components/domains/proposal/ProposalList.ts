@@ -5,7 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import type {
-    Proposal, ProposalEventContext,
+    Proposal,
+    ProposalEventContext,
     SocketServerToClientEventContext,
 } from '@personalhealthtrain/central-common';
 import {
@@ -15,60 +16,38 @@ import {
     buildDomainEventFullName,
     buildDomainEventSubscriptionFullName,
 } from '@personalhealthtrain/central-common';
-import type { PropType } from 'vue';
+import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
-import type { BuildInput } from 'rapiq';
 import { DomainEventName } from '@authup/core';
 import { realmIdForSocket } from '../../../composables/domain/realm';
 import { useSocket } from '../../../composables/socket';
 import type {
-    DomainListHeaderSearchOptionsInput,
-    DomainListHeaderTitleOptionsInput,
+    DomainListSlotsType,
 } from '../../../core';
 import {
-    createDomainListBuilder, isQuerySortedDescByDate,
+    createDomainListBuilder,
+    defineDomainListEvents,
+    defineDomainListProps,
+    isQuerySortedDescByDate,
 } from '../../../core';
 
 export default defineComponent({
     props: {
-        loadOnSetup: {
-            type: Boolean,
-            default: true,
-        },
-        query: {
-            type: Object as PropType<BuildInput<Proposal>>,
-            default() {
-                return {};
-            },
-        },
-        noMore: {
-            type: Boolean,
-            default: true,
-        },
-        footerPagination: {
-            type: Boolean,
-            default: true,
-        },
-        headerTitle: {
-            type: [Boolean, Object] as PropType<boolean | DomainListHeaderTitleOptionsInput>,
-            default: true,
-        },
-        headerSearch: {
-            type: [Boolean, Object] as PropType<boolean | DomainListHeaderSearchOptionsInput>,
-            default: true,
-        },
+        ...defineDomainListProps<Proposal>(),
         realmId: {
             type: String,
             default: undefined,
         },
     },
+    slots: Object as SlotsType<DomainListSlotsType<Proposal>>,
+    emits: defineDomainListEvents<Proposal>(),
     setup(props, ctx) {
         const refs = toRefs(props);
 
         const socketRealmId = realmIdForSocket(refs.realmId.value);
 
         const { build, meta, handleCreated } = createDomainListBuilder<Proposal>({
-            props: refs,
+            props,
             setup: ctx,
             load: (buildInput) => useAPI().proposal.getMany(buildInput),
             queryFilter: (q) => ({
@@ -84,7 +63,7 @@ export default defineComponent({
                 },
 
                 noMore: {
-                    textContent: 'No more proposals available...',
+                    content: 'No more proposals available...',
                 },
             },
         });

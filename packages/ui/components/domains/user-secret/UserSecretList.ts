@@ -6,49 +6,22 @@
  */
 import type { UserSecret } from '@personalhealthtrain/central-common';
 import { SecretType } from '@personalhealthtrain/central-common';
-import type { PropType } from 'vue';
+import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
-import type { BuildInput } from 'rapiq';
 import type {
-    DomainListHeaderSearchOptionsInput,
-    DomainListHeaderTitleOptionsInput,
+    DomainListSlotsType,
 } from '../../../core';
 import {
-    createDomainListBuilder,
+    createDomainListBuilder, defineDomainListEvents, defineDomainListProps,
 } from '../../../core';
 
 export default defineComponent({
-    props: {
-        loadOnSetup: {
-            type: Boolean,
-            default: true,
-        },
-        query: {
-            type: Object as PropType<BuildInput<UserSecret>>,
-            default() {
-                return {};
-            },
-        },
-        noMore: {
-            type: Boolean,
-            default: true,
-        },
-        footerPagination: {
-            type: Boolean,
-            default: true,
-        },
-        headerTitle: {
-            type: [Boolean, Object] as PropType<boolean | DomainListHeaderTitleOptionsInput>,
-            default: true,
-        },
-        headerSearch: {
-            type: [Boolean, Object] as PropType<boolean | DomainListHeaderSearchOptionsInput>,
-            default: true,
-        },
-    },
+    props: defineDomainListProps<UserSecret>(),
+    slots: Object as SlotsType<DomainListSlotsType<UserSecret>>,
+    emits: defineDomainListEvents<UserSecret>(),
     setup(props, ctx) {
         const { build } = createDomainListBuilder<UserSecret>({
-            props: toRefs(props),
+            props,
             setup: ctx,
             load: (buildInput) => useAPI().userSecret.getMany(buildInput),
             defaults: {
@@ -60,37 +33,40 @@ export default defineComponent({
                     icon: 'fa fa-key',
                 },
 
-                items: {
-                    item: {
-                        icon: false,
-                        textFn(item) {
-                            return [
-                                h(
-                                    'span',
-                                    {
-                                        class: ['badge badge-pill', {
-                                            'bg-primary': item.type === SecretType.RSA_PUBLIC_KEY,
-                                            'bg-dark': item.type === SecretType.PAILLIER_PUBLIC_KEY,
-                                        }],
-                                    },
-                                    [
-                                        (item.type === SecretType.PAILLIER_PUBLIC_KEY ? 'Paillier' : 'RSA'),
-                                    ],
-                                ),
-                                h(
-                                    'span',
-                                    {
-                                        class: 'ms-1',
-                                    },
-                                    [item.key],
-                                ),
-                            ];
-                        },
+                item: {
+                    icon: false,
+                    content(item, props, sections) {
+                        if (sections.slot) {
+                            return sections.slot;
+                        }
+
+                        return [
+                            h(
+                                'div',
+                                {
+                                    class: ['badge badge-pill', {
+                                        'bg-primary': item.type === SecretType.RSA_PUBLIC_KEY,
+                                        'bg-dark': item.type === SecretType.PAILLIER_PUBLIC_KEY,
+                                    }],
+                                },
+                                [
+                                    (item.type === SecretType.PAILLIER_PUBLIC_KEY ? 'Paillier' : 'RSA'),
+                                ],
+                            ),
+                            h(
+                                'div',
+                                {
+                                    class: 'ms-1',
+                                },
+                                [item.key],
+                            ),
+                            sections.actions,
+                        ];
                     },
                 },
 
                 noMore: {
-                    textContent: 'No more secrets available...',
+                    content: 'No more secrets available...',
                 },
             },
         });

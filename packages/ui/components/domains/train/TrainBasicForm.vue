@@ -155,7 +155,7 @@ export default {
                 class="col"
             >
                 <proposal-list :query="proposalQuery">
-                    <template #header-title>
+                    <template #headerTitle>
                         <label>Proposals</label>
                     </template>
                     <template #item="props">
@@ -164,7 +164,7 @@ export default {
                             @updated="props.handleUpdated"
                             @deleted="props.handleDeleted"
                         >
-                            <template #item-actions="itemActionProps">
+                            <template #itemActions="itemActionProps">
                                 <button
                                     :disabled="itemActionProps.busy"
                                     type="button"

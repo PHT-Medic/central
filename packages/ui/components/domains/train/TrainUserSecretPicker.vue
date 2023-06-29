@@ -68,10 +68,10 @@ export default defineComponent({
         <div class="col">
             <UserSecretList
                 ref="itemsList"
-                :with-header="false"
+                :header-title="false"
                 :query="{filter: {user_id: userId}, sort: {created_at: 'DESC'}}"
             >
-                <template #item-actions="props">
+                <template #itemActions="props">
                     <div class="d-flex flex-row">
                         <template v-if="props.data.id === userRsaSecretId || props.data.id === userPaillierSecretId">
                             <button

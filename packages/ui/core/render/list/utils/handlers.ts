@@ -5,12 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ListLoadMeta } from '@vue-layout/list-controls';
+import type { ListMeta } from '@vue-layout/list-controls';
 import type { Ref } from 'vue';
 
 export function buildListCreatedHandler<T extends Record<string, any>>(
     items: Ref<T[]>,
-    meta: Ref<ListLoadMeta>,
+    meta: Ref<ListMeta>,
 ) {
     return (item: T, options?: { unshift?: boolean}) => {
         options = options || {};
@@ -43,15 +43,13 @@ export function buildListUpdatedHandler<T extends Record<string, any>>(items: Re
 
 export function buildListDeletedHandler<T extends Record<string, any>>(
     items: Ref<T[]>,
-    meta: Ref<ListLoadMeta>,
+    meta: Ref<ListMeta>,
 ) {
     return (item: T) => {
         const index = items.value.findIndex((el: T) => el.id === item.id);
-        console.log(items.value, item);
         if (index !== -1) {
             meta.value.total--;
             items.value.splice(index, 1);
-            console.log(meta.value);
         }
     };
 }

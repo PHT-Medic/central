@@ -8,7 +8,7 @@
 import type { MasterImage, MasterImageGroup } from '@personalhealthtrain/central-common';
 import type { FormSelectOption } from '@vue-layout/form-controls';
 import { buildFormSelect } from '@vue-layout/form-controls';
-import type { ListItemsSlotProps } from '@vue-layout/list-controls';
+import type { ListBodySlotProps } from '@vue-layout/list-controls';
 import { SlotName } from '@vue-layout/list-controls';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -163,7 +163,7 @@ export default defineComponent({
                         footerPagination: false,
                         query: imageQuery.value,
                     }, {
-                        [SlotName.ITEMS]: (props: ListItemsSlotProps<MasterImage>) => {
+                        [SlotName.BODY]: (props: ListBodySlotProps<MasterImage>) => {
                             const options: FormSelectOption[] = props.data.map((entity) => ({
                                 id: entity.id,
                                 value: entity.name,
@@ -210,7 +210,7 @@ export default defineComponent({
                             headerTitle: false,
                             footerPagination: false,
                         }, {
-                            [SlotName.ITEMS]: (props: ListItemsSlotProps<MasterImageGroup>) => {
+                            [SlotName.BODY]: (props: ListBodySlotProps<MasterImageGroup>) => {
                                 const options : FormSelectOption[] = props.data.map((entity) => ({
                                     id: entity.virtual_path,
                                     value: entity.virtual_path,

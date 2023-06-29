@@ -6,7 +6,6 @@
   -->
 <script lang="ts">
 import { FormWizard, TabContent, WizardButton } from 'vue3-form-wizard';
-import { initFormAttributesFromSource } from '@authup/client-vue';
 import type { PropType, Ref } from 'vue';
 import {
     computed,
@@ -16,6 +15,7 @@ import type { Train, TrainFile } from '@personalhealthtrain/central-common';
 import {
     TrainConfigurationStatus,
 } from '@personalhealthtrain/central-common';
+import { initFormAttributesFromSource } from '../../../../utils';
 import { useAPI } from '#imports';
 import TrainWizardStepBase from './TrainWizardStepBase';
 import TrainFileManager from '../../train-file/TrainFileManager';

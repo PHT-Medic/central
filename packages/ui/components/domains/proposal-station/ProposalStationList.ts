@@ -16,17 +16,23 @@ import {
     DomainSubType,
     DomainType,
     buildDomainChannelName,
-    buildDomainEventFullName,
-    buildDomainEventSubscriptionFullName,
+    buildDomainEventFullName, buildDomainEventSubscriptionFullName,
 } from '@personalhealthtrain/central-common';
-import type { BuildInput, FiltersBuildInput } from 'rapiq';
+import type { FiltersBuildInput } from 'rapiq';
 
-import type { PropType } from 'vue';
+import type { PropType, SlotsType, VNodeChild } from 'vue';
 import { computed, defineComponent } from 'vue';
 import { realmIdForSocket } from '../../../composables/domain/realm';
 import { useSocket } from '../../../composables/socket';
-import type { DomainListHeaderSearchOptionsInput, DomainListHeaderTitleOptionsInput } from '../../../core';
-import { createDomainListBuilder } from '../../../core';
+import type {
+    DomainListSlotsType,
+} from '../../../core';
+import {
+    createDomainListBuilder,
+    defineDomainListEvents,
+    defineDomainListProps,
+} from '../../../core';
+import type { DomainDetailsSlotProps } from '../type';
 import ProposalStationDetails from './ProposalStationDetails';
 
 enum Direction {
@@ -37,33 +43,7 @@ enum Direction {
 export default defineComponent({
     name: 'ProposalStationList',
     props: {
-        loadOnSetup: {
-            type: Boolean,
-            default: true,
-        },
-        query: {
-            type: Object as PropType<BuildInput<ProposalStation>>,
-            default() {
-                return {};
-            },
-        },
-        noMore: {
-            type: Boolean,
-            default: true,
-        },
-        footerPagination: {
-            type: Boolean,
-            default: true,
-        },
-        headerTitle: {
-            type: [Boolean, Object] as PropType<boolean | DomainListHeaderTitleOptionsInput>,
-            default: true,
-        },
-        headerSearch: {
-            type: [Boolean, Object] as PropType<boolean | DomainListHeaderSearchOptionsInput>,
-            default: true,
-        },
-
+        ...defineDomainListProps<ProposalStation>(),
         realmId: {
             type: String,
         },
@@ -80,6 +60,8 @@ export default defineComponent({
             default: Direction.OUT,
         },
     },
+    slots: Object as SlotsType<DomainListSlotsType<ProposalStation>>,
+    emits: defineDomainListEvents<ProposalStation>(),
     async setup(props, ctx) {
         const refs = toRefs(props);
 
@@ -93,7 +75,7 @@ export default defineComponent({
             build,
             handleCreated,
         } = createDomainListBuilder<ProposalStation>({
-            props: refs,
+            props,
             setup: ctx,
             load: (buildInput) => useAPI().proposalStation.getMany(buildInput),
             queryFilter: (q) => {
@@ -143,49 +125,53 @@ export default defineComponent({
                         'fa-solid fa-file',
                 },
 
-                items: {
-                    item: {
-                        fn(
-                            item,
-                            itemProps,
-                            slotContent,
-                        ) {
-                            const slots : Record<string, any> = {};
-                            if (slotContent) {
-                                slots.default = slotContent;
-                            }
+                item: {
+                    content(
+                        item,
+                        itemProps,
+                        slotContent,
+                    ) {
+                        return h(ProposalStationDetails, {
+                            entity: item,
+                            direction: refs.direction.value,
+                            target: refs.target.value,
+                            onUpdated: itemProps.updated,
+                            onDeleted: itemProps.deleted,
+                            onFailed: itemProps.failed,
+                        }, {
+                            default: (props: DomainDetailsSlotProps<ProposalStation>) => {
+                                if (slotContent.slot) {
+                                    return slotContent.slot;
+                                }
 
-                            return h(ProposalStationDetails, {
-                                entity: item,
-                                direction: refs.direction.value,
-                                target: refs.target.value,
-                                onUpdated: itemProps.updated,
-                                onDeleted: itemProps.deleted,
-                                onFailed: itemProps.failed,
-                            }, slots);
-                        },
-                        textFn(item) {
-                            if (
-                                refs.target.value === DomainType.STATION &&
-                                item.station
-                            ) {
-                                return h('span', [item.station.name]);
-                            }
+                                let text : VNodeChild | undefined;
 
-                            if (
-                                refs.target.value === DomainType.PROPOSAL &&
-                                item.proposal
-                            ) {
-                                return h('span', [item.proposal.title]);
-                            }
+                                if (
+                                    refs.target.value === DomainType.STATION &&
+                                    props.data.station
+                                ) {
+                                    text = h('div', [props.data.station.name]);
+                                } else if (
+                                    refs.target.value === DomainType.PROPOSAL &&
+                                    props.data.proposal
+                                ) {
+                                    text = h('div', [props.data.proposal.title]);
+                                } else {
+                                    text = h('div', [props.data.id]);
+                                }
 
-                            return h('span', [item.id]);
-                        },
+                                return [
+                                    slotContent.icon,
+                                    text,
+                                    slotContent.actions,
+                                ];
+                            },
+                        });
                     },
                 },
 
                 noMore: {
-                    textContent: `No more ${refs.target.value} available...`,
+                    content: `No more ${refs.target.value} available...`,
                 },
             },
         });

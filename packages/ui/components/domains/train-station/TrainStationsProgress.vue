@@ -93,7 +93,7 @@ export default defineComponent({
                     :source-id="entity.id"
                 >
                     <template
-                        #items="props"
+                        #body="props"
                     >
                         <div
                             v-if="!props.busy"

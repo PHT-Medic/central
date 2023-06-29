@@ -394,7 +394,7 @@ export default defineComponent({
                     @updated="handleUpdated"
                     @deleted="handleDeleted"
                 >
-                    <template #items="props">
+                    <template #body="props">
                         <div class="d-flex flex-column">
                             <template
                                 v-for="file in props.data"

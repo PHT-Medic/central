@@ -108,11 +108,11 @@ export default defineComponent({
                         :direction="'out'"
                         :query="{filter: {proposal_id: train.proposal_id}}"
                     >
-                        <template #header-title>
+                        <template #headerTitle>
                             <span>Stations <span class="text-info">available</span></span>
                         </template>
 
-                        <template #item-actions="props">
+                        <template #itemActions="props">
                             <train-station-assign-action
                                 :station-id="props.data.station_id"
                                 :train-id="train.id"
@@ -131,7 +131,7 @@ export default defineComponent({
                         :direction="'out'"
                         :query="{filter: {train_id: train.id}}"
                     >
-                        <template #header-title>
+                        <template #headerTitle>
                             <span>Stations <span class="text-success">selected</span></span>
                         </template>
                     </TrainStationList>
