@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.11](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.10...v2.4.0-alpha.11) (2023-06-29)
+
+
+### Bug Fixes
+
+* train-station-progress view render ([934b418](https://github.com/PHT-Medic/central/commit/934b4180a62e0826be80d0d2ae8cd144ea945bf7))
+
+
+
+
+
 # [2.4.0-alpha.10](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.9...v2.4.0-alpha.10) (2023-06-29)
 
 
