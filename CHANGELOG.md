@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.10](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.9...v2.4.0-alpha.10) (2023-06-29)
+
+
+### Bug Fixes
+
+* **deps:** bump socket.io from 4.6.2 to 4.7.1 ([#1042](https://github.com/PHT-Medic/central/issues/1042)) ([de2c09d](https://github.com/PHT-Medic/central/commit/de2c09d07fe3de06117011e4e450a22ed421e65c))
+
+
+### Features
+
+* enhanced and unified slot- & prop-typing and capabilities + proposal/station list rendering ([19e484d](https://github.com/PHT-Medic/central/commit/19e484dc763740d655dfeed1d23df39518bf3149))
+
+
+
+
+
 # [2.4.0-alpha.9](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.8...v2.4.0-alpha.9) (2023-06-26)
 
 
