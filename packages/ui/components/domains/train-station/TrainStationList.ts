@@ -16,10 +16,8 @@ import {
     DomainEventSubscriptionName,
     DomainSubType,
     DomainType,
-    ProposalStation,
     buildDomainChannelName, buildDomainEventFullName, buildDomainEventSubscriptionFullName,
 } from '@personalhealthtrain/central-common';
-import type { ListItemSlotProps } from '@vue-layout/list-controls';
 import type { FiltersBuildInput } from 'rapiq';
 
 import type { PropType, SlotsType, VNodeChild } from 'vue';

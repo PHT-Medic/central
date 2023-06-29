@@ -92,9 +92,7 @@ export default defineComponent({
                     :realm-id="entity.realm_id"
                     :source-id="entity.id"
                 >
-                    <template
-                        #body="props"
-                    >
+                    <template #body="props">
                         <div
                             v-if="!props.busy"
                             class="d-flex flex-column progress-step"
@@ -180,7 +178,7 @@ export default defineComponent({
     </div>
 </template>
 <style>
-.train-stations-progress .list-items {
+.train-stations-progress .list-body {
     flex-direction: row;
     justify-content: space-between;
     display: flex;
