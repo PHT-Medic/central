@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.12](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.11...v2.4.0-alpha.12) (2023-07-03)
+
+
+### Bug Fixes
+
+* allways display station public-key in form as utf-8 ([7f19ea8](https://github.com/PHT-Medic/central/commit/7f19ea8ed231f6d53da7da67797f30c05524e356))
+
+
+### Features
+
+* use text-decoder to decode buffer source for user-secret management ([7b644b0](https://github.com/PHT-Medic/central/commit/7b644b046155b355a50a9057fc7442383c7999c3))
+
+
+
+
+
 # [2.4.0-alpha.11](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.10...v2.4.0-alpha.11) (2023-06-29)
 
 
