@@ -74,6 +74,12 @@ export default defineComponent({
             form.key = type;
         };
 
+        const readContent = (input: string) => (
+            isHex(input) ?
+                hexToUTF8(input) :
+                input
+        );
+
         const resetFormData = () => {
             const keys = Object.keys(form) as (keyof UserSecret)[];
             for (let i = 0; i < keys.length; i++) {
@@ -82,9 +88,7 @@ export default defineComponent({
                 switch (key) {
                     case 'content': {
                         if (refs.entity.value) {
-                            form.content = isHex(refs.entity.value.content) ?
-                                hexToUTF8(refs.entity.value.content) :
-                                refs.entity.value.content;
+                            form.content = readContent(refs.entity.value.content);
                         } else {
                             form.content = '';
                         }
@@ -135,17 +139,16 @@ export default defineComponent({
                     return;
                 }
 
-                let content = evt.target.result;
-
-                if (Buffer.isBuffer(content)) {
-                    content = content.toString();
+                const content = evt.target.result;
+                if (!content) {
+                    form.content = '';
+                } else if (typeof content === 'string') {
+                    form.content = readContent(content);
+                } else {
+                    const decoder = new TextDecoder();
+                    form.content = readContent(decoder.decode(content));
                 }
 
-                if (ArrayBuffer.isView(content)) {
-                    content = content.toString();
-                }
-
-                form.content = Buffer.from(content as string, 'utf-8').toString('hex');
                 busy.value = false;
 
                 if (fileInput.value) {
