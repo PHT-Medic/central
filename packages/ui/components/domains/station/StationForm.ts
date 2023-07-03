@@ -9,7 +9,7 @@ import type { Registry, Station } from '@personalhealthtrain/central-common';
 import {
     Ecosystem,
     alphaNumHyphenUnderscoreRegex,
-    isHex,
+    hexToUTF8, isHex,
 } from '@personalhealthtrain/central-common';
 import {
     buildFormInput, buildFormSelect, buildFormSubmit, buildFormTextarea,
@@ -104,8 +104,6 @@ export default defineComponent({
         const isRealmLocked = computed(() => refs.realmId.value ||
                 (refs.entity.value && refs.entity.value.realm_id));
 
-        const isHexPublicKey = computed(() => form.public_key && isHex(form.public_key));
-
         const updatedAt = computed(() => {
             if (!refs.entity.value) {
                 return undefined;
@@ -116,9 +114,19 @@ export default defineComponent({
 
         const registryNode = ref<typeof RegistryList | null>(null);
 
+        const readContent = (input: string) => (
+            isHex(input) ?
+                hexToUTF8(input) :
+                input
+        );
+
         const initForm = () => {
             if (refs.entity.value) {
                 initFormAttributesFromSource(form, refs.entity.value);
+            }
+
+            if (form.public_key) {
+                form.public_key = readContent(form.public_key);
             }
 
             if (!form.realm_id && refs.realmId.value) {
@@ -246,16 +254,7 @@ export default defineComponent({
                 validationTranslator: buildValidationTranslator(),
                 validationResult: $v.value.public_key,
                 label: true,
-                labelContent: [
-                    'PublicKey',
-                    (isHexPublicKey.value ?
-                        h('span', { class: 'text-danger font-weight-bold ps-1' }, [
-                            'Hex',
-                            h('i', { class: 'fa fa-exclamation-triangle ps-1' }),
-                        ]) :
-                        ''
-                    ),
-                ],
+                labelContent: 'PublicKey',
                 value: form.public_key,
                 onChange(input) {
                     form.public_key = input;
