@@ -16,6 +16,7 @@ import {
     buildDomainEventFullName,
     buildDomainEventSubscriptionFullName,
 } from '@personalhealthtrain/central-common';
+import type { ListItemSlotProps } from '@vue-layout/list-controls';
 import { defineComponent, ref, toRefs } from 'vue';
 import { useAPI, useSocket } from '#imports';
 import { realmIdForSocket } from '../../../composables/domain/realm';
@@ -67,25 +68,27 @@ export default defineComponent({
 
                 noMore: {
                     class: { presets: { bootstrap: false }, value: 'list-no-more' },
-                    textContent: 'No more logs available...',
+                    content: 'No more logs available...',
                 },
-                items: {
-                    item: {
-                        fn(item, slotProps) {
-                            return h(
-                                TrainLogComponent,
-                                {
-                                    entity: item,
-                                    index: slotProps.index,
-                                    onDeleted() {
-                                        slotProps.deleted();
-                                    },
-                                    onUpdated(e: TrainLog) {
-                                        slotProps.updated(e);
-                                    },
+                item: {
+                    content(item: TrainLog, slotProps: ListItemSlotProps<TrainLog>) {
+                        return h(
+                            TrainLogComponent,
+                            {
+                                entity: item,
+                                index: slotProps.index,
+                                onDeleted() {
+                                    if (slotProps) {
+                                        slotProps.deleted(item);
+                                    }
                                 },
-                            );
-                        },
+                                onUpdated(e: TrainLog) {
+                                    if (slotProps) {
+                                        slotProps.updated(e);
+                                    }
+                                },
+                            },
+                        );
                     },
                 },
             },

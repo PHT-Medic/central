@@ -45,12 +45,18 @@ export type DomainListProps<T extends Record<string, any>> = {
     loadOnSetup?: boolean,
 } & DomainListBuilderTemplateOptions<T>;
 
+export type DomainListEventsType<T extends Record<string, any>> = {
+    created: (item: T) => true,
+    deleted: (item: T) => true,
+    updated: (item: T) => true
+};
+
 export type DomainListBuilderContext<T extends Record<string, any>> = {
     setup: SetupContext<DomainListEventsType<T>>,
     props: DomainListProps<T>,
     load: (input: BuildInput<T>) => Promise<CollectionResourceResponse<T>>,
     loadAll?: boolean,
-    defaults: Partial<DomainListBuilderTemplateOptions<T>>,
+    defaults: DomainListBuilderTemplateOptions<T>,
     query?: BuildInput<T> | (() => BuildInput<T>),
     queryFilter?: FiltersBuildInput<T> | ((q: string) => FiltersBuildInput<T>)
 };
@@ -75,10 +81,4 @@ export type DomainListSlotsType<T extends Record<string, any>> = {
     headerSearch?: Record<string, any>,
     headerTitle?: Record<string, any>,
     [SlotName.FOOTER]?: ListFooterSlotProps<T>
-};
-
-export type DomainListEventsType<T extends Record<string, any>> = {
-    created: (item: T) => true,
-    deleted: (item: T) => true,
-    updated: (item: T) => true
 };
