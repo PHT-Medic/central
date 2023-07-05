@@ -55,9 +55,10 @@ export async function executeBuilderBuildCommand(
 
     useBuilderLogger().debug('Pulling image...', {
         command: BuilderCommand.BUILD,
+        image: `${masterImagePath}:latest`,
     });
 
-    await pullDockerImage(masterImagePath);
+    await pullDockerImage(`${masterImagePath}:latest`);
 
     // -----------------------------------------------------------------------------------
 
