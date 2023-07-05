@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.14](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.13...v2.4.0-alpha.14) (2023-07-05)
+
+
+### Bug Fixes
+
+* pull explicit docker master image by tag for train building process ([5d9e5e6](https://github.com/PHT-Medic/central/commit/5d9e5e69538007f7d99a9543c9a64c69178234af))
+
+
+
+
+
 # [2.4.0-alpha.13](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.12...v2.4.0-alpha.13) (2023-07-05)
 
 
