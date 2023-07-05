@@ -8,7 +8,7 @@
 import type { PropType } from 'vue';
 import type { Train } from '@personalhealthtrain/central-common';
 import { defineNuxtComponent } from '#app';
-import TrainLogs from '../../../components/domains/train/TrainLogs';
+import TrainLogs from '../../../components/domains/train-log/TrainLogs';
 import TrainPipeline from '../../../components/domains/train/TrainPipeline.vue';
 import TrainStationsProgress from '../../../components/domains/train-station/TrainStationsProgress.vue';
 
