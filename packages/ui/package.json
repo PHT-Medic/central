@@ -7,7 +7,7 @@
         "url": "https://tada5hi.net"
     },
     "license": "MIT",
-    "version": "2.4.0-alpha.12",
+    "version": "2.4.0-alpha.13",
     "description": "This package contains the Central UI frontend application of the PHT. It was initially developed as part of my Bachelor Thesis.",
     "scripts": {
         "dev": "nuxi dev",

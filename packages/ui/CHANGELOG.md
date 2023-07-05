@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.13](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.12...v2.4.0-alpha.13) (2023-07-05)
+
+
+### Bug Fixes
+
+* move train-log components to separate directory ([b869f83](https://github.com/PHT-Medic/central/commit/b869f83a726541f472d024973dcaa75587eb0e0b))
+* train-logs rendering ([b24bcbc](https://github.com/PHT-Medic/central/commit/b24bcbc94b95bcfbfd0298382864118c1dfdd276))
+
+
+
+
+
 # [2.4.0-alpha.12](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.11...v2.4.0-alpha.12) (2023-07-03)
 
 
