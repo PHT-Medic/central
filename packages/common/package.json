@@ -28,7 +28,7 @@
     "devDependencies": {
         "@authup/core": "^0.38.0",
         "hapic": "^2.0.0",
-        "rapiq": "^0.8.1"
+        "rapiq": "^0.9.0"
     },
     "peerDependencies": {
         "@authup/core": ">=0.38.0 <1.0.0",
