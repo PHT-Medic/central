@@ -8,3 +8,4 @@
 export * from './render';
 export * from './socket';
 export * from './query';
+export * from './slot';

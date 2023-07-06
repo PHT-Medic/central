@@ -8,4 +8,3 @@
 export * from './list';
 export * from './list-footer';
 export * from './list-header';
-export * from './slot';

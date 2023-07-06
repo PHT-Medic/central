@@ -7,8 +7,8 @@
 
 import type { PropType } from 'vue';
 import { defineComponent, toRef } from 'vue';
-import type { NavItems } from '../core/render/nav';
-import { createNavRenderFn } from '../core/render/nav';
+import type { NavItems } from '../core/nav';
+import { createNavRenderFn } from '../core/nav';
 
 export default defineComponent({
     props: {

@@ -9,7 +9,7 @@ import type { FormInputBuildOptionsInput } from '@vue-layout/form-controls';
 import { buildFormInputText } from '@vue-layout/form-controls';
 import type { VNodeArrayChildren, VNodeChild } from 'vue';
 import { h } from 'vue';
-import { hasNormalizedSlot, normalizeSlot } from '../slot';
+import { hasNormalizedSlot, normalizeSlot } from '../../slot';
 import type { DomainListHeaderSearchOptions, DomainListHeaderTitleOptions, ListHeaderOptions } from './type';
 
 export function buildDomainListHeaderSearch(

@@ -12,8 +12,8 @@ import {
 import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
 import { wrapFnWithBusyState } from '../../../core/busy';
-import { renderActionCommand } from '../../../core/render/action-command/utils';
-import type { ActionCommandProperties } from '../../../core/render/action-command/type';
+import { renderActionCommand } from '../../../core/action-command/utils';
+import type { ActionCommandProperties } from '../../../core/action-command/type';
 import { useAuthStore } from '../../../store/auth';
 
 export default defineComponent({

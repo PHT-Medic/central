@@ -19,7 +19,7 @@ import { useAPI } from '#imports';
 import { wrapFnWithBusyState } from '../../../../core/busy';
 import { useAuthStore } from '../../../../store/auth';
 import type { TrainCommandProperties } from './type';
-import { renderActionCommand } from '../../../../core/render/action-command/utils';
+import { renderActionCommand } from '../../../../core/action-command/utils';
 
 export default defineNuxtComponent({
     props: {

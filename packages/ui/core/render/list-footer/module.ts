@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { PaginationMeta } from '@vue-layout/pagination';
 import { buildPagination } from '@vue-layout/pagination';
 import type { VNodeArrayChildren } from 'vue';
 import { h } from 'vue';
@@ -15,11 +14,13 @@ export function buildDomainListFooterPagination<T>(
     ctx: DomainListFooterPaginationOptions,
 ) {
     return buildPagination({
-        load: ctx.load as (meta: PaginationMeta) => any,
+        load: (meta) => {
+            ctx.load(meta);
+        },
         total: ctx.meta?.value.total || 0,
         limit: ctx.meta?.value.limit || 0,
         offset: ctx.meta?.value.offset || 0,
-        busy: ctx.busy,
+        busy: unref(ctx.busy),
     });
 }
 
