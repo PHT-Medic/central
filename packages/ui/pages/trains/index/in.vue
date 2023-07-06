@@ -12,6 +12,7 @@ import { BDropdown, BTable } from 'bootstrap-vue-next';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { computed, ref } from 'vue';
+import TrainName from '../../../components/domains/train/TrainName';
 import { defineNuxtComponent, useRuntimeConfig } from '#app';
 import { definePageMeta, useAPI } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
@@ -23,6 +24,7 @@ import { useAuthStore } from '../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
+        TrainName,
         BDropdown,
         BTable,
         TrainStationRunStatus,
@@ -70,6 +72,7 @@ export default defineNuxtComponent({
         const query = computed<BuildInput<Train>>(() => ({
             include: {
                 station: true,
+                train: true,
             },
         }));
 
@@ -126,6 +129,17 @@ export default defineNuxtComponent({
                         :sort-desc="true"
                         outlined
                     >
+                        <template #cell(train_id)="data">
+                            <template v-if="data.item.train_id">
+                                <TrainName
+                                    :entity-id="data.item.train.id"
+                                    :entity-name="data.item.train.name"
+                                />
+                            </template>
+                            <template v-else>
+                                {{ data.item.train_id }}
+                            </template>
+                        </template>
                         <template #cell(realm)="data">
                             <span class="bg-dark badge">{{ data.item.train_realm_id }}</span>
                         </template>
