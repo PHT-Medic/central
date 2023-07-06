@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.15](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.14...v2.4.0-alpha.15) (2023-07-06)
+
+
+### Bug Fixes
+
+* incoming train view ([d260939](https://github.com/PHT-Medic/central/commit/d260939cb5d9b1aaea290a68b23dd651ebcf709c))
+* list pagination for domain resource collections ([171ba29](https://github.com/PHT-Medic/central/commit/171ba29c92cd292775727b9fce7915cd9b81755a))
+
+
+
+
+
 # [2.4.0-alpha.13](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.12...v2.4.0-alpha.13) (2023-07-05)
 
 
