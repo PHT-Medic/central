@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.16](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.15...v2.4.0-alpha.16) (2023-07-11)
+
+
+### Bug Fixes
+
+* remove image tag for building image & creating container ([d41492e](https://github.com/PHT-Medic/central/commit/d41492e1157cefb705ef84e4474e22c42257159f))
+
+
+
+
+
 # [2.4.0-alpha.15](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.14...v2.4.0-alpha.15) (2023-07-06)
 
 
