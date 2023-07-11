@@ -9,6 +9,7 @@ import type {
     APIClient,
 } from '@personalhealthtrain/central-common';
 import {
+    REGISTRY_ARTIFACT_TAG_BASE,
     REGISTRY_ARTIFACT_TAG_LATEST,
     TrainContainerFileName,
 } from '@personalhealthtrain/central-common';
@@ -75,7 +76,6 @@ export async function executeBuilderBuildCommand(
         hostname: data.registry.host,
         projectName: incomingProject.external_name,
         repositoryName: data.entity.id,
-        tagOrDigest: REGISTRY_ARTIFACT_TAG_LATEST,
     });
 
     const authConfig = buildDockerAuthConfig({
@@ -113,18 +113,18 @@ export async function executeBuilderBuildCommand(
 
     // -----------------------------------------------------------------------------------
 
-    useBuilderLogger().debug('Tagging container', {
+    useBuilderLogger().debug('Committing container', {
         command: BuilderCommand.BUILD,
     });
 
     await container.commit({
         repo: imageURL,
-        tag: 'latest',
+        tag: REGISTRY_ARTIFACT_TAG_LATEST,
     });
 
     await container.commit({
         repo: imageURL,
-        tag: 'base',
+        tag: REGISTRY_ARTIFACT_TAG_BASE,
     });
 
     await container.remove({
