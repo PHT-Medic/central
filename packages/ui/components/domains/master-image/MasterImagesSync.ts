@@ -83,13 +83,16 @@ export default defineComponent({
                     ]),
                 ]),
                 h('p', { class: 'text-muted' }, [
-                    'The last synchronisation created',
+                    'Results of the last synchronisation:',
+                    h('br'),
+                    'created: ',
                     h('strong', { class: 'text-success ms-1 me-1' }, [meta.created]),
-                    'updated',
+                    h('br'),
+                    'updated: ',
                     h('strong', { class: 'text-primary ms-1 me-1' }, [meta.updated]),
-                    'deleted',
+                    h('br'),
+                    'deleted:',
                     h('strong', { class: 'text-danger ms-1 me-1' }, [meta.deleted]),
-                    'master image(s).',
                 ]),
 
                 h(MasterImageList, {

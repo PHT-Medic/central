@@ -16,15 +16,17 @@ export async function pullDockerImage(
     if (authConfig) {
         options.authconfig = authConfig;
     }
+
     const stream = await useDocker().pull(image, options);
 
     return new Promise<any>(((resolve, reject) => {
         useDocker().modem.followProgress(stream, (error: Error, output: any) => {
             if (error) {
                 reject(error);
+                return;
             }
 
             resolve(output);
-        }, (e: any) => e);
+        });
     }));
 }
