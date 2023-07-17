@@ -8,6 +8,7 @@
 import tar from 'tar-stream';
 import { createGzip } from 'node:zlib';
 import { useDocker } from './instance';
+import { findErrorInDockerModemResponse } from './modem-response';
 import type { DockerAuthConfig } from './type';
 
 export async function buildDockerImage(
@@ -39,15 +40,10 @@ export async function buildDockerImage(
     });
 
     return new Promise<any>(((resolve, reject) => {
-        useDocker().modem.followProgress(stream, (error: Error, output: Record<string, any>[]) => {
+        useDocker().modem.followProgress(stream, (error: Error, output: any[]) => {
+            error = error || findErrorInDockerModemResponse(output);
             if (error) {
                 reject(error);
-                return;
-            }
-
-            const raw = output.pop();
-            if (typeof raw?.errorDetail?.message === 'string') {
-                reject(new Error(raw.errorDetail.message));
                 return;
             }
 

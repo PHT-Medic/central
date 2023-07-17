@@ -6,6 +6,7 @@
  */
 
 import { useDocker } from './instance';
+import { findErrorInDockerModemResponse } from './modem-response';
 import type { DockerAuthConfig } from './type';
 
 export async function pullDockerImage(
@@ -20,7 +21,8 @@ export async function pullDockerImage(
     const stream = await useDocker().pull(image, options);
 
     return new Promise<any>(((resolve, reject) => {
-        useDocker().modem.followProgress(stream, (error: Error, output: any) => {
+        useDocker().modem.followProgress(stream, (error: Error | null, output: any[]) => {
+            error = error || findErrorInDockerModemResponse(output);
             if (error) {
                 reject(error);
                 return;

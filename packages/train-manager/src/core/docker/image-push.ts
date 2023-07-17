@@ -7,6 +7,7 @@
 
 import type { Image } from 'dockerode';
 import { useDocker } from './instance';
+import { findErrorInDockerModemResponse } from './modem-response';
 import type { DockerAuthConfig } from './type';
 
 export async function pushDockerImage(image: Image | string, authConfig: DockerAuthConfig) {
@@ -21,12 +22,13 @@ export async function pushDockerImage(image: Image | string, authConfig: DockerA
     await new Promise((resolve, reject) => {
         useDocker().modem.followProgress(
             stream,
-            (err: Error, res: any[]) => {
-                if (err) {
-                    return reject(err);
+            (error: Error, output: any[]) => {
+                error = error || findErrorInDockerModemResponse(output);
+                if (error) {
+                    return reject(error);
                 }
 
-                return resolve(res);
+                return resolve(output);
             },
         );
     });

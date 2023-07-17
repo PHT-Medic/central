@@ -11,6 +11,7 @@ export * from './image-exists';
 export * from './image-pull';
 export * from './image-push';
 export * from './image-remove';
+export * from './modem-response';
 export * from './instance';
 export * from './registry';
 export * from './type';
