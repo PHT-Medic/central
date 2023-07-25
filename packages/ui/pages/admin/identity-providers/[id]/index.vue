@@ -1,16 +1,15 @@
 <script lang="ts">
 
-import { OAuth2ProviderForm } from '@authup/client-vue';
+import { IdentityProviderOAuth2Form } from '@authup/client-vue';
 import type { IdentityProvider } from '@authup/core';
 import { PermissionName } from '@authup/core';
 import type { PropType } from 'vue';
-import { useNuxtApp } from '#app';
 import { defineNuxtComponent, definePageMeta, useRuntimeConfig } from '#imports';
 import { LayoutKey } from '~/config/layout';
 
 export default defineNuxtComponent({
     components: {
-        OAuth2ProviderForm,
+        IdentityProviderOAuth2Form,
     },
     props: {
         entity: {
@@ -46,7 +45,7 @@ export default defineNuxtComponent({
 });
 </script>
 <template>
-    <OAuth2ProviderForm
+    <IdentityProviderOAuth2Form
         :api-url="apiUrl"
         :entity="entity"
         :realm-id="entity.realm_id"
