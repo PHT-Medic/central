@@ -7,7 +7,7 @@
 
 import { DataSource } from 'typeorm';
 import {
-    checkDatabase, createDatabase, setDataSource, setupDatabaseSchema,
+    checkDatabase, createDatabase, setDataSource, synchronizeDatabaseSchema,
 } from 'typeorm-extension';
 import {
     createConfig, getWritableDirPath, useEnv, useLogger,
@@ -61,7 +61,7 @@ export async function startCommand() {
     if (!check.schema) {
         logger.info('Applying database schema...');
 
-        await setupDatabaseSchema(dataSource);
+        await synchronizeDatabaseSchema(dataSource);
 
         logger.info('Applied database schema.');
     }
