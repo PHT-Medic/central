@@ -40,7 +40,7 @@
         "winston": "^3.10.0"
     },
     "devDependencies": {
-        "@types/dockerode": "^3.3.18",
+        "@types/dockerode": "^3.3.19",
         "@types/dotenv": "^8.2.0",
         "@types/minio": "^7.1.0",
         "@types/tar-stream": "^2.2.2",

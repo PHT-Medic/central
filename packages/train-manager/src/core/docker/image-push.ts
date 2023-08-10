@@ -21,7 +21,7 @@ export async function pushDockerImage(image: Image | string, authConfig: DockerA
 
     await new Promise((resolve, reject) => {
         useDocker().modem.followProgress(
-            stream,
+            stream as any,
             (error: Error, output: any[]) => {
                 error = error || findErrorInDockerModemResponse(output);
                 if (error) {
