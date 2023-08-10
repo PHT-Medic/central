@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.18](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.17...v2.4.0-alpha.18) (2023-08-10)
+
+
+### Bug Fixes
+
+* bump hapic to v2.2 & authup tp v0.39.xÂ ([bc4f977](https://github.com/PHT-Medic/central/commit/bc4f977af11802ef4c11c722012287e96bb06978))
+* **deps:** bump rapiq from 0.8.1 to 0.9.0 ([#1062](https://github.com/PHT-Medic/central/issues/1062)) ([219c0ea](https://github.com/PHT-Medic/central/commit/219c0ea4bfc69a9d27d7f5036c815584e5039d8c))
+
+
+
+
+
 # [2.4.0-alpha.17](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.16...v2.4.0-alpha.17) (2023-07-13)
 
 

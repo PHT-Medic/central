@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.18](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.17...v2.4.0-alpha.18) (2023-08-10)
+
+
+### Bug Fixes
+
+* bump hapic to v2.2 & authup tp v0.39.xÂ ([bc4f977](https://github.com/PHT-Medic/central/commit/bc4f977af11802ef4c11c722012287e96bb06978))
+* **deps:** bump winston from 3.9.0 to 3.10.0 ([#1076](https://github.com/PHT-Medic/central/issues/1076)) ([9b56165](https://github.com/PHT-Medic/central/commit/9b561658d4813735e19ed683a03366c3475a5985))
+
+
+
+
+
 # [2.4.0-alpha.10](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.9...v2.4.0-alpha.10) (2023-06-29)
 
 
