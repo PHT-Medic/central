@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.18](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.17...v2.4.0-alpha.18) (2023-08-10)
+
+
+### Bug Fixes
+
+* bump hapic to v2.2 & authup tp v0.39.xÂ ([bc4f977](https://github.com/PHT-Medic/central/commit/bc4f977af11802ef4c11c722012287e96bb06978))
+* **deps:** bump rapiq from 0.8.1 to 0.9.0 ([#1062](https://github.com/PHT-Medic/central/issues/1062)) ([219c0ea](https://github.com/PHT-Medic/central/commit/219c0ea4bfc69a9d27d7f5036c815584e5039d8c))
+* **deps:** bump routup from 1.0.1 to 1.0.2 ([#1073](https://github.com/PHT-Medic/central/issues/1073)) ([a5814a2](https://github.com/PHT-Medic/central/commit/a5814a2a6da11fd9228041169e4467637a9fffa1))
+* **deps:** bump tar-stream from 3.1.5 to 3.1.6 ([#1066](https://github.com/PHT-Medic/central/issues/1066)) ([bfb1ba2](https://github.com/PHT-Medic/central/commit/bfb1ba21a53801225b633b5f3ddf8497a4f2477b))
+* **deps:** bump typeorm-extension to v3.x ([cf2c094](https://github.com/PHT-Medic/central/commit/cf2c09468b4057cea798805f92616fd665b329cd))
+* **deps:** bump winston from 3.9.0 to 3.10.0 ([#1076](https://github.com/PHT-Medic/central/issues/1076)) ([9b56165](https://github.com/PHT-Medic/central/commit/9b561658d4813735e19ed683a03366c3475a5985))
+* docker modem typing for stream ([deb6307](https://github.com/PHT-Medic/central/commit/deb6307134d19176a5822a033a42dc1d864b2d96))
+
+
+### Features
+
+* find error in docker modem response ([c00cb14](https://github.com/PHT-Medic/central/commit/c00cb14ab735bafb188cbdab115d77d48589ff5d))
+
+
+
+
+
 # [2.4.0-alpha.17](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.16...v2.4.0-alpha.17) (2023-07-13)
 
 

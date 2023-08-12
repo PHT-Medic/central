@@ -1,6 +1,6 @@
 {
     "name": "@personalhealthtrain/client-vue",
-    "version": "2.4.0-alpha.10",
+    "version": "2.4.0-alpha.18",
     "description": "This package contains vue components.",
     "main": "dist/index.cjs",
     "module": "dist/index.mjs",
@@ -41,7 +41,7 @@
     "devDependencies": {
         "@authup/core": "^0.39.0",
         "@authup/client-vue": "^0.39.1",
-        "@personalhealthtrain/central-common": "^2.4.0-alpha.10",
+        "@personalhealthtrain/central-common": "^2.4.0-alpha.18",
         "@types/node": "^20.4.2",
         "@vue-layout/form-controls": "^3.4.0",
         "@vue-layout/list-controls": "^3.4.0",
@@ -60,7 +60,7 @@
     "peerDependencies": {
         "@authup/core": ">=0.39.0 <1.0.0",
         "@authup/client-vue": ">=0.39.1 <1.0.0",
-        "@personalhealthtrain/central-common": "^2.4.0-alpha.10",
+        "@personalhealthtrain/central-common": "^2.4.0-alpha.18",
         "@vue-layout/form-controls": "^3.4.0",
         "@vue-layout/list-controls": "^3.4.0",
         "@vue-layout/pagination": "^3.4.0",

@@ -34,13 +34,14 @@ export async function buildDockerImage(
     entry.write(context.content);
     entry.end();
 
-    const stream = await useDocker().buildImage(pack.pipe(createGzip()), {
-        t: context.imageName,
-        authconfig: context.authConfig,
-    });
+    const stream = await useDocker()
+        .buildImage(pack.pipe(createGzip()), {
+            t: context.imageName,
+            authconfig: context.authConfig,
+        });
 
     return new Promise<any>(((resolve, reject) => {
-        useDocker().modem.followProgress(stream, (error: Error, output: any[]) => {
+        useDocker().modem.followProgress(stream as any, (error: Error, output: any[]) => {
             error = error || findErrorInDockerModemResponse(output);
             if (error) {
                 reject(error);
