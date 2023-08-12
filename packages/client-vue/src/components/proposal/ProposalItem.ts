@@ -10,7 +10,7 @@ import type {
     PropType, VNode,
 } from 'vue';
 import {
-    computed, defineComponent, h, resolveComponent,
+    computed, defineComponent, h,
 } from 'vue';
 import type {
     Proposal,
@@ -21,6 +21,7 @@ import {
 } from '@personalhealthtrain/central-common';
 import { hasNormalizedSlot, injectAuthupStore, normalizeSlot } from '../../core';
 import EntityDelete from '../EntityDelete';
+import Link from '../MyLink';
 import ProposalEntity from './ProposalEntity';
 import type { EntityManagerSlotProps } from '../../core';
 
@@ -33,7 +34,6 @@ export default defineComponent({
     },
     emits: ['updated', 'failed', 'deleted'],
     setup(props, { slots, emit }) {
-        const nuxtLink = resolveComponent('NuxtLink');
         const store = injectAuthupStore();
         const canDrop = computed(() => store.has(PermissionID.PROPOSAL_DROP));
 
@@ -50,7 +50,7 @@ export default defineComponent({
             },
         }, {
             default: (props: EntityManagerSlotProps<Proposal>) => {
-                if (!props.entity) {
+                if (!props.data) {
                     return [];
                 }
 
@@ -63,9 +63,9 @@ export default defineComponent({
                         EntityDelete,
                         {
                             withText: false,
-                            entityId: props.entity.id,
+                            entityId: props.data.id,
                             entityType: DomainType.PROPOSAL,
-                            disabled: props.busy || props.entity.trains > 0,
+                            disabled: props.busy || props.data.trains > 0,
                             class: 'btn btn-xs btn-danger ms-1',
                             onDeleted(data: any) {
                                 props.deleted(data);
@@ -79,9 +79,9 @@ export default defineComponent({
                 } else {
                     itemActions = [
                         h(
-                            nuxtLink,
+                            Link,
                             {
-                                to: `/proposals/${props.entity.id}`,
+                                to: `/proposals/${props.data.id}`,
                                 disabled: props.busy,
                                 class: 'btn btn-xs btn-dark',
                             },
@@ -113,13 +113,13 @@ export default defineComponent({
                                     'div',
                                     [
                                         h(
-                                            nuxtLink,
+                                            Link,
                                             {
-                                                to: `/proposals/${props.entity.id}`,
+                                                to: `/proposals/${props.data.id}`,
                                                 class: 'mb-0',
                                             },
                                             [
-                                                props.entity.title,
+                                                props.data.title,
                                             ],
                                         ),
                                     ],
@@ -143,7 +143,7 @@ export default defineComponent({
                                     h(
                                         'small',
                                         [
-                                            h('span', { class: 'text-primary' }, [props.entity.trains]),
+                                            h('span', { class: 'text-primary' }, [props.data.trains]),
                                             ' ',
                                             'Train(s)',
                                         ],
@@ -155,7 +155,7 @@ export default defineComponent({
                                         ]),
                                         ' ',
                                         h(Timeago, {
-                                            datetime: props.entity.updated_at,
+                                            datetime: props.data.updated_at,
                                         }),
                                     ]),
                                 ]),
@@ -166,7 +166,7 @@ export default defineComponent({
                                         ]),
                                         ' ',
                                         h('span', [
-                                            props.entity.user_id,
+                                            props.data.user_id,
                                         ]),
                                     ]),
                                 ]),

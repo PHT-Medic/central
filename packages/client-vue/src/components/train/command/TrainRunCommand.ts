@@ -4,7 +4,6 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { useToast } from 'bootstrap-vue-next';
 import {
     computed, defineComponent, ref, toRefs,
 } from 'vue';
@@ -44,12 +43,10 @@ export default defineComponent({
             default: true,
         },
     },
-    emits: ['failed', 'done'],
+    emits: ['failed', 'updated', 'executed'],
     setup(props, { emit, slots }) {
         const refs = toRefs(props);
         const busy = ref(false);
-
-        const toast = useToast();
 
         const store = injectAuthupStore();
         const isAllowed = computed(() => store.has(PermissionID.TRAIN_EXECUTION_START) ||
@@ -116,17 +113,10 @@ export default defineComponent({
             try {
                 const train = await injectAPIClient().train.runCommand(refs.entity.value.id, refs.command.value);
 
-                if (toast) {
-                    toast.success({ body: `Successfully executed run command ${commandText.value}.` });
-                }
-
-                emit('done', train);
+                emit('executed', props.command);
+                emit('updated', train);
             } catch (e) {
                 if (e instanceof Error) {
-                    if (toast) {
-                        toast.warning({ body: e.message });
-                    }
-
                     emit('failed', e);
                 }
             }

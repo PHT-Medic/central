@@ -18,6 +18,7 @@ export default defineNuxtComponent({
             required: true,
         },
     },
+    emits: ['failed', 'executed', 'updated'],
     setup(props, { emit }) {
         const handleUpdated = (train: Train) => {
             emit('updated', train);
@@ -27,9 +28,14 @@ export default defineNuxtComponent({
             emit('failed', e);
         };
 
+        const handleExecuted = (component: string, command: string) => {
+            emit('executed', component, command);
+        };
+
         return {
             handleUpdated,
             handleFailed,
+            handleExecuted,
         };
     },
 });
@@ -55,6 +61,7 @@ export default defineNuxtComponent({
                         :entity="entity"
                         @updated="handleUpdated"
                         @failed="handleFailed"
+                        @executed="handleExecuted"
                     />
                 </div>
             </div>

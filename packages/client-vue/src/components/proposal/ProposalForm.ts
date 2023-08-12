@@ -92,9 +92,9 @@ export default defineComponent({
         });
 
         const initFromProperties = () => {
-            if (!manager.entity.value) return;
+            if (!manager.data.value) return;
 
-            initFormAttributesFromSource(form, manager.entity.value);
+            initFormAttributesFromSource(form, manager.data.value);
         };
 
         initFromProperties();
@@ -103,7 +103,7 @@ export default defineComponent({
 
         watch(updatedAt, (val, oldVal) => {
             if (val && val !== oldVal) {
-                manager.entity.value = props.entity;
+                manager.data.value = props.entity;
 
                 initFromProperties();
             }
@@ -207,7 +207,7 @@ export default defineComponent({
                 busy: busy.value,
                 updateText: 'Update',
                 createText: 'Create',
-                isEditing: !!manager.entity.value,
+                isEditing: !!manager.data.value,
                 validationResult: $v.value,
             });
 
@@ -221,11 +221,11 @@ export default defineComponent({
                 } satisfies EntityListProps<Station>, {
                     [EntityListHeaderTitleSlotName]: () => h('label', 'Stations'),
                     [SlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Station>) => {
-                        if (manager.entity.value) {
+                        if (manager.data.value) {
                             return h(ProposalStationAssignAction, {
                                 stationId: props.data.id,
-                                proposalId: manager.entity.value.id,
-                                realmId: manager.entity.value.id,
+                                proposalId: manager.data.value.id,
+                                realmId: manager.data.value.id,
                             });
                         }
 

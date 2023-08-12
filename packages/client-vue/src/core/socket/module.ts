@@ -14,24 +14,29 @@ import {
 } from '@personalhealthtrain/central-common';
 import type { ManagerOptions, Socket } from 'socket.io-client';
 import { Manager } from 'socket.io-client';
+import type { AuthupStore } from '../authup';
 import { injectAuthupStore } from '../authup';
 
 type SocketModuleManagerConfiguration = {
     url: string,
-    options?: Partial<ManagerOptions>
+    options?: Partial<ManagerOptions>,
+    store?: AuthupStore
 };
 
 export type SocketClient = Socket<SocketServerToClientEvents, SocketClientToServerEvents>;
 
-// todo: call reconnect on store change
 export class SocketManager {
     protected manager : Manager;
 
     protected sockets : Record<string, SocketClient>;
 
+    protected store : AuthupStore | undefined;
+
     //--------------------------------------------------------------------
 
-    constructor(managerConfiguration : SocketModuleManagerConfiguration) {
+    constructor(
+        managerConfiguration : SocketModuleManagerConfiguration,
+    ) {
         this.sockets = {};
 
         this.manager = new Manager(managerConfiguration.url, {
@@ -39,14 +44,15 @@ export class SocketManager {
             reconnectionAttempts: 10,
             ...managerConfiguration.options,
         });
+
+        this.store = managerConfiguration.store;
     }
 
     //--------------------------------------------------------------------
 
     public forRealm(realmId?: string | null) : SocketClient {
-        if (!realmId) {
-            const store = injectAuthupStore();
-            realmId = store.realmId;
+        if (!realmId && this.store) {
+            realmId = this.store.realmId;
         }
 
         if (!realmId) {

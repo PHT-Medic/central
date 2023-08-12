@@ -20,7 +20,6 @@ import useVuelidate from '@vuelidate/core';
 import {
     email, helpers, maxLength, minLength, required,
 } from '@vuelidate/validators';
-import { BFormCheckbox } from 'bootstrap-vue-next';
 import type {
     PropType, VNodeArrayChildren,
 } from 'vue';
@@ -109,7 +108,7 @@ export default defineComponent({
         });
 
         const isRealmLocked = computed(() => props.realmId ||
-                (manager.entity.value && manager.entity.value.realm_id));
+                (manager.data.value && manager.data.value.realm_id));
 
         const updatedAt = useUpdatedAt(props.entity);
 
@@ -122,7 +121,7 @@ export default defineComponent({
         );
 
         const initForm = () => {
-            initFormAttributesFromSource(form, manager.entity.value);
+            initFormAttributesFromSource(form, manager.data.value);
 
             if (form.public_key) {
                 form.public_key = readContent(form.public_key);
@@ -252,17 +251,27 @@ export default defineComponent({
                 class: 'form-group mb-1',
             }, [
                 h('label', { class: 'mb-2' }, ['Hidden']),
-                h(BFormCheckbox, {
-                    class: 'pb-2',
-                    model: {
-                        value: form.hidden,
-                        callback(v: boolean) {
-                            form.hidden = v;
+                h('div', { class: 'form-check form-switch' }, [
+                    h('input', {
+                        type: 'checkbox',
+                        class: 'form-check-input',
+                        checked: form.hidden,
+                        onInput: ($event: any) => {
+                            if ($event.target.composing) {
+                                return;
+                            }
+
+                            form.hidden = !form.hidden;
                         },
-                        expression: 'form.hidden',
-                    },
-                }, [
-                    'Hide for proposal & train selection?',
+
+                        id: 'station-switch',
+                    }),
+                    h('label', {
+                        class: 'form-check-label',
+                        for: 'station-switch',
+                    }, [
+                        'Hide for proposal & train selection?',
+                    ]),
                 ]),
             ]);
 
@@ -327,7 +336,7 @@ export default defineComponent({
                 createText: 'Create',
                 updateText: 'Update',
                 validationResult: $v.value,
-                isEditing: !!manager.entity.value,
+                isEditing: !!manager.data.value,
             });
 
             return h('div', [

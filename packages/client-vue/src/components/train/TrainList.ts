@@ -17,7 +17,10 @@ import TrainItem from './TrainItem';
 export default defineComponent({
     props: defineDomainListProps<Train>(),
     slots: Object as SlotsType<EntityListSlotsType<Train>>,
-    emits: defineDomainListEvents<Train>(),
+    emits: {
+        ...defineDomainListEvents<Train>(),
+        executed: (_component: string, _command :string) => true,
+    },
     setup(props, setup) {
         const {
             render,
@@ -45,6 +48,9 @@ export default defineComponent({
                         entity: item,
                         onDeleted: handleDeleted,
                         onUpdated: handleUpdated,
+                        onExecuted(component: string, command: string) {
+                            setup.emit('executed', component, command);
+                        },
                     });
                 },
             },

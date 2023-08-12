@@ -61,7 +61,7 @@ export default defineNuxtComponent({
             },
         });
 
-        if (!manager.entity.value) {
+        if (!manager.data.value) {
             await navigateTo({ path: '/admin/services/registries' });
             throw createError({});
         }
@@ -71,8 +71,8 @@ export default defineNuxtComponent({
                 name: 'General', icon: 'fas fa-bars', urlSuffix: '',
             },
             ...(
-                manager.entity.value &&
-                manager.entity.value.ecosystem === Ecosystem.DEFAULT ?
+                manager.data.value &&
+                manager.data.value.ecosystem === Ecosystem.DEFAULT ?
                     [
                         {
                             name: 'Cleanup', icon: 'fa-solid fa-hands-bubbles', urlSuffix: 'cleanup',
@@ -105,7 +105,7 @@ export default defineNuxtComponent({
             handleUpdated: manager.updated,
             handleDeleted: manager.deleted,
             tabs,
-            entity: manager.entity.value,
+            entity: manager.data.value,
         };
     },
 });

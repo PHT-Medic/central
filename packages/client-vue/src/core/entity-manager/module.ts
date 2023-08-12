@@ -348,7 +348,7 @@ export function createEntityManager<
         resolveOrFail,
         lockId,
         busy,
-        entity,
+        data: entity,
         error,
 
         create,

@@ -7,13 +7,13 @@
 <script lang="ts">
 import type { Registry } from '@personalhealthtrain/central-common';
 import { Ecosystem } from '@personalhealthtrain/central-common';
+import { useToast } from 'bootstrap-vue-next';
 import type { PropType } from 'vue';
-import { toRefs } from 'vue';
-import { RegistrySetup } from '@personalhealthtrain/client-vue';
+import { RegistryCleanup, RegistrySetup } from '@personalhealthtrain/client-vue';
 import { defineNuxtComponent, navigateTo } from '#app';
 
 export default defineNuxtComponent({
-    components: { RegistrySetup },
+    components: { RegistryCleanup, RegistrySetup },
     props: {
         entity: {
             type: Object as PropType<Registry>,
@@ -21,15 +21,41 @@ export default defineNuxtComponent({
         },
     },
     async setup(props) {
-        const refs = toRefs(props);
-        if (refs.entity.value.ecosystem !== Ecosystem.DEFAULT) {
-            await navigateTo(`/admin/services/registry/${refs.entity.value.id}`);
+        const toast = useToast();
+
+        if (props.entity.ecosystem !== Ecosystem.DEFAULT) {
+            await navigateTo(`/admin/services/registry/${props.entity.id}`);
         }
+
+        const handleExecuted = () => {
+            if (toast) {
+                toast.success({ body: 'You successfully executed the setup routine.' }, {
+                    pos: 'top-center',
+                });
+            }
+        };
+
+        const handleFailed = (e: Error) => {
+            if (toast) {
+                toast.danger({ body: e.message }, {
+                    pos: 'top-center',
+                });
+            }
+        };
+
+        return {
+            handleFailed,
+            handleExecuted,
+        };
     },
 });
 </script>
 <template>
     <div>
-        <RegistrySetup :entity-id="entity.id" />
+        <RegistrySetup
+            :entity-id="entity.id"
+            @executed="handleExecuted"
+            @failed="handleFailed"
+        />
     </div>
 </template>

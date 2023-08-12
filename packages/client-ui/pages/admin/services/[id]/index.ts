@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { toRefs } from 'vue';
+import { useToast } from 'bootstrap-vue-next';
 import type { PropType } from 'vue';
 import { ServiceID } from '@personalhealthtrain/central-common';
 import { MasterImagesSync, StationRegistryManagement } from '@personalhealthtrain/client-vue';
@@ -20,25 +20,50 @@ export default defineNuxtComponent({
     },
     emits: ['updated'],
     setup(props, { emit }) {
-        const refs = toRefs(props);
+        const toast = useToast();
 
-        if (refs.entityId.value === ServiceID.REGISTRY) {
+        const handleExecuted = () => {
+            if (toast) {
+                toast.success({ body: 'You successfully executed the sync routine.' }, {
+                    pos: 'top-center',
+                });
+            }
+        };
+
+        const handleFailed = (e: Error) => {
+            if (toast) {
+                toast.danger({ body: e.message }, {
+                    pos: 'top-center',
+                });
+            }
+        };
+
+        if (props.entityId === ServiceID.REGISTRY) {
             return () => h(MasterImagesSync, {
-                entityId: refs.entityId.value,
+                entityId: props.entityId,
                 onUpdated(event: any) {
                     emit('updated', event);
+                },
+                onFailed(e: Error) {
+                    handleFailed(e);
                 },
             });
         }
 
-        if (refs.entityId.value === ServiceID.STATION_REGISTRY) {
+        if (props.entityId === ServiceID.STATION_REGISTRY) {
             return () => h(StationRegistryManagement, {
-                entityId: refs.entityId.value,
+                entityId: props.entityId,
+                onExecuted() {
+                    handleExecuted();
+                },
+                onFailed(e: Error) {
+                    handleFailed(e);
+                },
             });
         }
 
         return () => h('div', {
             class: 'alert alert-info alert-sm',
-        }, `You can not execute any task for the ${refs.entityId.value} service yet.`);
+        }, `You can not execute any task for the ${props.entityId} service yet.`);
     },
 });

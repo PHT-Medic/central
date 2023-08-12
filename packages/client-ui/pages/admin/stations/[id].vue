@@ -55,7 +55,7 @@ export default defineNuxtComponent({
             },
         });
 
-        if (!manager.entity.value) {
+        if (!manager.data.value) {
             await navigateTo({ path: '/admin/stations' });
             throw createError({});
         }
@@ -68,7 +68,7 @@ export default defineNuxtComponent({
 
         return {
             tabs,
-            entity: manager.entity.value as Station,
+            entity: manager.data.value as Station,
             handleUpdated: manager.updated,
             handleFailed: manager.failed,
         };

@@ -106,16 +106,16 @@ export default defineComponent({
         await manager.resolve();
 
         if (
-            manager.entity.value &&
+            manager.data.value &&
             props.target &&
-            !manager.entity.value[props.target]
+            !manager.data.value[props.target]
         ) {
             if (props.target === Target.TRAIN) {
-                manager.entity.value[props.target] = await injectAPIClient()
-                    .train.getOne(manager.entity.value.train_id);
+                manager.data.value[props.target] = await injectAPIClient()
+                    .train.getOne(manager.data.value.train_id);
             } else {
-                manager.entity.value[props.target] = await injectAPIClient()
-                    .station.getOne(manager.entity.value.station_id);
+                manager.data.value[props.target] = await injectAPIClient()
+                    .station.getOne(manager.data.value.station_id);
             }
         }
 
@@ -123,23 +123,23 @@ export default defineComponent({
             const fallback = () : VNodeChild => {
                 if (
                     props.target &&
-                    manager.entity.value &&
-                    manager.entity.value[props.target]
+                    manager.data.value &&
+                    manager.data.value[props.target]
                 ) {
                     if (props.target === Target.TRAIN) {
                         return h('div', [
-                            manager.entity.value?.train.name,
+                            manager.data.value?.train.name,
                         ]);
                     }
                     if (props.target === Target.STATION) {
                         return h('div', [
-                            manager.entity.value?.station.name,
+                            manager.data.value?.station.name,
                         ]);
                     }
                 }
 
                 return [
-                    manager.entity?.value?.id,
+                    manager.data?.value?.id,
                 ];
             };
 

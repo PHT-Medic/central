@@ -65,13 +65,13 @@ export default defineNuxtComponent({
 
         await manager.resolve();
 
-        if (!manager.entity.value) {
+        if (!manager.data.value) {
             await navigateTo({ path: `/admin/registries/${route.params.id}/projects` });
             throw createError({});
         }
 
         return {
-            childEntity: manager.entity.value,
+            childEntity: manager.data.value,
             handleUpdated: manager.updated,
             handleFailed: manager.failed,
             handleDeleted: manager.deleted,

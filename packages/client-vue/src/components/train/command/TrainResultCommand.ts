@@ -4,7 +4,6 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { useToast } from 'bootstrap-vue-next';
 import { computed, defineComponent, ref } from 'vue';
 import type { PropType } from 'vue';
 import type { Train } from '@personalhealthtrain/central-common';
@@ -43,11 +42,9 @@ export default defineComponent({
             default: true,
         },
     },
-    emits: ['failed', 'done'],
+    emits: ['failed', 'updated', 'executed'],
     setup(props, { emit, slots }) {
         const busy = ref(false);
-
-        const toast = useToast();
 
         const store = injectAuthupStore();
         const isAllowed = computed(() => store.has(PermissionID.TRAIN_RESULT_READ));
@@ -127,17 +124,10 @@ export default defineComponent({
                 const train = await injectAPIClient()
                     .train.runCommand(props.entity.id, props.command);
 
-                emit('done', train);
-
-                const message = `Successfully executed result command ${commandText.value}`;
-                if (toast) {
-                    toast.success({ body: message });
-                }
+                emit('executed', props.command);
+                emit('updated', train);
             } catch (e) {
                 if (e instanceof Error) {
-                    if (toast) {
-                        toast.success({ body: e.message });
-                    }
                     emit('failed', e);
                 }
             }

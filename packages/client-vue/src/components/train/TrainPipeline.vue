@@ -12,10 +12,11 @@ import {
     TrainConfigurationStatus, TrainResultStatus,
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
-import { BDropdown } from 'bootstrap-vue-next';
 import type { PropType } from 'vue';
-import { defineComponent } from 'vue';
+import {computed, defineComponent} from 'vue';
 import { injectAuthupStore } from '../../core';
+import Dropdown from "../Dropdown";
+import MyLink from "../MyLink";
 import TrainResultCommand from './command/TrainResultCommand';
 import TrainBuildStatusText from './status/TrainBuildStatusText.vue';
 import TrainBuildCommand from './command/TrainBuildCommand';
@@ -26,7 +27,8 @@ import TrainConfigurationStatusText from './status/TrainConfigurationStatusText.
 
 export default defineComponent({
     components: {
-        BDropdown,
+      Dropdown,
+      MyLink,
         TrainResultCommand,
         TrainConfigurationStatusText,
         TrainResultStatusText,
@@ -49,37 +51,45 @@ export default defineComponent({
             required: true,
         },
     },
-    data() {
+    emits: ['updated', 'executed', 'failed'],
+    setup(props, { emit }) {
+      const canEdit = computed(() => {
+        return injectAuthupStore().has(PermissionID.TRAIN_EDIT);
+      });
+
+      // ---------------------------------------------------------
+       const canConfigure = computed(() =>  {
+          return canEdit.value &&
+              props.entity.configuration_status !== TrainConfigurationStatus.FINISHED;
+        });
+
+      const handleExecuted = (type: string, command: string) => {
+        emit('executed', type, command);
+      };
+      const handleUpdated = (item: Train) => {
+        emit('updated', item);
+      };
+      const handleFailed = (e: Error) => {
+        emit('failed', e);
+      };
+
         return {
-            trainBuildStatus: TrainBuildStatus,
-            trainConfigurationStatus: TrainConfigurationStatus,
-            trainRunStatus: TrainRunStatus,
-            trainResultStatus: TrainResultStatus,
-            trainCommand: TrainAPICommand,
+          trainBuildStatus: TrainBuildStatus,
+          trainConfigurationStatus: TrainConfigurationStatus,
+          trainRunStatus: TrainRunStatus,
+          trainResultStatus: TrainResultStatus,
+          trainCommand: TrainAPICommand,
 
-            busy: false,
-        };
-    },
-    computed: {
-        canEdit() {
-            return injectAuthupStore().has(PermissionID.TRAIN_EDIT);
-        },
+          busy: false,
 
-        // ---------------------------------------------------------
+          handleUpdated,
+          handleFailed,
+          handleExecuted,
 
-        canConfigure() {
-            return this.canEdit &&
-                this.entity.configuration_status !== TrainConfigurationStatus.FINISHED;
-        },
-    },
-    methods: {
-        handleUpdated(item) {
-            this.$emit('updated', item);
-        },
-        handleFailed(e) {
-            this.$emit('failed', e);
-        },
-    },
+          canConfigure,
+          canEdit
+        }
+    }
 });
 </script>
 <template>
@@ -108,14 +118,14 @@ export default defineComponent({
                 v-if="withCommand"
                 class="ms-auto"
             >
-                <NuxtLink
+                <MyLink
                     v-if="canConfigure"
                     class="btn btn-xs btn-primary"
                     type="button"
                     :to="'/trains/'+entity.id+'/setup'"
                 >
                     <i class="fas fa-wrench pe-1" /> setup
-                </NuxtLink>
+                </MyLink>
             </div>
         </div>
 
@@ -142,10 +152,11 @@ export default defineComponent({
                     :command="trainCommand.BUILD_START"
                     :with-icon="true"
                     :entity="entity"
-                    @done="handleUpdated"
+                    @executed="(command) => handleExecuted('build', command)"
+                    @updated="handleUpdated"
                     @failed="handleFailed"
                 />
-                <b-dropdown
+                <Dropdown
                     variant="dark"
                     :size="'xs' as 'sm'"
                     html="<i class='fa fa-bars'></i>"
@@ -155,7 +166,8 @@ export default defineComponent({
                         :element-type="'dropDownItem'"
                         :with-icon="true"
                         :entity="entity"
-                        @done="handleUpdated"
+                        @executed="(command) => handleExecuted('build', command)"
+                        @updated="handleUpdated"
                         @failed="handleFailed"
                     />
                     <train-build-command
@@ -163,10 +175,11 @@ export default defineComponent({
                         :element-type="'dropDownItem'"
                         :with-icon="true"
                         :entity="entity"
-                        @done="handleUpdated"
+                        @executed="(command) => handleExecuted('build', command)"
+                        @updated="handleUpdated"
                         @failed="handleFailed"
                     />
-                </b-dropdown>
+                </Dropdown>
             </div>
         </div>
 
@@ -193,10 +206,11 @@ export default defineComponent({
                     :command="trainCommand.RUN_START"
                     :with-icon="true"
                     :entity="entity"
-                    @done="handleUpdated"
+                    @executed="(command) => handleExecuted('run', command)"
+                    @updated="handleUpdated"
                     @failed="handleFailed"
                 />
-                <b-dropdown
+                <Dropdown
                     id="dropdown-1"
                     variant="dark"
                     :size="'xs' as 'sm'"
@@ -206,7 +220,8 @@ export default defineComponent({
                         :with-icon="true"
                         :element-type="'dropDownItem'"
                         :entity="entity"
-                        @done="handleUpdated"
+                        @executed="(command) => handleExecuted('run', command)"
+                        @updated="handleUpdated"
                         @failed="handleFailed"
                     />
                     <train-run-command
@@ -214,10 +229,11 @@ export default defineComponent({
                         :element-type="'dropDownItem'"
                         :with-icon="true"
                         :entity="entity"
-                        @done="handleUpdated"
+                        @executed="(command) => handleExecuted('run', command)"
+                        @updated="handleUpdated"
                         @failed="handleFailed"
                     />
-                </b-dropdown>
+                </Dropdown>
             </div>
         </div>
         <div
@@ -243,7 +259,8 @@ export default defineComponent({
                     :command="'resultDownload'"
                     :with-icon="true"
                     :entity="entity"
-                    @done="handleUpdated"
+                    @executed="(command) => handleExecuted('result', command)"
+                    @updated="handleUpdated"
                     @failed="handleFailed"
                 />
                 <train-result-command
@@ -251,10 +268,11 @@ export default defineComponent({
                     :command="trainCommand.RESULT_START"
                     :with-icon="true"
                     :entity="entity"
-                    @done="handleUpdated"
+                    @executed="(command) => handleExecuted('result', command)"
+                    @updated="handleUpdated"
                     @failed="handleFailed"
                 />
-                <b-dropdown
+                <Dropdown
                     variant="dark"
                     :size="'xs' as 'sm'"
                 >
@@ -263,10 +281,11 @@ export default defineComponent({
                         :with-icon="true"
                         :element-type="'dropDownItem'"
                         :entity="entity"
-                        @done="handleUpdated"
+                        @executed="(command) => handleExecuted('result', command)"
+                        @updated="handleUpdated"
                         @failed="handleFailed"
                     />
-                </b-dropdown>
+                </Dropdown>
             </div>
         </div>
     </div>

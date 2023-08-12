@@ -63,7 +63,7 @@ export default defineNuxtComponent({
 
         await manager.resolve();
 
-        if (!manager.entity.value) {
+        if (!manager.data.value) {
             await navigateTo({ path: '/proposals' });
             throw createError({});
         }
@@ -72,10 +72,10 @@ export default defineNuxtComponent({
 
         const proposalStation : Ref<ProposalStation | null> = ref(null);
 
-        if (manager.entity.value.realm_id !== store.realmId) {
+        if (manager.data.value.realm_id !== store.realmId) {
             const response = await useAPI().proposalStation.getMany({
                 filter: {
-                    proposal_id: manager.entity.value.id,
+                    proposal_id: manager.data.value.id,
                     station_realm_id: store.realmId,
                 },
             });
@@ -88,7 +88,7 @@ export default defineNuxtComponent({
         }
 
         // todo: maybe ref of store.realmId
-        const isProposalOwner = computed(() => manager.entity.value && store.realmId === manager.entity.value.realm_id);
+        const isProposalOwner = computed(() => manager.data.value && store.realmId === manager.data.value.realm_id);
 
         const isStationAuthority = computed(() => !!proposalStation.value);
 
@@ -130,7 +130,7 @@ export default defineNuxtComponent({
         };
 
         return {
-            entity: manager.entity.value,
+            entity: manager.data.value,
             proposalStation: proposalStation.value,
             backLink,
             tabs,

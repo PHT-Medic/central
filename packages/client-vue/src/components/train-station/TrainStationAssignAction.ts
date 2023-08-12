@@ -44,13 +44,13 @@ export default defineComponent({
 
         return () => h('button', {
             class: ['btn btn-xs', {
-                'btn-success': !manager.entity.value,
-                'btn-danger': manager.entity.value,
+                'btn-success': !manager.data.value,
+                'btn-danger': manager.data.value,
             }],
             onClick($event: any) {
                 $event.preventDefault();
 
-                if (manager.entity.value) {
+                if (manager.data.value) {
                     return manager.delete();
                 }
 
@@ -62,8 +62,8 @@ export default defineComponent({
         }, [
             h('i', {
                 class: ['fa', {
-                    'fa-plus': !manager.entity.value,
-                    'fa-trash': manager.entity.value,
+                    'fa-plus': !manager.data.value,
+                    'fa-trash': manager.data.value,
                 }],
             }),
         ]);

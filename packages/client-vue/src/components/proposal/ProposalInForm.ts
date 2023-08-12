@@ -57,12 +57,12 @@ export default defineComponent({
         });
 
         function initForm() {
-            initFormAttributesFromSource(form, manager.entity.value);
+            initFormAttributesFromSource(form, manager.data.value);
         }
 
         watch(updatedAt, (val, oldVal) => {
             if (val && val !== oldVal) {
-                manager.entity.value = props.entity;
+                manager.data.value = props.entity;
 
                 initForm();
             }

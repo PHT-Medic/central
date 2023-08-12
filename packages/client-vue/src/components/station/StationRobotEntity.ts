@@ -52,12 +52,11 @@ export default defineComponent({
                 maxLength: maxLength(256),
             },
         }, form);
-
         return () => h(RobotEntity, {
             onFailed: (e) => {
                 emit('failed', e);
             },
-            where: {
+            filters: {
                 name: props.entity.id,
                 realm_id: props.entity.realm_id,
             },

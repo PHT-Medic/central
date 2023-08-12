@@ -44,7 +44,7 @@ export default defineNuxtComponent({
 
         await manager.resolve();
 
-        if (!manager.entity.value) {
+        if (!manager.data.value) {
             if (isClientErrorWithStatusCode(manager.error, 404)) {
                 await navigateTo({
                     path: '/trains',
@@ -61,7 +61,7 @@ export default defineNuxtComponent({
 
         return {
             tabs,
-            entity: manager.entity,
+            entity: manager.data,
             handleFailed: manager.failed,
             handleUpdated: manager.updated,
         };

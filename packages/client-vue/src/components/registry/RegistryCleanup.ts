@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { useToast } from 'bootstrap-vue-next';
 import type { PropType } from 'vue';
 import { defineComponent, h, ref } from 'vue';
 import type { Registry } from '@personalhealthtrain/central-common';
@@ -23,9 +22,7 @@ export default defineComponent({
         },
     },
     emits: ['executed', 'failed'],
-    setup(props) {
-        const toast = useToast();
-
+    setup(props, { emit }) {
         const busy = ref(false);
 
         const execute = async () => {
@@ -38,16 +35,10 @@ export default defineComponent({
                     id: props.entityId,
                 });
 
-                if (toast) {
-                    toast.success({ body: 'You successfully executed the cleanup routine.' }, {
-                        pos: 'top-center',
-                    });
-                }
+                emit('executed');
             } catch (e) {
-                if (toast && e instanceof Error) {
-                    toast.danger({ body: e.message }, {
-                        pos: 'top-center',
-                    });
+                if (e instanceof Error) {
+                    emit('failed', e);
                 }
             }
 

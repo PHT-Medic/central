@@ -50,16 +50,7 @@ export default defineNuxtPlugin((ctx) => {
         options: {
             transports,
         },
-    });
-
-    const authupStore = useAuthStore(ctx.$pinia as Pinia);
-    const accessToken = ref<string | undefined>();
-
-    authupStore.$subscribe((mutation, state) => {
-        if (state.accessToken !== accessToken.value) {
-            accessToken.value = state.accessToken;
-            adapter.reconnect();
-        }
+        store: useAuthStore(ctx.$pinia as Pinia),
     });
 
     ctx.provide('socket', adapter);

@@ -5,7 +5,6 @@ import type {
 import {
     hasOwnProperty,
 } from '@personalhealthtrain/central-common';
-import { BFormCheckbox } from 'bootstrap-vue-next';
 import { isClientErrorWithStatusCode } from 'hapic';
 import type { PropType } from 'vue';
 import {
@@ -20,7 +19,6 @@ import TrainImageCommand from '../train/TrainImageCommand';
 
 export default defineComponent({
     components: {
-        BFormCheckbox,
         TrainFileList,
         TrainImageCommand,
         TrainFormFile,
@@ -251,7 +249,7 @@ export default defineComponent({
             <div class="col">
                 <h6><i class="fa fa-upload" /> Upload</h6>
                 <div class="form-group">
-                    <label class="form-label">Directories / Files</label>
+                    <label class="form-label">{{directoryMode ? 'Directories' : 'Files'}}</label>
                     <input
                         id="files"
                         ref="filesNode"
@@ -264,12 +262,10 @@ export default defineComponent({
                     >
                 </div>
                 <div class="form-group">
-                    <BFormCheckbox
-                        v-model="directoryMode"
-                        switch
-                    >
-                        Directory mode
-                    </BFormCheckbox>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" v-model="directoryMode" id="train-file-manager-switch">
+                    <label class="form-check-label" for="train-file-manager-switch">Directory Mode</label>
+                  </div>
                 </div>
 
                 <hr>

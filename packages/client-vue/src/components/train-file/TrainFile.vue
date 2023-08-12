@@ -45,24 +45,24 @@ export default defineComponent({
 
         const busy = ref(false);
 
-        const path = computed(() => `${manager.entity.value.directory}/${manager.entity.value.name}`);
+        const path = computed(() => `${manager.data.value.directory}/${manager.data.value.name}`);
 
         const marked = computed(() => {
             if (!props.filesSelected) {
                 return false;
             }
 
-            return props.filesSelected.findIndex((file) => manager.entity.value && file === manager.entity.value.id) !== -1;
+            return props.filesSelected.findIndex((file) => manager.data.value && file === manager.data.value.id) !== -1;
         });
 
-        const isMatch = computed(() => manager.entity.value && props.fileSelectedId === manager.entity.value.id);
+        const isMatch = computed(() => manager.data.value && props.fileSelectedId === manager.data.value.id);
 
         const toggle = () => {
-            setup.emit('toggle', manager.entity.value);
+            setup.emit('toggle', manager.data.value);
         };
 
         const markToggle = () => {
-            setup.emit('check', manager.entity.value);
+            setup.emit('check', manager.data.value);
         };
 
         return {

@@ -7,7 +7,6 @@
 
 import type { DomainType } from '@personalhealthtrain/central-common';
 import { useDomainAPI } from '@personalhealthtrain/central-common';
-import { BDropdownItem } from 'bootstrap-vue-next';
 import type {
     Component,
     PropType,
@@ -15,7 +14,7 @@ import type {
     VNodeProps,
 } from 'vue';
 import {
-    defineComponent, h, mergeProps, ref,
+    defineComponent, getCurrentInstance, h, mergeProps, ref, resolveDynamicComponent,
 } from 'vue';
 import { injectAPIClient, useTranslator } from '../core';
 
@@ -60,6 +59,7 @@ export default defineComponent({
         },
     },
     setup(props, ctx) {
+        const instance = getCurrentInstance();
         const busy = ref(false);
 
         const submit = async () => {
@@ -94,7 +94,12 @@ export default defineComponent({
                     tag = 'a';
                     break;
                 case ElementType.DROP_DOWN_ITEM:
-                    tag = BDropdownItem;
+                    if (
+                        instance &&
+                        typeof instance.appContext.app.component('BDropdownItem') !== 'undefined'
+                    ) {
+                        tag = resolveDynamicComponent('BDropdownItem') as Component;
+                    }
                     break;
             }
 

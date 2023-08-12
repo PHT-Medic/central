@@ -89,11 +89,11 @@ export default defineComponent({
         );
 
         const isExternalNameUnchanged = computed(() => {
-            if (!manager.entity.value || !manager.entity.value.external_name) {
+            if (!manager.data.value || !manager.data.value.external_name) {
                 return true;
             }
 
-            return manager.entity.value.external_name !== form.external_name;
+            return manager.data.value.external_name !== form.external_name;
         });
 
         const toggleForm = (key: keyof typeof form, id: any) => {
@@ -109,9 +109,9 @@ export default defineComponent({
         };
 
         const resetAlias = () => {
-            if (!manager.entity.value) return;
+            if (!manager.data.value) return;
 
-            form.external_name = manager.entity.value.external_name;
+            form.external_name = manager.data.value.external_name;
         };
 
         const initFromProperties = () => {
@@ -119,11 +119,11 @@ export default defineComponent({
                 form.registry_id = props.registryId;
             }
 
-            if (typeof manager.entity.value === 'undefined') {
+            if (typeof manager.data.value === 'undefined') {
                 generateAlias();
             }
 
-            initFormAttributesFromSource(form, manager.entity.value);
+            initFormAttributesFromSource(form, manager.data.value);
         };
 
         const updatedAt = useUpdatedAt(props.entity);
@@ -253,7 +253,7 @@ export default defineComponent({
                 busy: busy.value,
                 createText: 'Create',
                 updateText: 'Update',
-                isEditing: !!manager.entity.value,
+                isEditing: !!manager.data.value,
             });
 
             return h('form', {

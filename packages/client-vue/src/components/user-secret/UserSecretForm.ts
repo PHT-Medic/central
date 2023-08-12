@@ -93,16 +93,16 @@ export default defineComponent({
 
                 switch (key) {
                     case 'content': {
-                        if (manager.entity.value) {
-                            form.content = readContent(manager.entity.value.content);
+                        if (manager.data.value) {
+                            form.content = readContent(manager.data.value.content);
                         } else {
                             form.content = '';
                         }
                         break;
                     }
                     case 'type': {
-                        if (manager.entity.value) {
-                            form.type = manager.entity.value.type;
+                        if (manager.data.value) {
+                            form.type = manager.data.value.type;
                         } else {
                             form.type = SecretType.RSA_PUBLIC_KEY;
                         }
@@ -111,10 +111,10 @@ export default defineComponent({
                     }
                     default: {
                         if (
-                            manager.entity.value &&
-                            manager.entity.value[key]
+                            manager.data.value &&
+                            manager.data.value[key]
                         ) {
-                            (form as any)[key] = manager.entity.value[key];
+                            (form as any)[key] = manager.data.value[key];
                         } else {
                             (form as any)[key] = '' as any;
                         }
@@ -253,7 +253,7 @@ export default defineComponent({
                     updateText: 'Update',
                     submit,
                     busy: busy.value,
-                    isEditing: !!manager.entity.value,
+                    isEditing: !!manager.data.value,
                     validationResult: $v.value,
                 }),
             ]);

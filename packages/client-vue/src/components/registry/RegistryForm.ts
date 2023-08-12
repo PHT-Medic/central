@@ -79,11 +79,11 @@ export default defineComponent({
         });
 
         const initForm = () => {
-            if (!manager.entity.value) {
+            if (!manager.data.value) {
                 return;
             }
 
-            initFormAttributesFromSource(form, manager.entity.value);
+            initFormAttributesFromSource(form, manager.data.value);
         };
 
         watch(updatedAt, (val, oldVal) => {
@@ -142,7 +142,7 @@ export default defineComponent({
                 },
                 options: ecosystems,
                 props: {
-                    disabled: !!manager.entity.value,
+                    disabled: !!manager.data.value,
                 },
             });
 
@@ -179,7 +179,7 @@ export default defineComponent({
                 busy: busy.value,
                 createText: 'Create',
                 updateText: 'Update',
-                isEditing: !!manager.entity.value,
+                isEditing: !!manager.data.value,
                 validationResult: $v.value,
             });
 

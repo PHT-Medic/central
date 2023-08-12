@@ -21,7 +21,7 @@ export function buildEntityManagerSlotProps<T>(
         ...input,
         error: unref(input.error),
         busy: unref(input.busy),
-        entity: unref(input.entity),
+        data: unref(input.data),
         lockId: unref(input.lockId),
     };
 }

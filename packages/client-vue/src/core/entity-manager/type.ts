@@ -33,7 +33,7 @@ export type EntityManagerResolveContext<T> = {
 
 export type EntityManager<T> = {
     busy: Ref<boolean>,
-    entity: Ref<T | undefined>,
+    data: Ref<T | undefined>,
     error: Ref<Error | undefined>,
     lockId: Ref<EntityID<T> | undefined>,
     create(entity: Partial<T>): Promise<void>,

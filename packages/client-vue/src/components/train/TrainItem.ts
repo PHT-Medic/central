@@ -8,7 +8,7 @@
 import { Timeago } from '@vue-layout/timeago';
 import type { PropType, VNodeArrayChildren } from 'vue';
 import {
-    defineComponent, h, ref, resolveComponent,
+    defineComponent, h, ref,
 } from 'vue';
 import type {
     Train,
@@ -16,6 +16,7 @@ import type {
 import {
     PermissionID,
 } from '@personalhealthtrain/central-common';
+import Link from '../MyLink';
 import TrainEntity from './TrainEntity';
 import TrainPipeline from './TrainPipeline.vue';
 import TrainStationsProgress from '../train-station/TrainStationsProgress.vue';
@@ -36,14 +37,16 @@ export default defineComponent({
             required: true,
         },
     },
-    emits: ['updated', 'deleted', 'failed'],
+    emits: ['updated', 'deleted', 'failed', 'executed'],
     setup(props, { emit }) {
         const store = injectAuthupStore();
-        const nuxtLink = resolveComponent('NuxtLink');
-
         const extendedView = ref(false);
         const toggleView = () => {
             extendedView.value = !extendedView.value;
+        };
+
+        const handleExecuted = (component: string, command: string) => {
+            emit('executed', component, command);
         };
 
         return () => h(TrainEntity, {
@@ -59,7 +62,7 @@ export default defineComponent({
             },
         }, {
             default: (slotProps: EntityManagerSlotProps<Train>) => {
-                if (!slotProps.entity) {
+                if (!slotProps.data) {
                     return [];
                 }
 
@@ -69,7 +72,7 @@ export default defineComponent({
                     deleteButton = [
                         h(EntityDelete, {
                             withText: false,
-                            entityId: slotProps.entity.id,
+                            entityId: slotProps.data.id,
                             entityType: 'train',
                             class: 'btn btn-danger btn-xs ms-1',
                             onDeleted(data: any) {
@@ -95,8 +98,8 @@ export default defineComponent({
                                     h(
                                         TrainName,
                                         {
-                                            entityId: slotProps.entity.id,
-                                            entityName: slotProps.entity.name,
+                                            entityId: slotProps.data.id,
+                                            entityName: slotProps.data.name,
                                             editable: true,
                                             onUpdated(item: Train) {
                                                 slotProps.updated(item);
@@ -120,7 +123,7 @@ export default defineComponent({
 
                                                 return [
                                                     h('i', { class: 'fa-solid fa-train-tram me-1' }),
-                                                    h(nuxtLink, {
+                                                    h(Link, {
                                                         to: `/trains/${nameProps.entityId}`,
                                                     }, [
                                                         nameProps.nameDisplay,
@@ -147,10 +150,10 @@ export default defineComponent({
                                             }],
                                         }),
                                     ]),
-                                    h(nuxtLink, {
+                                    h(Link, {
                                         class: 'btn btn-dark btn-xs ms-1',
                                         type: 'button',
-                                        to: `/trains/${slotProps.entity.id}`,
+                                        to: `/trains/${slotProps.data.id}`,
                                     }, [
                                         h('i', { class: 'fa fa-bars' }),
                                     ]),
@@ -162,7 +165,7 @@ export default defineComponent({
                             class: 'mt-1 mb-1',
                         }),
                         h(TrainPipeline, {
-                            entity: slotProps.entity,
+                            entity: slotProps.data,
                             withCommand: extendedView.value,
                             listDirection: extendedView.value ? 'column' : 'row',
                             onUpdated(item: Train) {
@@ -174,10 +177,13 @@ export default defineComponent({
                             onDeleted() {
                                 slotProps.deleted();
                             },
+                            onExecuted(component: string, command: string) {
+                                handleExecuted(component, command);
+                            },
                         }),
                         h(TrainStationsProgress, {
                             class: 'mt-1 mb-1',
-                            entity: slotProps.entity,
+                            entity: slotProps.data,
                             elementType: 'progress-bar',
                         }),
                         h('div', {
@@ -187,7 +193,7 @@ export default defineComponent({
                                 h('small', [
                                     h('span', { class: 'text-muted' }, 'updated'),
                                     ' ',
-                                    h(Timeago, { datetime: slotProps.entity.updated_at }),
+                                    h(Timeago, { datetime: slotProps.data.updated_at }),
                                 ]),
                             ]),
                         ]),

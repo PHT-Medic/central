@@ -8,7 +8,6 @@
 import {
     ServiceID, StationRegistryAPICommand,
 } from '@personalhealthtrain/central-common';
-import { useToast } from 'bootstrap-vue-next';
 import { defineComponent, h, ref } from 'vue';
 import { injectAPIClient, wrapFnWithBusyState } from '../../core';
 import EntityDelete from '../EntityDelete';
@@ -16,24 +15,18 @@ import MasterImageList from '../master-image/MasterImageList';
 
 export default defineComponent({
     components: { EntityDelete, MasterImageList },
-    setup() {
-        const toast = useToast();
+    emits: ['executed', 'failed'],
+    setup(props, { emit }) {
         const busy = ref(false);
         const sync = wrapFnWithBusyState(busy, async () => {
             try {
                 await injectAPIClient()
                     .service.runCommand(ServiceID.STATION_REGISTRY, StationRegistryAPICommand.SYNC);
 
-                if (toast) {
-                    toast.success({ body: 'You successfully executed the sync routine.' }, {
-                        pos: 'top-center',
-                    });
-                }
+                emit('executed');
             } catch (e) {
-                if (e instanceof Error && toast) {
-                    toast.danger({ body: e.message }, {
-                        pos: 'top-center',
-                    });
+                if (e instanceof Error) {
+                    emit('failed', e);
                 }
             }
         });
