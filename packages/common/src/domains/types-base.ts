@@ -19,21 +19,23 @@ export type CollectionResourceResponse<R> = {
     }
 };
 
-export interface DomainAPISlim<
-    T extends Record<string, any> = Record<string, any>,
-    ID extends keyof T = 'id',
-    > {
+export type DomainEntityWithID = {
+    [key: string]: any,
+    id: any
+};
+export type DomainEntityID<T> = T extends DomainEntityWithID ?
+    T['id'] :
+    never;
+
+export interface DomainAPISlim<T> {
     getMany(record?: BuildInput<T>) : Promise<CollectionResourceResponse<T>>;
-    getOne(id: T[ID], record?: BuildInput<T>) : Promise<SingleResourceResponse<T>>;
-    delete(id: T[ID]) : Promise<SingleResourceResponse<T>>;
+    getOne(id: DomainEntityID<T>, record?: BuildInput<T>) : Promise<SingleResourceResponse<T>>;
+    delete(id: DomainEntityID<T>) : Promise<SingleResourceResponse<T>>;
     create(data: Partial<T>) : Promise<SingleResourceResponse<T>>;
 }
 
-export interface DomainAPI<
-    T extends Record<string, any> = Record<string, any>,
-    ID extends keyof T = 'id',
-    > extends DomainAPISlim<T, ID> {
-    update(id: T[ID], data: Partial<T>) : Promise<SingleResourceResponse<T>>;
+export interface DomainAPI<T> extends DomainAPISlim<T> {
+    update(id: DomainEntityID<T>, data: Partial<T>) : Promise<SingleResourceResponse<T>>;
 }
 
 export type BaseAPIContext = {

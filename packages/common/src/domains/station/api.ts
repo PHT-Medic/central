@@ -19,8 +19,8 @@ export class StationAPI extends BaseAPI {
         return response.data;
     }
 
-    async getOne(id: Station['id']): Promise<SingleResourceResponse<Station>> {
-        const response = await this.client.get(`stations/${id}`);
+    async getOne(id: Station['id'], options?: BuildInput<Station>): Promise<SingleResourceResponse<Station>> {
+        const response = await this.client.get(`stations/${id}${buildQuery(options)}`);
 
         return response.data;
     }

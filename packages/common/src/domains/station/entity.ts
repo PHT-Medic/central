@@ -23,7 +23,7 @@ export interface Station {
 
     email: string | null;
 
-    ecosystem: Ecosystem | null;
+    ecosystem: `${Ecosystem}` | null;
 
     hidden: boolean;
 

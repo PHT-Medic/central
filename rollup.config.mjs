@@ -13,7 +13,7 @@ import { builtinModules } from 'node:module';
 import { transform } from "@swc/core";
 
 const extensions = [
-    '.js', '.mjs', '.cjs', '.ts'
+    '.js', '.mjs', '.cjs', '.ts', '.vue'
 ];
 
 const swcOptions = {
@@ -26,8 +26,7 @@ const swcOptions = {
         transform: {
             decoratorMetadata: true,
             legacyDecorator: true
-        },
-        loose: true
+        }
     },
     sourceMaps: true
 }
@@ -70,6 +69,8 @@ export function createConfig(
             // Allows node_modules resolution
             resolve({ extensions }),
 
+            ...pluginsPost,
+
             // Compile TypeScript/JavaScript files
             {
                 name: 'swc',
@@ -77,8 +78,6 @@ export function createConfig(
                     return transform(code, merge({}, swc, swcOptions));
                 }
             },
-
-            ...pluginsPost
         ]
     };
 }

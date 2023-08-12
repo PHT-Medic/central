@@ -19,6 +19,13 @@ export class TrainAPI extends BaseAPI {
         return `trains/${id}/result/download`;
     }
 
+    getResultDownloadURL(id: Train['id']) {
+        return new URL(
+            this.getResultDownloadPath(id),
+            this.client.getBaseURL(),
+        ).href;
+    }
+
     getFilesDownloadPath(
         trainId: Train['id'],
     ): string {

@@ -1,0 +1,149 @@
+/*
+ * Copyright (c) 2023-2023.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
+import {
+    DomainSubType,
+    DomainType,
+    buildDomainChannelName,
+} from '@personalhealthtrain/central-common';
+import type {
+    ProposalStation,
+} from '@personalhealthtrain/central-common';
+import type { FiltersBuildInput } from 'rapiq';
+import {
+    defineComponent, h,
+} from 'vue';
+import type {
+    PropType,
+    VNodeChild,
+} from 'vue';
+import { createEntityManager, defineEntityManagerEvents, injectAPIClient } from '../../core';
+
+enum Direction {
+    IN = 'in',
+    OUT = 'out',
+}
+
+enum Target {
+    PROPOSAL = 'proposal',
+    STATION = 'station',
+}
+
+export default defineComponent({
+    props: {
+        entity: {
+            type: Object as PropType<ProposalStation>,
+        },
+        entityId: {
+            type: String,
+        },
+        // todo: rename to where
+        filters: {
+            type: Object as PropType<FiltersBuildInput<ProposalStation>>,
+        },
+        direction: {
+            type: String as PropType<`${Direction.IN}` | `${Direction.OUT}`>,
+        },
+        target: {
+            type: String as PropType<`${Target.STATION}` | `${Target.PROPOSAL}`>,
+        },
+    },
+    emits: defineEntityManagerEvents<ProposalStation>(),
+    async setup(props, setup) {
+        const manager = createEntityManager({
+            realmId: (entity) => {
+                if (!entity) {
+                    return undefined;
+                }
+
+                if (props.target === Target.PROPOSAL) {
+                    return entity.proposal_realm_id;
+                }
+
+                if (props.target === Target.STATION) {
+                    return entity.station_realm_id;
+                }
+
+                return undefined;
+            },
+            type: `${DomainType.PROPOSAL_STATION}`,
+            setup,
+            props,
+            socket: {
+                processEvent(event, realmId) {
+                    if (!realmId) {
+                        return true;
+                    }
+
+                    if (props.target === Target.PROPOSAL) {
+                        return realmId === event.data.station_realm_id;
+                    }
+
+                    if (props.target === Target.STATION) {
+                        return realmId === event.data.proposal_realm_id;
+                    }
+
+                    return false;
+                },
+                buildChannelName(id) {
+                    if (props.direction === Direction.IN) {
+                        return buildDomainChannelName(DomainSubType.PROPOSAL_STATION_IN, id);
+                    }
+
+                    if (props.direction === Direction.OUT) {
+                        return buildDomainChannelName(DomainSubType.PROPOSAL_STATION_OUT, id);
+                    }
+
+                    return buildDomainChannelName(DomainType.PROPOSAL_STATION, id);
+                },
+            },
+        });
+
+        await manager.resolve();
+
+        if (
+            manager.entity.value &&
+            props.target &&
+            !manager.entity.value[props.target]
+        ) {
+            if (props.target === Target.PROPOSAL) {
+                manager.entity.value[props.target] = await injectAPIClient()
+                    .proposal.getOne(manager.entity.value.proposal_id);
+            } else {
+                manager.entity.value[props.target] = await injectAPIClient()
+                    .station.getOne(manager.entity.value.station_id);
+            }
+        }
+
+        return () => {
+            const fallback = () : VNodeChild => {
+                if (
+                    props.target &&
+                    manager.entity.value &&
+                    manager.entity.value[props.target]
+                ) {
+                    if (props.target === Target.PROPOSAL) {
+                        return h('div', [
+                            manager.entity.value?.proposal.title,
+                        ]);
+                    }
+                    if (props.target === Target.STATION) {
+                        return h('div', [
+                            manager.entity.value?.station.name,
+                        ]);
+                    }
+                }
+
+                return [
+                    manager.entity?.value?.id,
+                ];
+            };
+
+            return manager.render(fallback);
+        };
+    },
+});

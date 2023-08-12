@@ -1,0 +1,61 @@
+{
+    "name": "@personalhealthtrain/client-ui",
+    "private": true,
+    "author": {
+        "name": "Peter Placzek",
+        "email": "contact@tada5hi.net",
+        "url": "https://tada5hi.net"
+    },
+    "license": "MIT",
+    "version": "2.4.0-alpha.17",
+    "description": "This package contains the Central UI frontend application of the PHT. It was initially developed as part of my Bachelor Thesis.",
+    "scripts": {
+        "dev": "nuxi dev",
+        "build": "nuxi build",
+        "start": "nuxi start",
+        "generate": "nuxi generate",
+        "prepare": "nuxi prepare",
+        "typecheck": "nuxi typecheck"
+    },
+    "devDependencies": {
+        "@authup/client-vue": "^0.39.1",
+        "@authup/core": "^0.39.0",
+        "@bootstrap-vue-next/nuxt": "^0.1.3",
+        "@fortawesome/fontawesome-free": "^6.4.0",
+        "@nuxtjs/google-fonts": "^3.0.2",
+        "@personalhealthtrain/central-common": "2.4.0-alpha.10",
+        "@personalhealthtrain/client-vue": "2.4.0-alpha.10",
+        "@pinia/nuxt": "^0.4.11",
+        "@types/moment": "^2.13.0",
+        "@vue-layout/countdown": "^3.0.0",
+        "@vue-layout/form-controls": "^3.4.0",
+        "@vue-layout/gravatar": "^3.0.0",
+        "@vue-layout/list-controls": "^3.4.0",
+        "@vue-layout/navigation": "^3.4.0",
+        "@vue-layout/pagination": "^3.4.0",
+        "@vue-layout/preset-bootstrap-v5": "^3.2.0",
+        "@vue-layout/preset-font-awesome": "^3.0.0",
+        "@vue-layout/timeago": "^3.0.0",
+        "@vuelidate/core": "^2.0.3",
+        "@vuelidate/validators": "^2.0.3",
+        "@vueuse/core": "^10.2.1",
+        "bootstrap": "^5.3.1",
+        "bootstrap-vue-next": "^0.9.26",
+        "browser-storage-adapter": "^1.1.2",
+        "events": "^3.3.0",
+        "hapic": "^2.2.0",
+        "ilingo": "^3.0.0",
+        "moment": "^2.29.4",
+        "nuxt": "^3.6.5",
+        "pinia": "^2.1.6",
+        "rapiq": "^0.9.0",
+        "smob": "^1.4.0",
+        "socket.io-client": "^4.7.1",
+        "vue": "^3.3.4",
+        "vue3-form-wizard": "^0.2.1"
+    },
+    "gitHead": "8881a3d4b427c45ac4b81ac4b31bf3d719463ef7",
+    "publishConfig": {
+        "access": "public"
+    }
+}

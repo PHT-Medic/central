@@ -1,0 +1,204 @@
+/*
+ * Copyright (c) 2022.
+ * Author Peter Placzek (tada5hi)
+ * For the full copyright and license information,
+ * view the LICENSE file that was distributed with this source code.
+ */
+
+.train-card {
+    /* box-shadow: 0 4px 25px 0 rgba(0,0,0,.1); */
+    transition: all .3s ease-in-out;
+
+    border-radius: 4px;
+
+    padding: 0.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.train-card-content{
+    min-height: 1.5rem;
+}
+
+.train-card-content input {
+    height: 1.5rem;
+}
+
+.train-card .train-card-content,
+.train-card .train-card-footer {
+    display: flex;
+    flex-direction: row;
+}
+
+.train-card .train-card-icon {
+    font-size: 1.5rem;
+    padding-right: 0.5rem;
+}
+
+.log-container {
+    background-color: #24292f;
+    min-height: 150px;
+    border-color: hsla(210,18%,87%,1);
+    border-radius: 4px;
+    max-height: 350px;
+    overflow-y: scroll;
+}
+
+.log-container .list-no-more {
+    color: #d0d7de;
+    margin: 0;
+}
+
+.log-container .list-item {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    background-color: inherit;
+}
+
+.log-container .log-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: #24292f;
+    border-bottom: 1px solid #32383f;
+    color: #f6f8fa;
+    padding: 1rem 0.5rem;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+.log-container .log-body {
+    padding: 0.25rem 0;
+}
+
+.log-body .line {
+    line-height: 20px;
+    color: #d0d7de;
+    width: 100%;
+}
+
+.log-body .line-status-message {
+    margin-left: 48px;
+}
+
+.log-body .line-number {
+    width: 48px;
+    overflow: hidden;
+    color: rgba(140,149,159,0.75);
+    text-align: center;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    -webkit-user-select: none;
+    user-select: none;
+    font-size: 0.75rem;
+    font-weight: 400;
+}
+
+.log-body .line-number:hover,
+.log-body .line-number:active {
+    color: #54aeff;
+}
+
+.log-body .line-content {
+    overflow-x: auto;
+    display: inline-block;
+    width: 100%;
+    margin-right: 1rem;
+}
+
+.line-component {
+    margin-right: 0.25rem;
+}
+
+.line-component.builder {
+    color: #C490D1;
+}
+
+.line-component.router {
+    color: #726DA8;
+}
+
+.line-component.extractor {
+    color: #C490D1;
+}
+
+.line-message.error {
+    color: #f79483;
+}
+
+/**
+TrainStationProgress
+ */
+
+.progress-with-circle {
+    position: relative;
+    top: 40px;
+    height: 4px;
+}
+
+.progress-with-circle .progress-bar {
+    box-shadow: none;
+    -webkit-transition: width .3s ease;
+    -o-transition: width .3s ease;
+    transition: width .3s ease;
+    height: 100%;
+}
+
+.progress-step {
+    width: 100px;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    text-align: center;
+
+}
+
+.icon-circle {
+    font-weight: 600;
+    height: 70px;
+    background-color: #ececec;
+    position: relative;
+    border-radius: 5px;
+}
+
+.icon-circle.active {
+    background: #FF5B5B;
+}
+
+.icon-circle .icon {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+}
+
+.command-box {
+    background-color: rgb(43, 43, 43);
+    border: 1px solid #dedede;
+    /* box-shadow: 0 4px 25px 0 rgb(0 0 0 / 10%); */
+    transition: all .3s ease-in-out;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    display: flex;
+    flex-direction: row;
+    color: rgb(184, 186, 160);
+}
+
+.command-box .shell-sign {
+    color: rgb(166, 89, 45);
+}
+
+.train-stations-progress .list-body {
+    flex-direction: row;
+    justify-content: space-between;
+    display: flex;
+    margin-bottom: 1rem;
+}
