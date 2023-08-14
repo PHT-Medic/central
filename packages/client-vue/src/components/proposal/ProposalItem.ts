@@ -19,7 +19,9 @@ import {
     DomainType,
     PermissionID,
 } from '@personalhealthtrain/central-common';
-import { hasNormalizedSlot, injectAuthupStore, normalizeSlot } from '../../core';
+import {
+    EntityListSlotName, hasNormalizedSlot, injectAuthupStore, normalizeSlot,
+} from '../../core';
 import EntityDelete from '../EntityDelete';
 import Link from '../MyLink';
 import ProposalEntity from './ProposalEntity';
@@ -74,8 +76,8 @@ export default defineComponent({
                     );
                 }
 
-                if (hasNormalizedSlot(SlotName.ITEM_ACTIONS, slots)) {
-                    itemActions = normalizeSlot(SlotName.ITEM_ACTIONS, props, slots);
+                if (hasNormalizedSlot(EntityListSlotName.ITEM_ACTIONS, slots)) {
+                    itemActions = normalizeSlot(EntityListSlotName.ITEM_ACTIONS, props, slots);
                 } else {
                     itemActions = [
                         h(

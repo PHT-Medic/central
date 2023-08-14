@@ -15,7 +15,6 @@ import {
     buildFormInput, buildFormSelect, buildFormSubmit, buildFormTextarea,
 } from '@vue-layout/form-controls';
 import type { ListBodySlotProps, ListItemSlotProps } from '@vue-layout/list-controls';
-import { SlotName } from '@vue-layout/list-controls';
 import useVuelidate from '@vuelidate/core';
 import {
     email, helpers, maxLength, minLength, required,
@@ -28,8 +27,8 @@ import {
 } from 'vue';
 import { useUpdatedAt } from '../../composables';
 import {
-    createEntityManager,
-    defineEntityManagerEvents,
+    EntityListSlotName,
+    createEntityManager, defineEntityManagerEvents,
     initFormAttributesFromSource,
     useValidationTranslator,
     wrapFnWithBusyState,
@@ -179,7 +178,7 @@ export default defineComponent({
                             footerPagination: false,
                         },
                         {
-                            [SlotName.BODY]: (props: ListBodySlotProps<Station>) => buildFormSelect({
+                            [EntityListSlotName.BODY]: (props: ListBodySlotProps<Station>) => buildFormSelect({
                                 validationTranslator: useValidationTranslator(),
                                 validationResult: $v.value.realm_id,
                                 label: true,
@@ -302,12 +301,12 @@ export default defineComponent({
                         ref: registryNode,
                         loadOnSetup: false,
                         query: {
-                            filter: {
+                            filters: {
                                 ecosystem: form.ecosystem as Ecosystem,
                             },
                         },
                     }, {
-                        [SlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Registry>) => h('button', {
+                        [EntityListSlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Registry>) => h('button', {
                             disabled: props.busy,
                             class: ['btn btn-xs', {
                                 'btn-dark': form.registry_id !== props.data.id,

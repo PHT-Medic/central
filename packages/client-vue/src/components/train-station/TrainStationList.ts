@@ -32,7 +32,6 @@ enum Direction {
 }
 
 export default defineComponent({
-    name: 'TrainStationList',
     props: {
         ...defineDomainListProps<TrainStation>(),
         realmId: {
@@ -145,7 +144,7 @@ export default defineComponent({
                     );
                 },
             },
-            queryFilter: (q) => {
+            queryFilters: (q) => {
                 let filter : FiltersBuildInput<TrainStation>;
 
                 if (props.target === DomainType.STATION) {

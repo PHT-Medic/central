@@ -24,7 +24,6 @@ import type {
 } from './type';
 import { buildEntityManagerSlotProps } from './utils';
 
-type Entity<T> = T extends Record<string, any> ? T : never;
 type DomainTypeInfer<T> = T extends DomainEntity<infer U> ? U extends `${DomainType}` ? U : never : never;
 
 export function createEntityManager<
@@ -47,22 +46,26 @@ export function createEntityManager<
 
     const realmId = computed<string | undefined>(
         () => {
-            // todo: check as long realmId is undefined
+            let realmId : string | undefined;
+
             if (ctx.realmId) {
                 if (typeof ctx.realmId === 'function') {
                     return ctx.realmId(entity.value);
                 }
 
-                return isRef(ctx.realmId) ? ctx.realmId.value : ctx.realmId;
+                realmId = isRef(ctx.realmId) ? ctx.realmId.value : ctx.realmId;
             }
 
-            if (entity.value) {
-                if (hasOwnProperty(entity.value, 'realm_id')) {
-                    return entity.value.realm_id as string;
+            if (!realmId && entity.value) {
+                if (
+                    hasOwnProperty(entity.value, 'realm_id') &&
+                    typeof entity.value.realm_id === 'string'
+                ) {
+                    return entity.value.realm_id;
                 }
             }
 
-            return undefined;
+            return realmId;
         },
     );
 
@@ -245,33 +248,56 @@ export function createEntityManager<
 
     const error = ref<Error | undefined>(undefined);
 
-    const resolve = async (resolveContext: EntityManagerResolveContext<T> = {}) => {
-        if (!ctx.props) {
-            resolved();
-
-            return;
+    const resolve = async (rctx: EntityManagerResolveContext<T> = {}) => {
+        let query : (T extends Record<string, any> ? BuildInput<T> : never) | undefined;
+        if (rctx.query) {
+            query = rctx.query;
         }
 
-        if (ctx.props.entity) {
-            entity.value = ctx.props.entity;
+        let { id } = rctx;
 
-            if (socket) {
-                socket.mount();
+        if (ctx.props) {
+            if (ctx.props.entity) {
+                entity.value = ctx.props.entity;
+
+                if (socket) {
+                    socket.mount();
+                }
+
+                resolved(entity.value);
+
+                return;
             }
 
-            resolved(entity.value);
-        }
+            if (typeof ctx.props.entity !== 'undefined') {
+                entity.value = ctx.props.entity;
 
-        if (typeof ctx.props.entity !== 'undefined') {
-            entity.value = ctx.props.entity;
+                if (socket) {
+                    socket.mount();
+                }
 
-            if (socket) {
-                socket.mount();
+                resolved(entity.value);
+
+                return;
             }
 
-            resolved(entity.value);
+            if (ctx.props.query || ctx.props.queryFilters) {
+                query = {
+                    ...(ctx.props.query ? { filters: ctx.props.query } : {}),
+                    ...(ctx.props.queryFilters ? { filters: ctx.props.queryFilters } : {}),
+                } as any;
 
-            return;
+                if (
+                    query &&
+                    ctx.props.queryFields
+                ) {
+                    query.fields = ctx.props.queryFields;
+                }
+            }
+
+            if (ctx.props.entityId) {
+                id = ctx.props.entityId;
+            }
         }
 
         if (!domainAPI) {
@@ -280,15 +306,9 @@ export function createEntityManager<
             return;
         }
 
-        // todo: merge query
-        const query = {
-            ...(resolveContext.query || {}),
-            ...(ctx.props.query || {}),
-        };
-
-        if (ctx.props.entityId) {
+        if (id) {
             try {
-                entity.value = await domainAPI.getOne(ctx.props.entityId, query as BuildInput<any>);
+                entity.value = await domainAPI.getOne(id, query as BuildInput<any>);
 
                 if (socket) {
                     socket.mount();
@@ -304,11 +324,10 @@ export function createEntityManager<
             }
         }
 
-        if (typeof ctx.props.where !== 'undefined') {
+        if (query) {
             try {
                 const response = await domainAPI.getMany({
                     ...query,
-                    filters: ctx.props.where,
                     pagination: {
                         limit: 1,
                     },

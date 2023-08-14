@@ -20,7 +20,6 @@ import type {
     ListItemSlotProps,
     ListMeta,
     ListNoMoreBuildOptionsInput,
-    SlotName,
 } from '@vue-layout/list-controls';
 import type { BuildInput, FiltersBuildInput } from 'rapiq';
 import type {
@@ -28,7 +27,7 @@ import type {
     Ref, SetupContext, VNodeChild,
 } from 'vue';
 import type { EntitySocketContext } from '../entity-socket';
-import type { EntityListHeaderSearchSlotName, EntityListHeaderTitleSlotName } from './constants';
+import type { EntityListSlotName } from './constants';
 import type { EntityListFooterPaginationOptions } from './footer';
 import type {
     EntityListHeaderSearchOptionsInput,
@@ -78,14 +77,14 @@ export type EntityListHeaderTitleSlotProps = {
 };
 
 export type EntityListSlotsType<T> = {
-    [SlotName.BODY]: ListBodySlotProps<T>,
-    [SlotName.ITEM]: ListItemSlotProps<T>,
-    [SlotName.ITEM_ACTIONS]: ListItemSlotProps<T>,
-    [SlotName.ITEM_ACTIONS_EXTRA]: ListItemSlotProps<T>,
-    [SlotName.HEADER]: ListHeaderSlotProps<T>,
-    [EntityListHeaderTitleSlotName]: EntityListHeaderTitleSlotProps,
-    [EntityListHeaderSearchSlotName]: undefined,
-    [SlotName.FOOTER]: ListFooterSlotProps<T>
+    [EntityListSlotName.BODY]: ListBodySlotProps<T>,
+    [EntityListSlotName.ITEM]: ListItemSlotProps<T>,
+    [EntityListSlotName.ITEM_ACTIONS]: ListItemSlotProps<T>,
+    [EntityListSlotName.ITEM_ACTIONS_EXTRA]: ListItemSlotProps<T>,
+    [EntityListSlotName.HEADER]: ListHeaderSlotProps<T>,
+    [EntityListSlotName.HEADER_TITLE]: EntityListHeaderTitleSlotProps,
+    [EntityListSlotName.HEADER_SEARCH]: undefined,
+    [EntityListSlotName.FOOTER]: ListFooterSlotProps<T>
 };
 
 export type EntityListEventsType<T> = {
@@ -104,7 +103,7 @@ export type EntityListCreateContext<
     props: EntityListProps<T>,
     loadAll?: boolean,
     query?: BuildInput<Entity<T>> | (() => BuildInput<Entity<T>>),
-    queryFilter?: FiltersBuildInput<Entity<T>> | ((q: string) => FiltersBuildInput<Entity<T>>),
+    queryFilters?: FiltersBuildInput<Entity<T>> | ((q: string) => FiltersBuildInput<Entity<T>>),
     onCreated?: (entity: T, meta: EntityListMeta) => void | Promise<void>,
     socket?: boolean | Omit<EntitySocketContext<A, T>, 'type'>
 };

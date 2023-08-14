@@ -30,7 +30,7 @@ import {
     useValidationTranslator,
     wrapFnWithBusyState,
 } from '../../core';
-import { EntityListHeaderTitleSlotName } from '../../core/entity-list/constants';
+import { EntityListHeaderTitleSlotName, EntityListSlotName } from '../../core/entity-list/constants';
 import MasterImagePicker from '../master-image/MasterImagePicker';
 import StationList from '../station/StationList';
 import ProposalStationAssignAction from '../proposal-station/ProposalStationAssignAction';
@@ -214,13 +214,13 @@ export default defineComponent({
             const stationsNode = h('div', [
                 h(StationList, {
                     query: {
-                        filter: {
+                        filters: {
                             hidden: false,
                         },
                     },
                 } satisfies EntityListProps<Station>, {
-                    [EntityListHeaderTitleSlotName]: () => h('label', 'Stations'),
-                    [SlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Station>) => {
+                    [EntityListSlotName.HEADER_TITLE]: () => h('label', 'Stations'),
+                    [EntityListSlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Station>) => {
                         if (manager.data.value) {
                             return h(ProposalStationAssignAction, {
                                 stationId: props.data.id,

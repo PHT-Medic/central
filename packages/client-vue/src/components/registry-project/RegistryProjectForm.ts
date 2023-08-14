@@ -20,7 +20,7 @@ import {
 } from 'vue';
 import { useUpdatedAt } from '../../composables';
 import {
-    createEntityManager, initFormAttributesFromSource, useValidationTranslator, wrapFnWithBusyState,
+    EntityListSlotName, createEntityManager, initFormAttributesFromSource, useValidationTranslator, wrapFnWithBusyState,
 } from '../../core';
 import RegistryList from '../registry/RegistryList';
 
@@ -223,7 +223,7 @@ export default defineComponent({
                 registry = [
                     h('hr'),
                     h(RegistryList, {
-                        [SlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Registry>) => h('button', {
+                        [EntityListSlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Registry>) => h('button', {
                             attrs: {
                                 disabled: props.busy,
                             },

@@ -13,8 +13,8 @@ import {
 import {
     defineComponent, h, reactive, ref,
 } from 'vue';
-import { SlotName } from '@vue-layout/list-controls';
 import { injectAPIClient } from '../../core';
+import { EntityListSlotName } from '../../core/entity-list/constants';
 import EntityDelete from '../EntityDelete';
 import MasterImageList from './MasterImageList';
 
@@ -101,8 +101,8 @@ export default defineComponent({
                 h(MasterImageList, {
                     ref: 'itemList',
                     scopedSlots: {
-                        [SlotName.HEADER_TITLE]: () => h('strong', ['Overview']),
-                        [SlotName.ITEM_ACTIONS]: (props : { data: MasterImage }) => h(EntityDelete, {
+                        [EntityListSlotName.HEADER_TITLE]: () => h('strong', ['Overview']),
+                        [EntityListSlotName.ITEM_ACTIONS]: (props : { data: MasterImage }) => h(EntityDelete, {
                             class: 'btn btn-xs btn-danger',
                             elementType: 'button',
                             entityId: props.data.id,

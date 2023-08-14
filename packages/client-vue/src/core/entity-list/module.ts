@@ -24,6 +24,7 @@ import {
     unref, watch,
 } from 'vue';
 import { isObject, merge } from 'smob';
+import { boolableToObject } from '../../utils';
 import { injectAPIClient } from '../api-client';
 import type { EntitySocketContext } from '../entity-socket';
 import { createEntitySocket } from '../entity-socket';
@@ -93,15 +94,15 @@ export function createEntityList<
         }
 
         try {
-            let filter : FiltersBuildInput<Entity<T>>;
-            if (context.queryFilter) {
-                if (typeof context.queryFilter === 'function') {
-                    filter = context.queryFilter(q.value) as FiltersBuildInput<Entity<T>>;
+            let filters : FiltersBuildInput<Entity<T>>;
+            if (context.queryFilters) {
+                if (typeof context.queryFilters === 'function') {
+                    filters = context.queryFilters(q.value) as FiltersBuildInput<Entity<T>>;
                 } else {
-                    filter = context.queryFilter as FiltersBuildInput<Entity<T>>;
+                    filters = context.queryFilters as FiltersBuildInput<Entity<T>>;
                 }
             } else {
-                filter = {
+                filters = {
                     ['name' as keyof T]: q.value.length > 0 ? `~${q.value}` : q.value,
                 } as FiltersBuildInput<Entity<T>>;
             }
@@ -129,7 +130,7 @@ export function createEntityList<
                         limit: targetMeta.limit ?? meta.value.limit,
                         offset: targetMeta.offset ?? meta.value.offset,
                     },
-                    filter,
+                    filters,
                 },
                 query || {},
             ));
@@ -173,40 +174,34 @@ export function createEntityList<
     const handleUpdated = buildEntityListUpdatedHandler(data);
 
     let options = context.props;
+
     const setDefaults = (defaults: EntityListBuilderTemplateOptions<T>) => {
         options = mergeEntityListOptions(context.props, defaults);
     };
+
+    console.log(context.type, options.header);
 
     function render() : VNodeArrayChildren {
         let header : ListHeaderBuildOptionsInput<T> | undefined;
         if (options.header) {
             header = typeof options.header === 'boolean' ? {} : options.header;
 
-            if (!header.content) {
-                if (options.headerTitle || options.headerSearch) {
-                    let search: EntityListHeaderSearchOptions | undefined;
-                    if (options.headerSearch) {
-                        search = {
-                            load(text: string) {
-                                q.value = text;
-                            },
-                            busy: busy.value,
-                        };
-                        if (typeof options.headerSearch !== 'boolean') {
-                            search = {
-                                ...search,
-                                ...options.headerSearch,
-                            };
-                        }
-                    }
-
-                    header.content = buildDomainListHeader({
-                        title: options.headerTitle,
-                        search,
-                        slots: context.setup.slots || {},
-                    });
-                }
+            let search: EntityListHeaderSearchOptions | undefined;
+            if (options.headerSearch) {
+                search = {
+                    load(text: string) {
+                        q.value = text;
+                    },
+                    busy: busy.value,
+                    ...boolableToObject(options.headerSearch),
+                };
             }
+
+            header.content = buildDomainListHeader({
+                title: options.headerTitle,
+                search,
+                slots: context.setup.slots || {},
+            });
         }
 
         let footer : ListFooterBuildOptionsInput<T> | undefined;

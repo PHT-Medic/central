@@ -63,14 +63,14 @@ export default defineComponent({
             setup,
             loadAll: true,
             query: {
-                filter: {
+                filters: {
                     train_id: props.entityId,
                 },
                 sort: {
                     created_at: 'ASC',
                 },
             },
-            queryFilter: (q) => ({
+            queryFilters: (q) => ({
                 title: q.length > 0 ? `~${q}` : q,
             }),
         });

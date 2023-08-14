@@ -60,7 +60,7 @@ export default defineComponent({
         }, form);
 
         const proposalQuery = computed<BuildInput<Proposal>>(() => ({
-            filter: {
+            filters: {
                 ...(props.realmId ? { realm_id: props.realmId } : {}),
             },
         }));

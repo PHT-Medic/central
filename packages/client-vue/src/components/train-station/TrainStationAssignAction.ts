@@ -29,15 +29,18 @@ export default defineComponent({
         const manager = createEntityManager({
             type: `${DomainType.TRAIN_STATION}`,
             setup,
-            props: {
-                where: {
-                    train_id: props.trainId,
-                    station_id: props.stationId,
-                },
-            },
             socket: {
                 processEvent(event) {
                     return event.data.train_id === props.trainId;
+                },
+            },
+        });
+
+        await manager.resolve({
+            query: {
+                filters: {
+                    train_id: props.trainId,
+                    station_id: props.stationId,
                 },
             },
         });

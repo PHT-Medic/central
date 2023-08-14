@@ -9,15 +9,16 @@ import type { FormInputBuildOptionsInput } from '@vue-layout/form-controls';
 import { buildFormInputText } from '@vue-layout/form-controls';
 import type { VNodeArrayChildren, VNodeChild } from 'vue';
 import { h } from 'vue';
+import { boolableToObject } from '../../../utils';
 import { hasNormalizedSlot, normalizeSlot } from '../../slot';
-import { EntityListHeaderTitleSlotName } from '../constants';
+import { EntityListSlotName } from '../constants';
 import type { EntityHeaderOptions, EntityListHeaderSearchOptions, EntityListHeaderTitleOptions } from './type';
 
 export function buildDomainListHeaderSearch(
     ctx: EntityListHeaderSearchOptions,
 ) {
-    if (hasNormalizedSlot(EntityListHeaderTitleSlotName, ctx.slots)) {
-        return normalizeSlot(EntityListHeaderTitleSlotName, {
+    if (hasNormalizedSlot(EntityListSlotName.HEADER_SEARCH, ctx.slots)) {
+        return normalizeSlot(EntityListSlotName.HEADER_SEARCH, {
             load: ctx.load,
             busy: ctx.busy,
         }, ctx.slots);
@@ -62,8 +63,8 @@ export function buildDomainListHeaderTitle(
         iconClassName = 'fa-solid fa-list';
     }
 
-    if (hasNormalizedSlot(EntityListHeaderTitleSlotName, ctx.slots)) {
-        return normalizeSlot(EntityListHeaderTitleSlotName, {
+    if (hasNormalizedSlot(EntityListSlotName.HEADER_TITLE, ctx.slots)) {
+        return normalizeSlot(EntityListSlotName.HEADER_TITLE, {
             icon: iconClassName,
         }, ctx.slots);
     }
@@ -98,14 +99,15 @@ export function buildDomainListHeader(
     const children : VNodeArrayChildren = [];
 
     if (ctx.title) {
-        const options : EntityListHeaderTitleOptions = typeof ctx.title === 'boolean' ? {} :
-            ctx.title;
-
+        const options = boolableToObject(ctx.title);
+        options.slots = ctx.slots;
         children.push(buildDomainListHeaderTitle(options));
     }
 
     if (ctx.search) {
-        children.push(buildDomainListHeaderSearch(ctx.search));
+        const options = ctx.search;
+        options.slots = ctx.slots;
+        children.push(buildDomainListHeaderSearch(options));
     }
 
     if (children.length > 0) {

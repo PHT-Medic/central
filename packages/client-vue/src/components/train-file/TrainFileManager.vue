@@ -262,7 +262,7 @@ export default defineComponent({
                     >
                 </div>
                 <div class="form-group">
-                  <div class="form-check form-switch">
+                  <div class="form-check form-switch"> 
                     <input class="form-check-input" type="checkbox" v-model="directoryMode" id="train-file-manager-switch">
                     <label class="form-check-label" for="train-file-manager-switch">Directory Mode</label>
                   </div>

@@ -30,7 +30,7 @@ export default defineComponent({
             type: `${DomainType.PROPOSAL}`,
             props,
             setup,
-            queryFilter: (q) => ({
+            queryFilters: (q) => ({
                 title: q.length > 0 ? `~${q}` : q,
             }),
         });

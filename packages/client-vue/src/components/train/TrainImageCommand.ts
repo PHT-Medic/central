@@ -69,7 +69,7 @@ export default defineComponent({
             try {
                 const item = await injectAPIClient().masterImage.getOne(refs.masterImageId.value);
                 const { data } = await injectAPIClient().masterImageGroup.getMany({
-                    filter: {
+                    filters: {
                         virtual_path: item.group_virtual_path,
                     },
                 });

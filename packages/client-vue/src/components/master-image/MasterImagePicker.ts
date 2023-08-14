@@ -9,19 +9,19 @@ import type { MasterImage, MasterImageGroup } from '@personalhealthtrain/central
 import type { FormSelectOption } from '@vue-layout/form-controls';
 import { buildFormSelect } from '@vue-layout/form-controls';
 import type { ListBodySlotProps } from '@vue-layout/list-controls';
-import { SlotName } from '@vue-layout/list-controls';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import type { VNodeArrayChildren } from 'vue';
 import {
     computed, defineComponent, h, reactive, ref, toRefs, watch,
 } from 'vue';
-import { injectAPIClient, useValidationTranslator, wrapFnWithBusyState } from '../../core';
+import {
+    EntityListSlotName, injectAPIClient, useValidationTranslator, wrapFnWithBusyState,
+} from '../../core';
 import MasterImageGroupList from '../master-image-group/MasterImageGroupList';
 import MasterImageList from './MasterImageList';
 
 export default defineComponent({
-    name: 'MasterImagePicker',
     components: { MasterImageList },
     props: {
         entityId: {
@@ -164,7 +164,7 @@ export default defineComponent({
                         footerPagination: false,
                         query: imageQuery.value,
                     }, {
-                        [SlotName.BODY]: (props: ListBodySlotProps<MasterImage>) => {
+                        [EntityListSlotName.BODY]: (props: ListBodySlotProps<MasterImage>) => {
                             const options: FormSelectOption[] = props.data.map((entity) => ({
                                 id: entity.id,
                                 value: entity.name,
@@ -211,7 +211,7 @@ export default defineComponent({
                             headerTitle: false,
                             footerPagination: false,
                         }, {
-                            [SlotName.BODY]: (props: ListBodySlotProps<MasterImageGroup>) => {
+                            [EntityListSlotName.BODY]: (props: ListBodySlotProps<MasterImageGroup>) => {
                                 const options : FormSelectOption[] = props.data.map((entity) => ({
                                     id: entity.virtual_path,
                                     value: entity.virtual_path,

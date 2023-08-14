@@ -25,7 +25,7 @@ export default defineComponent({
             type: `${DomainType.MASTER_IMAGE}`,
             props,
             setup: ctx,
-            queryFilter: (q) => ({
+            queryFilters: (q) => ({
                 path: q.length > 0 ? `~${q}` : q,
             }),
             query: {

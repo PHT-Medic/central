@@ -104,7 +104,7 @@ export default defineComponent({
                         ref="proposalStationList"
                         :realm-id="train.realm_id"
                         :direction="'out'"
-                        :query="{filter: {proposal_id: train.proposal_id}}"
+                        :query="{filters: {proposal_id: train.proposal_id}}"
                     >
                         <template #headerTitle>
                             <span>Stations <span class="text-info">available</span></span>
@@ -127,7 +127,7 @@ export default defineComponent({
                         ref="trainStationList"
                         :realm-id="train.realm_id"
                         :direction="'out'"
-                        :query="{filter: {train_id: train.id}}"
+                        :query="{filters: {train_id: train.id}}"
                     >
                         <template #headerTitle>
                             <span>Stations <span class="text-success">selected</span></span>

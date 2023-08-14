@@ -28,6 +28,7 @@ type EntityID<T> = T extends EntityWithID ?
 export type EntityManagerRenderFn = () => VNodeChild;
 
 export type EntityManagerResolveContext<T> = {
+    id?: EntityID<T>,
     query?: T extends Record<string, any> ? BuildInput<T> : never
 };
 
@@ -53,7 +54,8 @@ export type EntityManager<T> = {
 export type EntityManagerProps<T> = {
     entity?: T,
     entityId?: EntityID<T>,
-    where?: T extends Record<string, any> ? FiltersBuildInput<T> : never,
+    queryFilters?: T extends Record<string, any> ? FiltersBuildInput<T> : never,
+    queryFields?: T extends Record<string, any> ? FieldsBuildInput<T> : never,
     query?: T extends Record<string, any> ? BuildInput<T> : never
 };
 

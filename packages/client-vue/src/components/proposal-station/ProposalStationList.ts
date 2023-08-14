@@ -145,7 +145,7 @@ export default defineComponent({
                     );
                 },
             },
-            queryFilter: (q) => {
+            queryFilters: (q) => {
                 let filter : FiltersBuildInput<ProposalStation>;
 
                 if (props.target === DomainType.STATION) {

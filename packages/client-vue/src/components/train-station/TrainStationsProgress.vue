@@ -39,7 +39,7 @@ export default defineComponent({
         const entity = toRef(props, 'entity');
 
         const query : BuildInput<TrainStation> = {
-            filter: {
+            filters: {
                 train_id: entity.value.id,
             },
             sort: {

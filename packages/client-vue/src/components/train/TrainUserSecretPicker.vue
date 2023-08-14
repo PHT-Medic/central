@@ -62,7 +62,7 @@ export default defineComponent({
             <UserSecretList
                 ref="itemsList"
                 :header-title="false"
-                :query="{filter: {user_id: userId}, sort: {created_at: 'DESC'}}"
+                :query="{filters: {user_id: userId}, sort: {created_at: 'DESC'}}"
             >
                 <template #itemActions="props">
                     <div class="d-flex flex-row">
