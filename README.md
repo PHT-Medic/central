@@ -46,10 +46,16 @@ Read the `README.md` in each package directory. Each package must be configured 
 
 The repository contains the following packages:
 
-- **@personalhealthtrain/server-api** 🌴: This package contains aggregators, components and many more.
-- **@personalhealthtrain/server-core** 🧱: This package contains common constants, functions, types, ...
+**`General`**
+- **@personalhealthtrain/core** 🧱: This package contains common constants, functions, types, ...
+
+**`Client`**
 - **@personalhealthtrain/client-ui** 🧸: This package contains the User Interface.
 - **@personalhealthtrain/client-vue** 🧩: This package contains vue components for frontend applications.
+
+**`Server`**
+- **@personalhealthtrain/server-core** 🧱: This package contains common constants, functions, types, ... for the server side.
+- **@personalhealthtrain/server-api** 🌴: This package contains aggregators, components and many more.
 - **@personalhealthtrain/server-realtime** 🚄: This package contains the realtime application which connects the API with socket based clients.
 - **@personalhealthtrain/server-train-manager** 🏭: This package contains the train manager, which is responsible to route, build and extract a train.
 
