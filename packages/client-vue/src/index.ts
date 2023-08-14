@@ -7,6 +7,7 @@
 
 import { applyPluginBaseOptions } from '@vue-layout/list-controls/core';
 import type { App, Component, Plugin } from 'vue';
+import './css';
 import * as components from './components';
 import type { Options } from './type';
 import {

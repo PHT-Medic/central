@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import css from 'rollup-plugin-css-only';
 import vue from '@vitejs/plugin-vue';
 
 import fs from 'node:fs';
@@ -15,7 +16,8 @@ export default createConfig({
     defaultExport: true,
     pkg: JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url), {encoding: 'utf-8'})),
     pluginsPost: [
-        vue({css: false }),
+        vue(),
+        css({  output: 'index.css'})
     ],
     external: [
         /@vue-layout\/form-controls\//i,

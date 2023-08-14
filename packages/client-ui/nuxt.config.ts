@@ -28,7 +28,7 @@ export default defineNuxtConfig({
     */
     css: [
         'bootstrap-vue-next/dist/bootstrap-vue-next.css',
-        'vue3-form-wizard/dist/style.css',
+        '@/../client-vue/dist/index.css',
         '@fortawesome/fontawesome-free/css/all.css',
         'bootstrap/dist/css/bootstrap.css',
         '@/assets/css/vue-layout-navigation.css',
