@@ -6,7 +6,7 @@
  */
 import { buildFormInput, buildFormSubmit, buildFormTextarea } from '@vue-layout/form-controls';
 import type { ListItemSlotProps } from '@vue-layout/list-controls';
-import { SlotName, buildItemActionToggle } from '@vue-layout/list-controls';
+import { buildItemActionToggle } from '@vue-layout/list-controls';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
 import {
@@ -24,13 +24,13 @@ import { DomainType, ProposalRisk } from '@personalhealthtrain/central-common';
 import { useUpdatedAt } from '../../composables';
 import type { EntityListProps } from '../../core';
 import {
+    EntityListSlotName,
     createEntityManager,
     defineEntityManagerEvents,
     initFormAttributesFromSource,
     useValidationTranslator,
     wrapFnWithBusyState,
 } from '../../core';
-import { EntityListHeaderTitleSlotName, EntityListSlotName } from '../../core/entity-list/constants';
 import MasterImagePicker from '../master-image/MasterImagePicker';
 import StationList from '../station/StationList';
 import ProposalStationAssignAction from '../proposal-station/ProposalStationAssignAction';

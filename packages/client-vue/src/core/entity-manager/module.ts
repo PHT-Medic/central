@@ -358,6 +358,7 @@ export function createEntityManager<
                 throw EntityManagerError.unresolvable();
             }
 
+            // eslint-disable-next-line no-throw-literal
             throw error.value as Error;
         }
     };

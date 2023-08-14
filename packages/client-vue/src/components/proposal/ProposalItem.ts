@@ -4,7 +4,6 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { SlotName } from '@vue-layout/list-controls';
 import { Timeago } from '@vue-layout/timeago';
 import type {
     PropType, VNode,

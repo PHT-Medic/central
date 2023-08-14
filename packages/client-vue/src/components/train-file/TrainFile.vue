@@ -33,7 +33,9 @@ export default defineComponent({
     },
     emits: {
         ...defineEntityManagerEvents<TrainFile>(),
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         toggle: (_entity?: TrainFile) => true,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         check: (_entity?: TrainFile) => true,
     },
     setup(props, setup) {

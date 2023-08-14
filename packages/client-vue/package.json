@@ -46,16 +46,19 @@
         "@vue-layout/form-controls": "^3.4.0",
         "@vue-layout/list-controls": "^3.4.0",
         "@vue-layout/pagination": "^3.4.0",
+        "@vue-layout/timeago": "^3.0.0",
         "@vuelidate/core": "^2.0.3",
         "@vuelidate/validators": "^2.0.3",
         "@vitejs/plugin-vue": "^4.2.3",
         "cross-env": "^7.0.3",
         "ilingo": "^3.0.0",
+        "pinia": "^2.1.6",
         "rapiq": "^0.9.0",
         "smob": "^1.4.0",
         "socket.io-client": "^4.7.2",
         "vue": "^3.3.2",
-        "vue-tsc": "^1.8.6"
+        "vue-tsc": "^1.8.6",
+        "vue3-form-wizard": "^0.2.1"
     },
     "peerDependencies": {
         "@authup/core": ">=0.39.0 <1.0.0",
@@ -64,13 +67,16 @@
         "@vue-layout/form-controls": "^3.4.0",
         "@vue-layout/list-controls": "^3.4.0",
         "@vue-layout/pagination": "^3.4.0",
+        "@vue-layout/timeago": "^3.0.0",
         "@vuelidate/core": "^2.x",
         "@vuelidate/validators": "^2.x",
         "ilingo": "^3.x",
+        "pinia": "^2.1.6",
         "rapiq": ">=0.8.0 <1.0.0",
         "smob": "^1.4.x",
         "socket.io-client": "^4.7.2",
-        "vue": "^3.3.x"
+        "vue": "^3.3.x",
+        "vue3-form-wizard": "^0.2.1"
     },
     "publishConfig": {
         "access": "public"

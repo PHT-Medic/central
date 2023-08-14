@@ -28,10 +28,15 @@ export function buildEntityManagerSlotProps<T>(
 
 export function defineEntityManagerEvents<T>(): EntityManagerEventsType<T> {
     return {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         failed: (_item: Error) => true,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         created: (_item: T) => true,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         deleted: (_item: T) => true,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         updated: (_item: T) => true,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         resolved: (_item?: T) => true,
     };
 }

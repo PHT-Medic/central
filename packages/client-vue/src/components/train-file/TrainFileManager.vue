@@ -5,7 +5,6 @@ import type {
 import {
     hasOwnProperty,
 } from '@personalhealthtrain/central-common';
-import { isClientErrorWithStatusCode } from 'hapic';
 import type { PropType } from 'vue';
 import {
     computed, defineComponent, reactive, ref, toRefs, watch,
@@ -134,7 +133,7 @@ export default defineComponent({
                     handleDeleted(file);
                 }
             } catch (e) {
-                if (!isClientErrorWithStatusCode(e, 404)) {
+                if (e instanceof Error) {
                     emit('failed', e);
                 }
             }

@@ -19,6 +19,7 @@ export default defineComponent({
     slots: Object as SlotsType<EntityListSlotsType<Train>>,
     emits: {
         ...defineDomainListEvents<Train>(),
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         executed: (_component: string, _command :string) => true,
     },
     setup(props, setup) {

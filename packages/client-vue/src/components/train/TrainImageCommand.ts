@@ -6,14 +6,12 @@
  */
 
 import type { MasterImage, TrainFile } from '@personalhealthtrain/central-common';
-import { isClientErrorWithStatusCode } from 'hapic';
 import {
     computed, defineComponent, h, ref, toRefs, watch,
 } from 'vue';
 import { injectAPIClient, wrapFnWithBusyState } from '../../core';
 
 export default defineComponent({
-    name: 'TrainImageCommand',
     props: {
         trainId: {
             type: String,
@@ -81,7 +79,7 @@ export default defineComponent({
 
                 masterImageEntity.value = item;
             } catch (e) {
-                if (!isClientErrorWithStatusCode(e, 404)) {
+                if (e instanceof Error) {
                     emit('failed', e);
                 }
             }
@@ -101,7 +99,7 @@ export default defineComponent({
             try {
                 trainFileEntity.value = await injectAPIClient().trainFile.getOne(refs.trainFileId.value);
             } catch (e) {
-                if (!isClientErrorWithStatusCode(e, 404)) {
+                if (e instanceof Error) {
                     emit('failed', e);
                 }
             }

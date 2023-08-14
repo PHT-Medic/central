@@ -9,7 +9,6 @@ import type { Registry, RegistryProject } from '@personalhealthtrain/central-com
 import { DomainType, RegistryProjectType, createNanoID } from '@personalhealthtrain/central-common';
 import { buildFormInput, buildFormSelect, buildFormSubmit } from '@vue-layout/form-controls';
 import type { ListItemSlotProps } from '@vue-layout/list-controls';
-import { SlotName } from '@vue-layout/list-controls';
 import useVuelidate from '@vuelidate/core';
 import {
     helpers, maxLength, minLength, required,
