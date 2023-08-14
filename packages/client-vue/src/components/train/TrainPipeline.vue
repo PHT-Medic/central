@@ -13,10 +13,10 @@ import {
     TrainRunStatus,
 } from '@personalhealthtrain/central-common';
 import type { PropType } from 'vue';
-import {computed, defineComponent} from 'vue';
+import { computed, defineComponent } from 'vue';
 import { injectAuthupStore } from '../../core';
-import Dropdown from "../Dropdown";
-import MyLink from "../MyLink";
+import Dropdown from '../Dropdown';
+import MyLink from '../MyLink';
 import TrainResultCommand from './command/TrainResultCommand';
 import TrainBuildStatusText from './status/TrainBuildStatusText.vue';
 import TrainBuildCommand from './command/TrainBuildCommand';
@@ -27,8 +27,8 @@ import TrainConfigurationStatusText from './status/TrainConfigurationStatusText.
 
 export default defineComponent({
     components: {
-      Dropdown,
-      MyLink,
+        Dropdown,
+        MyLink,
         TrainResultCommand,
         TrainConfigurationStatusText,
         TrainResultStatusText,
@@ -53,43 +53,39 @@ export default defineComponent({
     },
     emits: ['updated', 'executed', 'failed'],
     setup(props, { emit }) {
-      const canEdit = computed(() => {
-        return injectAuthupStore().has(PermissionID.TRAIN_EDIT);
-      });
+        const canEdit = computed(() => injectAuthupStore().has(PermissionID.TRAIN_EDIT));
 
-      // ---------------------------------------------------------
-       const canConfigure = computed(() =>  {
-          return canEdit.value &&
-              props.entity.configuration_status !== TrainConfigurationStatus.FINISHED;
-        });
+        // ---------------------------------------------------------
+        const canConfigure = computed(() => canEdit.value &&
+              props.entity.configuration_status !== TrainConfigurationStatus.FINISHED);
 
-      const handleExecuted = (type: string, command: string) => {
-        emit('executed', type, command);
-      };
-      const handleUpdated = (item: Train) => {
-        emit('updated', item);
-      };
-      const handleFailed = (e: Error) => {
-        emit('failed', e);
-      };
+        const handleExecuted = (type: string, command: string) => {
+            emit('executed', type, command);
+        };
+        const handleUpdated = (item: Train) => {
+            emit('updated', item);
+        };
+        const handleFailed = (e: Error) => {
+            emit('failed', e);
+        };
 
         return {
-          trainBuildStatus: TrainBuildStatus,
-          trainConfigurationStatus: TrainConfigurationStatus,
-          trainRunStatus: TrainRunStatus,
-          trainResultStatus: TrainResultStatus,
-          trainCommand: TrainAPICommand,
+            trainBuildStatus: TrainBuildStatus,
+            trainConfigurationStatus: TrainConfigurationStatus,
+            trainRunStatus: TrainRunStatus,
+            trainResultStatus: TrainResultStatus,
+            trainCommand: TrainAPICommand,
 
-          busy: false,
+            busy: false,
 
-          handleUpdated,
-          handleFailed,
-          handleExecuted,
+            handleUpdated,
+            handleFailed,
+            handleExecuted,
 
-          canConfigure,
-          canEdit
-        }
-    }
+            canConfigure,
+            canEdit,
+        };
+    },
 });
 </script>
 <template>

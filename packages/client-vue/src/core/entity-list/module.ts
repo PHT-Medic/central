@@ -179,8 +179,6 @@ export function createEntityList<
         options = mergeEntityListOptions(context.props, defaults);
     };
 
-    console.log(context.type, options.header);
-
     function render() : VNodeArrayChildren {
         let header : ListHeaderBuildOptionsInput<T> | undefined;
         if (options.header) {

@@ -7,9 +7,6 @@
 
 import { SlotName } from '@vue-layout/list-controls';
 
-export const EntityListHeaderTitleSlotName = 'headerTitle';
-export const EntityListHeaderSearchSlotName = 'headerSearch';
-
 export enum EntityListSlotName {
     BODY = SlotName.BODY,
     ITEM = SlotName.ITEM,

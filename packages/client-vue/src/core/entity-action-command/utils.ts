@@ -5,9 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { h } from 'vue';
-import type { Slots, VNodeArrayChildren, VNodeProps } from 'vue';
-import { BDropdownItem } from 'bootstrap-vue-next';
+import { h, resolveDynamicComponent } from 'vue';
+import type {
+    Component, Slots, VNodeArrayChildren,
+    VNodeChild, VNodeProps,
+} from 'vue';
 import { hasNormalizedSlot, normalizeSlot } from '../slot';
 
 type Context = {
@@ -22,12 +24,13 @@ type Context = {
     classSuffix: string,
     slots: Slots
 };
-export function renderActionCommand(ctx: Context) {
+
+type RenderFn = () => VNodeChild;
+export function createActionRenderFn(ctx: Context) : RenderFn {
     if (!ctx.isAllowed) {
-        return h('span', {}, ['']);
+        return () => h('span', {}, ['']);
     }
 
-    let tag : string;
     const attributes : VNodeProps & Record<string, any> = {
         onClick(event: any) {
             event.preventDefault();
@@ -39,20 +42,25 @@ export function renderActionCommand(ctx: Context) {
 
     const iconClasses : string[] = [ctx.iconClass, 'pe-1'];
 
-    switch (ctx.elementType) {
-        case 'dropDownItem':
-            tag = BDropdownItem as any;
+    let tag : string | Component | undefined;
+
+    if (ctx.elementType === 'dropDownItem') {
+        const component = resolveDynamicComponent('BDropdownItem');
+        if (component && typeof component !== 'string') {
+            tag = component as Component;
             iconClasses.push('ps-1', `text-${ctx.classSuffix}`);
-            break;
-        case 'link':
-            tag = 'a';
-            iconClasses.push(`text-${ctx.classSuffix}`);
-            break;
-        default:
-            tag = 'button';
-            attributes.type = 'button';
-            attributes.class = ['btn', 'btn-xs', `btn-${ctx.classSuffix}`];
-            break;
+        }
+    }
+
+    if (ctx.elementType === 'link') {
+        tag = 'a';
+        iconClasses.push(`text-${ctx.classSuffix}`);
+    }
+
+    if (!tag) {
+        tag = 'button';
+        attributes.type = 'button';
+        attributes.class = ['btn', 'btn-xs', `btn-${ctx.classSuffix}`];
     }
 
     let text : VNodeArrayChildren = [ctx.commandText];
@@ -68,7 +76,7 @@ export function renderActionCommand(ctx: Context) {
     }
 
     if (hasNormalizedSlot('default', ctx.slots)) {
-        return normalizeSlot('default', {
+        return () => normalizeSlot('default', {
             commandText: ctx.commandText,
             isDisabled: ctx.isDisabled,
             isAllowed: ctx.isAllowed,
@@ -76,5 +84,5 @@ export function renderActionCommand(ctx: Context) {
         }, ctx.slots);
     }
 
-    return h(tag, attributes, text);
+    return () => h(tag as string, attributes, text);
 }

@@ -12,9 +12,9 @@ import {
 import type { PropType } from 'vue';
 import { computed, defineComponent, ref } from 'vue';
 import {
+    createActionRenderFn,
     injectAPIClient,
     injectAuthupStore,
-    renderActionCommand,
     wrapFnWithBusyState,
 } from '../../core';
 import type { ActionCommandProperties } from '../../core';
@@ -123,7 +123,7 @@ export default defineComponent({
             }
         });
 
-        return () => renderActionCommand({
+        const renderFn = createActionRenderFn({
             execute,
             elementType: props.elementType,
             withIcon: props.withIcon,
@@ -135,5 +135,7 @@ export default defineComponent({
             classSuffix: classSuffix.value,
             slots,
         });
+
+        return () => renderFn();
     },
 });

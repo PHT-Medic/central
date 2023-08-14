@@ -7,11 +7,10 @@
 
 import type { PaginationMeta } from '@vue-layout/pagination';
 import { buildPagination } from '@vue-layout/pagination';
-import type { VNodeArrayChildren } from 'vue';
-import { h, unref } from 'vue';
-import type { EntityListFooterOptions, EntityListFooterPaginationOptions } from './type';
+import { unref } from 'vue';
+import type { EntityListFooterPaginationOptions } from './type';
 
-export function buildEntityListFooterPagination<T>(
+export function buildEntityListFooterPagination(
     ctx: EntityListFooterPaginationOptions,
 ) {
     return buildPagination({

@@ -11,7 +11,7 @@ import {
 import type { PropType } from 'vue';
 import { computed, defineComponent, ref } from 'vue';
 import type { ActionCommandProperties } from '../../core';
-import { injectAPIClient, injectAuthupStore, renderActionCommand } from '../../core';
+import { createActionRenderFn, injectAPIClient, injectAuthupStore } from '../../core';
 
 export default defineComponent({
     name: 'TrainStationCommand',
@@ -124,7 +124,7 @@ export default defineComponent({
             busy.value = false;
         };
 
-        return () => renderActionCommand({
+        const renderFn = createActionRenderFn({
             execute,
             elementType: props.elementType,
             withIcon: props.withIcon,
@@ -136,5 +136,7 @@ export default defineComponent({
             classSuffix: classSuffix.value,
             slots: setup.slots,
         });
+
+        return () => renderFn();
     },
 });

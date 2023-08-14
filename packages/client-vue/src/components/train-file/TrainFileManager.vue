@@ -249,7 +249,7 @@ export default defineComponent({
             <div class="col">
                 <h6><i class="fa fa-upload" /> Upload</h6>
                 <div class="form-group">
-                    <label class="form-label">{{directoryMode ? 'Directories' : 'Files'}}</label>
+                    <label class="form-label">{{ directoryMode ? 'Directories' : 'Files' }}</label>
                     <input
                         id="files"
                         ref="filesNode"
@@ -262,10 +262,18 @@ export default defineComponent({
                     >
                 </div>
                 <div class="form-group">
-                  <div class="form-check form-switch"> 
-                    <input class="form-check-input" type="checkbox" v-model="directoryMode" id="train-file-manager-switch">
-                    <label class="form-check-label" for="train-file-manager-switch">Directory Mode</label>
-                  </div>
+                    <div class="form-check form-switch">
+                        <input
+                            id="train-file-manager-switch"
+                            v-model="directoryMode"
+                            class="form-check-input"
+                            type="checkbox"
+                        >
+                        <label
+                            class="form-check-label"
+                            for="train-file-manager-switch"
+                        >Directory Mode</label>
+                    </div>
                 </div>
 
                 <hr>

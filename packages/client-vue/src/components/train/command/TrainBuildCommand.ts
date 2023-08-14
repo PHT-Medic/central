@@ -15,7 +15,7 @@ import {
     TrainConfigurationStatus,
 } from '@personalhealthtrain/central-common';
 import {
-    injectAPIClient, injectAuthupStore, renderActionCommand, wrapFnWithBusyState,
+    createActionRenderFn, injectAPIClient, injectAuthupStore, wrapFnWithBusyState,
 } from '../../../core';
 import type { TrainCommandProperties } from './type';
 
@@ -128,7 +128,7 @@ export default defineComponent({
             }
         });
 
-        return () => renderActionCommand({
+        const renderFn = createActionRenderFn({
             execute,
             elementType: props.elementType,
             withIcon: props.withIcon,
@@ -140,5 +140,7 @@ export default defineComponent({
             classSuffix: classSuffix.value,
             slots,
         });
+
+        return () => renderFn();
     },
 });

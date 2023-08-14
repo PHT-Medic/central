@@ -54,7 +54,7 @@ export default defineComponent({
                 return 'a';
             }
 
-            if(instance) {
+            if (instance) {
                 if (typeof instance.appContext.app.component('NuxtLink') !== 'undefined') {
                     return 'nuxt-link';
                 }
