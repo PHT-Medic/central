@@ -50,13 +50,6 @@ export default defineComponent({
             },
         }, form);
 
-        // todo: add fields
-        /*
-            '+account_id',
-            '+account_name',
-            '+account_secret',
-         */
-
         const manager = createEntityManager({
             type: `${DomainType.TRAIN}`,
             setup,
@@ -73,7 +66,15 @@ export default defineComponent({
             },
         });
 
-        await manager.resolve();
+        await manager.resolve({
+            query: {
+                fields: [
+                    '+account_id',
+                    '+account_name',
+                    '+account_secret',
+                ],
+            },
+        });
 
         const execute = async (command: RegistryAPICommand) => wrapFnWithBusyState(busy, async () => {
             if (!entity.value) return;

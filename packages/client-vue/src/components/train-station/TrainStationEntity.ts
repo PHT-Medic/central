@@ -41,8 +41,7 @@ export default defineComponent({
         entityId: {
             type: String,
         },
-        // todo: rename to where
-        filters: {
+        queryFilters: {
             type: Object as PropType<FiltersBuildInput<TrainStation>>,
         },
         direction: {
