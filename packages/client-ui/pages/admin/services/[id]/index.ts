@@ -7,7 +7,7 @@
 
 import { useToast } from 'bootstrap-vue-next';
 import type { PropType } from 'vue';
-import { ServiceID } from '@personalhealthtrain/central-common';
+import { ServiceID } from '@personalhealthtrain/core';
 import { MasterImagesSync, StationRegistryManagement } from '@personalhealthtrain/client-vue';
 import { defineNuxtComponent } from '#app';
 

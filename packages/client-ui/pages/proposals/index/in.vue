@@ -6,10 +6,10 @@
   -->
 <script lang="ts">
 import { Timeago } from '@vue-layout/timeago';
-import type { ProposalStation } from '@personalhealthtrain/central-common';
+import type { ProposalStation } from '@personalhealthtrain/core';
 import {
     PermissionID,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import {
     BDropdown, BDropdownDivider, BDropdownItem, BModal, BSpinner, BTable,
 } from 'bootstrap-vue-next';

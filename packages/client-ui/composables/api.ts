@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { APIClient } from '@personalhealthtrain/central-common';
+import type { APIClient } from '@personalhealthtrain/core';
 import type { APIClient as AuthupAPIClient } from '@authup/core';
 import { useNuxtApp } from '#app';
 

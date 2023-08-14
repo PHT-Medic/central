@@ -11,7 +11,7 @@ import { useToast } from 'bootstrap-vue-next';
 import { storeToRefs } from 'pinia';
 import type { Ref } from 'vue';
 import { h, ref } from 'vue';
-import { ServiceID } from '@personalhealthtrain/central-common';
+import { ServiceID } from '@personalhealthtrain/core';
 import { createError, defineNuxtComponent, navigateTo } from '#app';
 import { useAuthupAPI } from '../../../../composables/api';
 import { useAuthStore } from '../../../../store/auth';

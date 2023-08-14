@@ -12,10 +12,10 @@ import {
 } from 'vue';
 import type {
     Train,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import {
     PermissionID,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import Link from '../MyLink';
 import TrainEntity from './TrainEntity';
 import TrainPipeline from './TrainPipeline.vue';

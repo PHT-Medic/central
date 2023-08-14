@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import { Timeago } from '@vue-layout/timeago';
-import type { TrainLog } from '@personalhealthtrain/central-common';
+import type { TrainLog } from '@personalhealthtrain/core';
 import { defineComponent, h, toRefs } from 'vue';
 import type {
     PropType, VNode, VNodeArrayChildren,

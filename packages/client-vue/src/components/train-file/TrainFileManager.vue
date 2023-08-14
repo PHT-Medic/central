@@ -1,10 +1,10 @@
 <script lang="ts">
 import type {
     Train, TrainFile,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import {
     hasOwnProperty,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import type { PropType } from 'vue';
 import {
     computed, defineComponent, reactive, ref, toRefs, watch,

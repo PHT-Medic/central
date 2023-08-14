@@ -4,10 +4,10 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { DomainType } from '@personalhealthtrain/central-common';
+import { DomainType } from '@personalhealthtrain/core';
 import type {
     Train,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import type { SetupContext, SlotsType } from 'vue';
 import { defineComponent, h } from 'vue';
 import type { EntityListEventsType, EntityListSlotsType } from '../../core';

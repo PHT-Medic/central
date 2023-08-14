@@ -5,12 +5,12 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import { RealmList } from '@authup/client-vue';
-import type { Registry, Station } from '@personalhealthtrain/central-common';
+import type { Registry, Station } from '@personalhealthtrain/core';
 import {
     DomainType,
     Ecosystem,
     alphaNumHyphenUnderscoreRegex, hexToUTF8, isHex,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import {
     buildFormInput, buildFormSelect, buildFormSubmit, buildFormTextarea,
 } from '@vue-layout/form-controls';

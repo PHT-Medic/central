@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Registry, RegistryProject } from '@personalhealthtrain/central-common';
-import { DomainType, RegistryProjectType, createNanoID } from '@personalhealthtrain/central-common';
+import type { Registry, RegistryProject } from '@personalhealthtrain/core';
+import { DomainType, RegistryProjectType, createNanoID } from '@personalhealthtrain/core';
 import { buildFormInput, buildFormSelect, buildFormSubmit } from '@vue-layout/form-controls';
 import type { ListItemSlotProps } from '@vue-layout/list-controls';
 import useVuelidate from '@vuelidate/core';

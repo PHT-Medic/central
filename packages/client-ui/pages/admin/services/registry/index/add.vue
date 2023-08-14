@@ -5,8 +5,8 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Registry } from '@personalhealthtrain/central-common';
-import { PermissionID } from '@personalhealthtrain/central-common';
+import type { Registry } from '@personalhealthtrain/core';
+import { PermissionID } from '@personalhealthtrain/core';
 import { RegistryForm } from '@personalhealthtrain/client-vue';
 import { definePageMeta, navigateTo } from '#imports';
 import { defineNuxtComponent } from '#app';

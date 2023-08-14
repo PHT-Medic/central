@@ -9,10 +9,10 @@ import type { EntityManagerSlotProps } from '@authup/client-vue';
 import { RobotEntity } from '@authup/client-vue';
 import type { PropType } from 'vue';
 import { defineComponent, h, reactive } from 'vue';
-import type { Station } from '@personalhealthtrain/central-common';
+import type { Station } from '@personalhealthtrain/core';
 import {
     Ecosystem,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import type { Robot } from '@authup/core';
 import { buildFormInput, buildFormSubmit } from '@vue-layout/form-controls';
 import useVuelidate from '@vuelidate/core';

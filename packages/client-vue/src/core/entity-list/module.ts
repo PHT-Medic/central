@@ -10,7 +10,7 @@ import type {
     DomainAPI,
     DomainEntity,
     DomainType,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import type {
     ListFooterBuildOptionsInput, ListHeaderBuildOptionsInput, ListMeta,
 } from '@vue-layout/list-controls';

@@ -6,8 +6,8 @@
   -->
 <script lang="ts">
 import { Timeago } from '@vue-layout/timeago';
-import type { Station } from '@personalhealthtrain/central-common';
-import { PermissionID } from '@personalhealthtrain/central-common';
+import type { Station } from '@personalhealthtrain/core';
+import { PermissionID } from '@personalhealthtrain/core';
 import { BSpinner, BTable, useToast } from 'bootstrap-vue-next';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';

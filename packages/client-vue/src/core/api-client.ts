@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { APIClient } from '@personalhealthtrain/central-common';
+import type { APIClient } from '@personalhealthtrain/core';
 import type { App } from 'vue';
 import { inject, provide } from 'vue';
 

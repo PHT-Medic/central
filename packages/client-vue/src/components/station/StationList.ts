@@ -4,8 +4,8 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { DomainType } from '@personalhealthtrain/central-common';
-import type { Station } from '@personalhealthtrain/central-common';
+import { DomainType } from '@personalhealthtrain/core';
+import type { Station } from '@personalhealthtrain/core';
 import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
 import { createEntityList, defineDomainListEvents, defineDomainListProps } from '../../core';

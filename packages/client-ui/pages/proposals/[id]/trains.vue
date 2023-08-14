@@ -8,7 +8,7 @@
 import { storeToRefs } from 'pinia';
 import { computed, toRefs } from 'vue';
 import type { PropType } from 'vue';
-import type { Proposal, ProposalStation } from '@personalhealthtrain/central-common';
+import type { Proposal, ProposalStation } from '@personalhealthtrain/core';
 import { defineNuxtComponent } from '#app';
 import DomainEntityNav from '../../../components/DomainEntityNav';
 import { useAuthStore } from '../../../store/auth';

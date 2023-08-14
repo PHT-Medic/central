@@ -6,7 +6,7 @@
  */
 
 import type { PluginBaseOptions } from '@vue-layout/list-controls/core';
-import type { APIClient } from '@personalhealthtrain/central-common';
+import type { APIClient } from '@personalhealthtrain/core';
 import type { AuthupAPIClient, AuthupStore, SocketManager } from './core';
 
 export type Options = PluginBaseOptions & {

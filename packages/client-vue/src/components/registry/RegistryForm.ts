@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Registry } from '@personalhealthtrain/central-common';
-import { DomainType, Ecosystem } from '@personalhealthtrain/central-common';
+import type { Registry } from '@personalhealthtrain/core';
+import { DomainType, Ecosystem } from '@personalhealthtrain/core';
 import { buildFormInput, buildFormSelect, buildFormSubmit } from '@vue-layout/form-controls';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';

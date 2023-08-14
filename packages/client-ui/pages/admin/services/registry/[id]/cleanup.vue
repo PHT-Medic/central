@@ -7,8 +7,8 @@
 <script lang="ts">
 
 import { useToast } from 'bootstrap-vue-next';
-import type { Registry } from '@personalhealthtrain/central-common';
-import { Ecosystem } from '@personalhealthtrain/central-common';
+import type { Registry } from '@personalhealthtrain/core';
+import { Ecosystem } from '@personalhealthtrain/core';
 import type { PropType } from 'vue';
 import { RegistryCleanup } from '@personalhealthtrain/client-vue';
 import { defineNuxtComponent, navigateTo } from '#app';

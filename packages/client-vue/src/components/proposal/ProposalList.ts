@@ -6,10 +6,10 @@
  */
 import type {
     Proposal,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import {
     DomainType,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
 import type { EntityListSlotsType } from '../../core';

@@ -6,10 +6,10 @@
  */
 
 import { defineComponent, h } from 'vue';
-import type { ProposalStation } from '@personalhealthtrain/central-common';
+import type { ProposalStation } from '@personalhealthtrain/core';
 import {
     DomainType,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import { createEntityManager, defineEntityManagerEvents } from '../../core';
 
 export default defineComponent({

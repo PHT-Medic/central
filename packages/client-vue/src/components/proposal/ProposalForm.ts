@@ -19,8 +19,8 @@ import type {
     PropType,
 } from 'vue';
 
-import type { MasterImage, Proposal, Station } from '@personalhealthtrain/central-common';
-import { DomainType, ProposalRisk } from '@personalhealthtrain/central-common';
+import type { MasterImage, Proposal, Station } from '@personalhealthtrain/core';
+import { DomainType, ProposalRisk } from '@personalhealthtrain/core';
 import { useUpdatedAt } from '../../composables';
 import type { EntityListProps } from '../../core';
 import {

@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import type { PropType } from 'vue';
-import type { Train } from '@personalhealthtrain/central-common';
+import type { Train } from '@personalhealthtrain/core';
 import { TrainWizard } from '@personalhealthtrain/client-vue';
 import { navigateTo } from '#imports';
 import { defineNuxtComponent } from '#app';

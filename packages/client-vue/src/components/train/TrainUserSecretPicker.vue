@@ -1,6 +1,6 @@
 <script lang="ts">
-import type { Train } from '@personalhealthtrain/central-common';
-import { SecretType } from '@personalhealthtrain/central-common';
+import type { Train } from '@personalhealthtrain/core';
+import { SecretType } from '@personalhealthtrain/core';
 import { storeToRefs } from 'pinia';
 import { defineComponent, toRefs } from 'vue';
 import { injectAPIClient, injectAuthupStore } from '../../core';

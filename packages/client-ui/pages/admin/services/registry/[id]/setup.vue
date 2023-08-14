@@ -5,8 +5,8 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Registry } from '@personalhealthtrain/central-common';
-import { Ecosystem } from '@personalhealthtrain/central-common';
+import type { Registry } from '@personalhealthtrain/core';
+import { Ecosystem } from '@personalhealthtrain/core';
 import { useToast } from 'bootstrap-vue-next';
 import type { PropType } from 'vue';
 import { RegistryCleanup, RegistrySetup } from '@personalhealthtrain/client-vue';

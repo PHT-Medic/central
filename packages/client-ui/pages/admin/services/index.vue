@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { PermissionID, ServiceID } from '@personalhealthtrain/central-common';
+import { PermissionID, ServiceID } from '@personalhealthtrain/core';
 import { definePageMeta, navigateTo } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';

@@ -6,10 +6,10 @@
  */
 
 import { defineComponent, h } from 'vue';
-import type { TrainStation } from '@personalhealthtrain/central-common';
+import type { TrainStation } from '@personalhealthtrain/core';
 import {
     DomainType,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import { createEntityManager, defineEntityManagerEvents } from '../../core';
 
 export default defineComponent({

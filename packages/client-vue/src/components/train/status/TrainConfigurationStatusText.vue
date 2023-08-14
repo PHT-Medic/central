@@ -15,7 +15,7 @@
     </span>
 </template>
 <script lang="ts">
-import { TrainConfigurationStatus } from '@personalhealthtrain/central-common';
+import { TrainConfigurationStatus } from '@personalhealthtrain/core';
 import { defineComponent } from 'vue';
 
 export default defineComponent({

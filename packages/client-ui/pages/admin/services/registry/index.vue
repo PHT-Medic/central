@@ -6,8 +6,8 @@
   -->
 
 <script lang="ts">
-import type { Registry } from '@personalhealthtrain/central-common';
-import { PermissionID } from '@personalhealthtrain/central-common';
+import type { Registry } from '@personalhealthtrain/core';
+import { PermissionID } from '@personalhealthtrain/core';
 import { useToast } from 'bootstrap-vue-next';
 import { defineNuxtComponent } from '#app';
 import { definePageMeta } from '#imports';

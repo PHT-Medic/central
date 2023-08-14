@@ -8,13 +8,13 @@ import {
     computed, defineComponent, ref, toRefs,
 } from 'vue';
 import type { PropType } from 'vue';
-import type { Train } from '@personalhealthtrain/central-common';
+import type { Train } from '@personalhealthtrain/core';
 import {
     PermissionID,
     TrainAPICommand,
     TrainBuildStatus,
     TrainRunStatus,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import type { TrainCommandProperties } from './type';
 import {
     createActionRenderFn, injectAPIClient, injectAuthupStore, wrapFnWithBusyState,

@@ -1,0 +1,32 @@
+{
+    "name": "@personalhealthtrain/server-core",
+    "private": true,
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "author": {
+        "name": "Peter Placzek",
+        "email": "contact@tada5hi.net",
+        "url": "https://tada5hi.net"
+    },
+    "license": "MIT",
+    "version": "2.4.0-alpha.18",
+    "description": "This package contains the common packages for server applications of the PHT.",
+    "scripts": {
+        "build": "tsc -p tsconfig.build.json"
+    },
+    "dependencies": {
+        "@authup/core": "^0.39.0",
+        "@ebec/http": "^1.1.0",
+        "@personalhealthtrain/core": "2.4.0-alpha.18",
+        "@socket.io/redis-emitter": "^5.1.0"
+    },
+    "devDependencies": {
+        "redis-extension": "^1.3.0"
+    },
+    "peerDependencies": {
+        "redis-extension": "^1.x"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}

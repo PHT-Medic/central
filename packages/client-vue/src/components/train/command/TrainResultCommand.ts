@@ -6,13 +6,13 @@
  */
 import { computed, defineComponent, ref } from 'vue';
 import type { PropType } from 'vue';
-import type { Train } from '@personalhealthtrain/central-common';
+import type { Train } from '@personalhealthtrain/core';
 import {
     PermissionID,
     TrainAPICommand,
     TrainResultStatus,
     TrainRunStatus,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import {
     createActionRenderFn, injectAPIClient, injectAuthupStore, wrapFnWithBusyState,
 } from '../../../core';

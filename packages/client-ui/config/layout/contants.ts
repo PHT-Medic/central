@@ -6,7 +6,7 @@
  */
 
 import type { NavigationElement } from '@vue-layout/navigation';
-import { PermissionID } from '@personalhealthtrain/central-common';
+import { PermissionID } from '@personalhealthtrain/core';
 
 export enum LayoutKey {
     NAVIGATION_ID = 'navigationId',

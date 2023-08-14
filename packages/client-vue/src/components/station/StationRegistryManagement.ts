@@ -7,7 +7,7 @@
 
 import {
     ServiceID, StationRegistryAPICommand,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import { defineComponent, h, ref } from 'vue';
 import { injectAPIClient, wrapFnWithBusyState } from '../../core';
 import EntityDelete from '../EntityDelete';

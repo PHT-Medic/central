@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 import { defineComponent } from 'vue';
-import type { Train } from '@personalhealthtrain/central-common';
+import type { Train } from '@personalhealthtrain/core';
 import type { PropType } from 'vue';
 import TrainUserSecretPicker from '../TrainUserSecretPicker.vue';
 

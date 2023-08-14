@@ -1,0 +1,13 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "paths": {
+            "@personalhealthtrain/core": [
+                "./packages/core/src"
+            ],
+            "@personalhealthtrain/server-core": [
+                "./packages/server-core/src"
+            ]
+        }
+    }
+}

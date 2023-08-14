@@ -9,10 +9,10 @@ import { createEntityManager } from '@personalhealthtrain/client-vue';
 import { useToast } from 'bootstrap-vue-next';
 import type {
     Station,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import {
     DomainType,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import {
     useRoute,
 } from '#imports';

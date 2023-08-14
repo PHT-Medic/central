@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { MasterImage, Train, TrainStation } from '@personalhealthtrain/central-common';
+import type { MasterImage, Train, TrainStation } from '@personalhealthtrain/core';
 import type { PropType } from 'vue';
 import {
     defineComponent, ref,

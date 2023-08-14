@@ -6,11 +6,11 @@
  */
 import type {
     TrainLog,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import {
     DomainType,
     buildDomainChannelName,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import type { ListItemSlotProps } from '@vue-layout/list-controls';
 import {
     defineComponent, h, ref,

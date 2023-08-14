@@ -5,10 +5,10 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { UserSecret } from '@personalhealthtrain/central-common';
+import type { UserSecret } from '@personalhealthtrain/core';
 import {
     SecretStorageAPICommand, buildUserSecretsSecretStorageKey,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import { useToast } from 'bootstrap-vue-next';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';

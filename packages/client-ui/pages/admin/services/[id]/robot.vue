@@ -7,7 +7,7 @@
 <script lang="ts">
 import { RobotForm } from '@authup/client-vue';
 import type { Robot } from '@authup/core';
-import type { ServiceID } from '@personalhealthtrain/central-common';
+import type { ServiceID } from '@personalhealthtrain/core';
 import { useToast } from 'bootstrap-vue-next';
 import type { PropType, Ref } from 'vue';
 import { ref, toRefs } from 'vue';

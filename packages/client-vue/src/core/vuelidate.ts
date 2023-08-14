@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { hasOwnProperty } from '@personalhealthtrain/central-common';
+import { hasOwnProperty } from '@personalhealthtrain/core';
 import type { Validation } from '@vuelidate/core';
 import { helpers } from '@vuelidate/validators';
 import type { Ref } from 'vue';

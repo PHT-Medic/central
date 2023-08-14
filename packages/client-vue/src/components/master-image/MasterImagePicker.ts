@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { MasterImage, MasterImageGroup } from '@personalhealthtrain/central-common';
+import type { MasterImage, MasterImageGroup } from '@personalhealthtrain/core';
 import type { FormSelectOption } from '@vue-layout/form-controls';
 import { buildFormSelect } from '@vue-layout/form-controls';
 import type { ListBodySlotProps } from '@vue-layout/list-controls';

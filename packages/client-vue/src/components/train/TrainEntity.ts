@@ -7,10 +7,10 @@
 
 import {
     DomainType,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import type {
     Train,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import {
     defineComponent,
 } from 'vue';

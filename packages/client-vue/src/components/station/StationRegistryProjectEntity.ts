@@ -7,10 +7,10 @@
 
 import type { PropType } from 'vue';
 import { defineComponent, h } from 'vue';
-import type { RegistryProject, Station } from '@personalhealthtrain/central-common';
+import type { RegistryProject, Station } from '@personalhealthtrain/core';
 import {
     Ecosystem,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import RegistryProjectDetails from '../registry-project/RegistryProjectEntity';
 
 export default defineComponent({

@@ -6,7 +6,7 @@
  */
 import type { PropType } from 'vue';
 import { computed, defineComponent, h } from 'vue';
-import { TrainStationApprovalStatus } from '@personalhealthtrain/central-common';
+import { TrainStationApprovalStatus } from '@personalhealthtrain/core';
 import { hasNormalizedSlot, normalizeSlot } from '../../core';
 
 export default defineComponent({

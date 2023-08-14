@@ -7,7 +7,7 @@
 <script lang="ts">
 import {
     DomainType,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import { TrainName, createEntityManager } from '@personalhealthtrain/client-vue';
 import { useToast } from 'bootstrap-vue-next';
 import { isClientErrorWithStatusCode } from 'hapic';

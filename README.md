@@ -46,28 +46,29 @@ Read the `README.md` in each package directory. Each package must be configured 
 
 The repository contains the following packages:
 
-- **@personalhealthtrain/central-api** 🌴: This package contains aggregators, components and many more.
-- **@personalhealthtrain/central-common** 🧱: This package contains common constants, functions, types, ...
-- **@personalhealthtrain/central-ui** 🧸: This package contains the User Interface.
-- **@personalhealthtrain/central-realtime** 🚄: This package contains the realtime application which connects the API with socket based clients.
-- **@personalhealthtrain/central-train-manager** 🏭: This package contains the train manager, which is responsible to route, build and extract a train.
+- **@personalhealthtrain/server-api** 🌴: This package contains aggregators, components and many more.
+- **@personalhealthtrain/server-core** 🧱: This package contains common constants, functions, types, ...
+- **@personalhealthtrain/client-ui** 🧸: This package contains the User Interface.
+- **@personalhealthtrain/client-vue** 🧩: This package contains vue components for frontend applications.
+- **@personalhealthtrain/server-realtime** 🚄: This package contains the realtime application which connects the API with socket based clients.
+- **@personalhealthtrain/server-train-manager** 🏭: This package contains the train manager, which is responsible to route, build and extract a train.
 
 ## Usage
 Start the ui-, api-, & realtime-application in a single terminal window (or as background process) with the following command:
 ```shell
-$ npm run api
+$ npm run server-api
 ```
 
 ```shell
-$ npm run ui
+$ npm run client-ui
 ```
 
 ```shell
-$ npm run realtime
+$ npm run server-realtime
 ```
 
 ```shell
-$ npm run train-manager
+$ npm run server-train-manager
 ```
 
 ## Contributing

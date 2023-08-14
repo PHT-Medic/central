@@ -11,7 +11,7 @@ import {
     buildDomainChannelName,
     buildDomainEventFullName,
     buildDomainEventSubscriptionFullName,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import type {
     DomainEntity,
     DomainEventContext,
@@ -19,7 +19,7 @@ import type {
     DomainInput,
     DomainType,
     SocketServerToClientEventContext,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import {
     computed, isRef, onMounted, onUnmounted, watch,
 } from 'vue';

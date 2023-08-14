@@ -9,9 +9,9 @@ COPY . .
 RUN rm -rf ./node-modules && \
     npm ci && \
     npm run build && \
-    touch packages/api/.env && \
-    touch packages/realtime/.env && \
-    touch packages/train-manager/.env && \
+    touch packages/server-api/.env && \
+    touch packages/server-realtime/.env && \
+    touch packages/server-train-manager/.env && \
     touch packages/client-ui/.env
 
 COPY ./entrypoint.sh ./entrypoint.sh

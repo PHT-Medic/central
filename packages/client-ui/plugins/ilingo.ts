@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { registryRobotSecretRegex } from '@personalhealthtrain/central-common';
+import { registryRobotSecretRegex } from '@personalhealthtrain/core';
 import { Ilingo } from 'ilingo';
 
 declare module '#app' {

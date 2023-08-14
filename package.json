@@ -41,12 +41,11 @@
     "lint:fix": "npm run lint -- --fix",
     "prepare": "husky install",
     "prepublishOnly": "npm run build",
-    "cli": "npm run cli --workspace=packages/api",
-    "ui": "npm run dev --workspace=packages/ui",
-    "api": "npm run dev --workspace=packages/api",
-    "realtime": "npm run dev --workspace=packages/realtime",
-    "train-manager": "npm run dev --workspace=packages/train-manager",
-    "common": "npm run build-watch --workspace=packages/common"
+    "cli": "npm run cli --workspace=packages/server-api",
+    "client-ui": "npm run dev --workspace=packages/client-ui",
+    "server-api": "npm run dev --workspace=packages/server-api",
+    "server-realtime": "npm run dev --workspace=packages/server-realtime",
+    "server-train-manager": "npm run dev --workspace=packages/server-train-manager"
   },
   "resolutions": {
     "minimatch": "^5.1.6"

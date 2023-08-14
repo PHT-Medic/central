@@ -8,7 +8,7 @@
 
 import { toRefs } from 'vue';
 import type { PropType } from 'vue';
-import type { Registry } from '@personalhealthtrain/central-common';
+import type { Registry } from '@personalhealthtrain/core';
 import { RegistryForm } from '@personalhealthtrain/client-vue';
 import { defineNuxtComponent } from '#app';
 

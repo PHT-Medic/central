@@ -6,7 +6,7 @@
   -->
 <script lang="ts">
 
-import { TrainBuildStatus } from '@personalhealthtrain/central-common';
+import { TrainBuildStatus } from '@personalhealthtrain/core';
 import { defineComponent } from 'vue';
 
 export default defineComponent({

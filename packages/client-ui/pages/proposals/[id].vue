@@ -8,11 +8,11 @@
 import type {
     Proposal,
     ProposalStation,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import {
     DomainType,
     PermissionID,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import { createEntityManager } from '@personalhealthtrain/client-vue';
 import { useToast } from 'bootstrap-vue-next';
 import type { Ref } from 'vue';

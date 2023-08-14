@@ -5,8 +5,8 @@
   - view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Station } from '@personalhealthtrain/central-common';
-import { PermissionID } from '@personalhealthtrain/central-common';
+import type { Station } from '@personalhealthtrain/core';
+import { PermissionID } from '@personalhealthtrain/core';
 import { useToast } from 'bootstrap-vue-next';
 import { storeToRefs } from 'pinia';
 import { StationForm } from '@personalhealthtrain/client-vue';

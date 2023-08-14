@@ -8,7 +8,7 @@
 import type {
     DomainEntity,
     DomainType,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import type {
     ListBodyBuildOptionsInput,
     ListBodySlotProps,

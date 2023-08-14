@@ -11,7 +11,7 @@ import type {
     DomainEventContext,
     DomainEventSubscriptionFullName,
     DomainType, SocketServerToClientEventContext,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import type { MaybeRef } from 'vue';
 
 export type EntitySocketContext<

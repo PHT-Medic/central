@@ -7,7 +7,7 @@
 import {
     PermissionID, TrainStationApprovalCommand,
     TrainStationApprovalStatus,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import type { PropType } from 'vue';
 import { computed, defineComponent, ref } from 'vue';
 import type { ActionCommandProperties } from '../../core';

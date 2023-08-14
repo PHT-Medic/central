@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { TrainRunStatus } from '@personalhealthtrain/central-common';
+import { TrainRunStatus } from '@personalhealthtrain/core';
 import { defineComponent } from 'vue';
 
 export default defineComponent({

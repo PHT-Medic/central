@@ -1,0 +1,45 @@
+{
+    "name": "@personalhealthtrain/core",
+    "version": "2.4.0-alpha.18",
+    "description": "",
+    "exports": {
+        "./package.json": "./package.json",
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.mjs",
+            "require": "./dist/index.cjs"
+        }
+    },
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "author": {
+        "name": "Peter Placzek",
+        "email": "admin@tada5hi.net",
+        "url": "https://github.com/tada5hi"
+    },
+    "scripts": {
+        "build:types": "tsc --emitDeclarationOnly -p tsconfig.build.json",
+        "build:js": "rollup -c",
+        "build": "rimraf ./dist && cross-env NODE_ENV=production npm run build:js && npm run build:types",
+        "build-watch": "rimraf ./dist && tsc -p tsconfig.build.json --watch"
+    },
+    "license": "MIT",
+    "devDependencies": {
+        "@authup/core": "^0.39.0",
+        "hapic": "^2.2.0",
+        "rapiq": "^0.9.0"
+    },
+    "peerDependencies": {
+        "@authup/core": ">=0.39.0 <1.0.0",
+        "hapic": "^2.2.0",
+        "rapiq": ">=0.9 <1.0.0"
+    },
+    "dependencies": {
+        "nanoid": "^3.3.4"
+    },
+    "gitHead": "5d3b6f4ce1edf2383bdfbf66e913a08c8a3a2e40",
+    "publishConfig": {
+        "access": "public"
+    }
+}

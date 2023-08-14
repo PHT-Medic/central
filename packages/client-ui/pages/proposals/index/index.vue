@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script>
-import { PermissionID } from '@personalhealthtrain/central-common';
+import { PermissionID } from '@personalhealthtrain/core';
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { ProposalItem, ProposalList } from '@personalhealthtrain/client-vue';

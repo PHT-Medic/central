@@ -6,13 +6,13 @@
  */
 import type {
     RegistryProject,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import {
     DomainType,
     RegistryAPICommand,
     ServiceID,
     registryRobotSecretRegex,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import { buildFormInput } from '@vue-layout/form-controls';
 import useVuelidate from '@vuelidate/core';
 import {

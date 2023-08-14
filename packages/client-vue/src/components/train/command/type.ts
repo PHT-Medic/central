@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Train, TrainAPICommand } from '@personalhealthtrain/central-common';
+import type { Train, TrainAPICommand } from '@personalhealthtrain/core';
 import type { ActionCommandProperties } from '../../../core';
 
 export type TrainCommandProperties = {

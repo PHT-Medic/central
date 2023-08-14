@@ -5,8 +5,8 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Proposal, Train } from '@personalhealthtrain/central-common';
-import { DomainType, TrainType } from '@personalhealthtrain/central-common';
+import type { Proposal, Train } from '@personalhealthtrain/core';
+import { DomainType, TrainType } from '@personalhealthtrain/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
 import type { BuildInput } from 'rapiq';
 import useVuelidate from '@vuelidate/core';

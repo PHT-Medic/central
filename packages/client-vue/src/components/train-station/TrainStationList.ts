@@ -7,14 +7,14 @@
 
 import type {
     TrainStation,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import {
     DomainEventSubscriptionName,
     DomainSubType,
     DomainType,
     buildDomainChannelName,
     buildDomainEventSubscriptionFullName,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import type { FiltersBuildInput } from 'rapiq';
 
 import type { PropType, SlotsType, VNodeChild } from 'vue';

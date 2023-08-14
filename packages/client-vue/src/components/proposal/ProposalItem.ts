@@ -13,11 +13,11 @@ import {
 } from 'vue';
 import type {
     Proposal,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import {
     DomainType,
     PermissionID,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import {
     EntityListSlotName, hasNormalizedSlot, injectAuthupStore, normalizeSlot,
 } from '../../core';

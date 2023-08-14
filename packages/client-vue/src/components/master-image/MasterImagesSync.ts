@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { MasterImage } from '@personalhealthtrain/central-common';
+import type { MasterImage } from '@personalhealthtrain/core';
 import {
     DomainType,
     MasterImageCommand,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import {
     defineComponent, h, reactive, ref,
 } from 'vue';

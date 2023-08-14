@@ -8,7 +8,7 @@ import {
     PermissionID,
     ProposalStationApprovalCommand,
     ProposalStationApprovalStatus,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import type { PropType } from 'vue';
 import { computed, defineComponent, ref } from 'vue';
 import {

@@ -6,7 +6,7 @@
   -->
 
 <script lang="ts">
-import { PermissionID } from '@personalhealthtrain/central-common';
+import { PermissionID } from '@personalhealthtrain/core';
 import { definePageMeta } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';

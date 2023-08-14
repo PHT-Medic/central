@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { TrainResultStatus } from '@personalhealthtrain/central-common';
+import { TrainResultStatus } from '@personalhealthtrain/core';
 import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
 

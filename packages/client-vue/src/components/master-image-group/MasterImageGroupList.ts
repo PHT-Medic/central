@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { DomainType } from '@personalhealthtrain/central-common';
-import type { MasterImageGroup } from '@personalhealthtrain/central-common';
+import { DomainType } from '@personalhealthtrain/core';
+import type { MasterImageGroup } from '@personalhealthtrain/core';
 import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
 import {

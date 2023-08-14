@@ -5,13 +5,13 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Train } from '@personalhealthtrain/central-common';
+import type { Train } from '@personalhealthtrain/core';
 import {
     PermissionID,
     TrainAPICommand, TrainBuildStatus,
     TrainConfigurationStatus, TrainResultStatus,
     TrainRunStatus,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
 import { injectAuthupStore } from '../../core';

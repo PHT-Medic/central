@@ -9,10 +9,10 @@ import {
     DomainSubType,
     DomainType,
     buildDomainChannelName,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import type {
     ProposalStation,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import type { FiltersBuildInput } from 'rapiq';
 import {
     defineComponent, h,

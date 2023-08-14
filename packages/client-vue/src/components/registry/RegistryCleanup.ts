@@ -7,8 +7,8 @@
 
 import type { PropType } from 'vue';
 import { defineComponent, h, ref } from 'vue';
-import type { Registry } from '@personalhealthtrain/central-common';
-import { RegistryAPICommand } from '@personalhealthtrain/central-common';
+import type { Registry } from '@personalhealthtrain/core';
+import { RegistryAPICommand } from '@personalhealthtrain/core';
 import EntityDelete from '../EntityDelete';
 import MasterImageList from '../master-image/MasterImageList';
 import { injectAPIClient } from '../../core';

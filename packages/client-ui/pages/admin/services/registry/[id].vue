@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { DomainType, Ecosystem, PermissionID } from '@personalhealthtrain/central-common';
+import { DomainType, Ecosystem, PermissionID } from '@personalhealthtrain/core';
 import { createEntityManager } from '@personalhealthtrain/client-vue';
 import { useToast } from 'bootstrap-vue-next';
 import { computed } from 'vue';

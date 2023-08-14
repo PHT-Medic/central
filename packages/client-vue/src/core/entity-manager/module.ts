@@ -8,7 +8,7 @@
 import { hasOwnProperty } from '@authup/core';
 import type {
     DomainAPI, DomainEntity, DomainEntityID, DomainType,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import type { BuildInput } from 'rapiq';
 import { isObject } from 'smob';
 import type { Ref, VNodeChild } from 'vue';

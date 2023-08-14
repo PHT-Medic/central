@@ -5,13 +5,13 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import type { Train, TrainStation } from '@personalhealthtrain/central-common';
+import type { Train, TrainStation } from '@personalhealthtrain/core';
 import {
     TrainBuildStatus,
     TrainRunStatus,
     TrainStationRunStatus,
     TrainStationStatic,
-} from '@personalhealthtrain/central-common';
+} from '@personalhealthtrain/core';
 import type { BuildInput } from 'rapiq';
 import type { PropType } from 'vue';
 import { computed, defineComponent, toRef } from 'vue';
