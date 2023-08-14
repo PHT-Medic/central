@@ -14,7 +14,7 @@ export type TransferItem = {
 };
 
 export type TransferEcosystemItem = {
-    ecosystem: Ecosystem,
+    ecosystem: `${Ecosystem}`,
     repositoryName: string,
     artifactTag?: string,
 };

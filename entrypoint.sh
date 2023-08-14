@@ -41,7 +41,7 @@ case "${PACKAGE}" in
     ui)
         export NUXT_HOST=0.0.0.0
         export NUXT_PORT=3000
-        exec npm run "$1" --workspace=packages/ui
+        exec npm run "$1" --workspace=packages/client-ui
         ;;
     realtime)
         exec npm run "$1" --workspace=packages/realtime

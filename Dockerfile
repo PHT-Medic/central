@@ -12,7 +12,7 @@ RUN rm -rf ./node-modules && \
     touch packages/api/.env && \
     touch packages/realtime/.env && \
     touch packages/train-manager/.env && \
-    touch packages/ui/.env
+    touch packages/client-ui/.env
 
 COPY ./entrypoint.sh ./entrypoint.sh
 

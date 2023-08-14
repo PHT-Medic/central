@@ -32,12 +32,12 @@ export class RegistryProjectEntity implements RegistryProject {
         name: string;
 
     @Column({ type: 'varchar', length: 64, default: Ecosystem.DEFAULT })
-        ecosystem: Ecosystem;
+        ecosystem: `${Ecosystem}`;
 
     @Column({
         type: 'varchar', length: 64, nullable: true, default: RegistryProjectType.DEFAULT,
     })
-        type: RegistryProjectType;
+        type: `${RegistryProjectType}`;
 
     @Column({ type: 'boolean', default: true })
         public: boolean;

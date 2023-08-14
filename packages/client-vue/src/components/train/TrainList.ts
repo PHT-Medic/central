@@ -8,9 +8,9 @@ import { DomainType } from '@personalhealthtrain/central-common';
 import type {
     Train,
 } from '@personalhealthtrain/central-common';
-import type { SlotsType } from 'vue';
+import type { SetupContext, SlotsType } from 'vue';
 import { defineComponent, h } from 'vue';
-import type { EntityListSlotsType } from '../../core';
+import type { EntityListEventsType, EntityListSlotsType } from '../../core';
 import { createEntityList, defineDomainListEvents, defineDomainListProps } from '../../core';
 import TrainItem from './TrainItem';
 
@@ -31,7 +31,7 @@ export default defineComponent({
         } = createEntityList({
             type: `${DomainType.TRAIN}`,
             props,
-            setup,
+            setup: setup as unknown as SetupContext<EntityListEventsType<Train>>,
         });
 
         setDefaults({

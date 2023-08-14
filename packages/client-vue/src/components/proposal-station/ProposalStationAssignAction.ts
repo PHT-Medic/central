@@ -28,16 +28,20 @@ export default defineComponent({
     async setup(props, setup) {
         const manager = createEntityManager({
             type: `${DomainType.PROPOSAL_STATION}`,
+            realmId: props.realmId,
             setup,
-            props: {
-                where: {
-                    proposal_id: props.proposalId,
-                    station_id: props.stationId,
-                },
-            },
             socket: {
                 processEvent(event) {
                     return event.data.proposal_id === props.proposalId;
+                },
+            },
+        });
+
+        await manager.resolve({
+            query: {
+                filters: {
+                    proposal_id: props.proposalId,
+                    station_id: props.stationId,
                 },
             },
         });
