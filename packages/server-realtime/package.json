@@ -22,9 +22,6 @@
         "socket.io": "^4.7.1",
         "winston": "^3.10.0"
     },
-    "devDependencies": {
-        "@types/dotenv": "^8.2.0"
-    },
     "scripts": {
         "dev": "ts-node src/index.ts",
         "build": "rimraf dist && tsc -p tsconfig.build.json",

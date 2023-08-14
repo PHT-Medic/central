@@ -87,8 +87,8 @@ jobs:
                     AUTHUP_API_URL: http://localhost:3000/
                     VAULT_CONNECTION_STRING: start123@http://127.0.0.1:8090/v1/
                 run: |
-                    npm run test --workspace=packages/api
+                    npm run test --workspace=packages/server-api
 
             -   name: Test Train-Manager
                 run: |
-                    npm run test --workspace=packages/train-manager
+                    npm run test --workspace=packages/server-train-manager
