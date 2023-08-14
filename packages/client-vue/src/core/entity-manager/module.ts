@@ -12,7 +12,9 @@ import type {
 import type { BuildInput } from 'rapiq';
 import { isObject } from 'smob';
 import type { Ref, VNodeChild } from 'vue';
-import { computed, isRef, ref } from 'vue';
+import {
+    computed, isRef, ref, toRef, watch,
+} from 'vue';
 import { injectAPIClient } from '../api-client';
 import type { EntitySocket, EntitySocketContext } from '../entity-socket';
 import { createEntitySocket } from '../entity-socket';
@@ -248,7 +250,49 @@ export function createEntityManager<
 
     const error = ref<Error | undefined>(undefined);
 
+    const resolveByProps = () : boolean => {
+        if (!ctx.props) {
+            return false;
+        }
+
+        if (ctx.props.entity) {
+            entity.value = ctx.props.entity;
+
+            if (socket) {
+                socket.mount();
+            }
+
+            resolved(entity.value);
+
+            return true;
+        }
+
+        return false;
+    };
+
+    if (ctx.props) {
+        const propEntityRef = toRef(ctx.props, 'entity');
+        const propsEntityId = computed(() => (propEntityRef.value ? propEntityRef.value.id : undefined));
+        watch(propsEntityId, (val) => {
+            entity.value = propEntityRef.value;
+
+            if (val) {
+                if (socket) {
+                    socket.mount();
+                }
+            } else if (socket) {
+                socket.unmount();
+            }
+        });
+    }
+
+    resolveByProps();
+
     const resolve = async (rctx: EntityManagerResolveContext<T> = {}) => {
+        if (entity.value) {
+            return;
+        }
+
         let query : (T extends Record<string, any> ? BuildInput<T> : never) | undefined;
         if (rctx.query) {
             query = rctx.query;
@@ -257,19 +301,11 @@ export function createEntityManager<
         let { id } = rctx;
 
         if (ctx.props) {
-            if (ctx.props.entity) {
-                entity.value = ctx.props.entity;
-
-                if (socket) {
-                    socket.mount();
-                }
-
-                resolved(entity.value);
-
+            if (resolveByProps()) {
                 return;
             }
 
-            if (typeof ctx.props.entity !== 'undefined') {
+            if (ctx.props.entity) {
                 entity.value = ctx.props.entity;
 
                 if (socket) {

@@ -59,13 +59,14 @@ export default defineComponent({
         },
     },
     setup(props, ctx) {
+        const apiClient = injectAPIClient();
         const instance = getCurrentInstance();
         const busy = ref(false);
 
         const submit = async () => {
             if (busy.value) return;
 
-            const domainApi = useDomainAPI(injectAPIClient(), props.entityType);
+            const domainApi = useDomainAPI(apiClient, props.entityType);
             if (!domainApi) {
                 return;
             }

@@ -28,7 +28,6 @@ export default defineNuxtComponent({
         const store = useAuthStore();
         const { userId } = storeToRefs(store);
 
-        const busy = ref(false);
         const entity : Ref<UserSecret | null> = ref(null);
         const entityId = computed(() => (entity.value ? entity.value.id : undefined));
 
@@ -51,25 +50,6 @@ export default defineNuxtComponent({
                 }
             });
         };
-
-        const triggerSync = wrapFnWithBusyState(busy, async () => {
-            try {
-                await useAPI().service.runSecretStorageCommand(
-                    SecretStorageAPICommand.ENGINE_KEY_SAVE,
-                    {
-                        name: buildUserSecretsSecretStorageKey(userId.value),
-                    },
-                );
-
-                if (toast) {
-                    toast.success({ body: 'The secret was successfully synced.' });
-                }
-            } catch (e) {
-                if (e instanceof Error && toast) {
-                    toast.warning({ body: e.message });
-                }
-            }
-        });
 
         const listNode = ref<null | typeof UserSecretList>(null);
         const handleCreated = (item: UserSecret) => {
@@ -118,7 +98,6 @@ export default defineNuxtComponent({
             listNode,
             formNode,
             triggerEdit,
-            triggerSync,
             entityId,
             entity,
         };
@@ -159,13 +138,6 @@ export default defineNuxtComponent({
                                 class="fas"
                                 :class="{'fas fa-pen-alt': entityId !== props.data.id, 'fa fa-eject': entityId === props.data.id}"
                             />
-                        </button>
-                        <button
-                            type="button"
-                            class="btn btn-xs btn-primary me-1"
-                            @click.prevent="triggerSync()"
-                        >
-                            <i class="fa-solid fa-refresh" />
                         </button>
                         <entity-delete
                             :with-text="false"

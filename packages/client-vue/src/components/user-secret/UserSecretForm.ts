@@ -109,14 +109,11 @@ export default defineComponent({
                         handleTypeChanged(form.type);
                         break;
                     }
-                    default: {
-                        if (
-                            manager.data.value &&
-                            manager.data.value[key]
-                        ) {
-                            (form as any)[key] = manager.data.value[key];
+                    case 'key': {
+                        if (manager.data.value) {
+                            form.key = manager.data.value.key;
                         } else {
-                            (form as any)[key] = '' as any;
+                            form.key = '' as any;
                         }
                     }
                 }
