@@ -28,6 +28,7 @@ export default defineComponent({
     },
     emits: ['failed'],
     async setup(props, { emit }) {
+        const apiClient = injectAPIClient();
         const refs = toRefs(props);
 
         const masterImageEntity = ref<null | MasterImage>(null);
@@ -65,8 +66,8 @@ export default defineComponent({
             if (!refs.masterImageId.value) return;
 
             try {
-                const item = await injectAPIClient().masterImage.getOne(refs.masterImageId.value);
-                const { data } = await injectAPIClient().masterImageGroup.getMany({
+                const item = await apiClient.masterImage.getOne(refs.masterImageId.value);
+                const { data } = await apiClient.masterImageGroup.getMany({
                     filters: {
                         virtual_path: item.group_virtual_path,
                     },
@@ -97,7 +98,7 @@ export default defineComponent({
             if (!refs.trainFileId.value) return;
 
             try {
-                trainFileEntity.value = await injectAPIClient().trainFile.getOne(refs.trainFileId.value);
+                trainFileEntity.value = await apiClient.trainFile.getOne(refs.trainFileId.value);
             } catch (e) {
                 if (e instanceof Error) {
                     emit('failed', e);

@@ -7,7 +7,7 @@
 
 import type { PropType, VNodeChild } from 'vue';
 import {
-    computed, defineComponent, h, ref,
+    computed, defineComponent, h, ref, toRef, watch,
 } from 'vue';
 import {
     hasNormalizedSlot, injectAPIClient, normalizeSlot, wrapFnWithBusyState,
@@ -30,8 +30,18 @@ export default defineComponent({
     },
     emits: ['updated', 'failed'],
     setup(props, { emit, slots }) {
+        const apiClient = injectAPIClient();
         const busy = ref(false);
         const name = ref('');
+
+        if (props.entityName) {
+            name.value = props.entityName;
+        }
+
+        const propName = toRef(props, 'entityName');
+        watch(propName, (val) => {
+            name.value = val || '';
+        });
 
         const editing = ref(false);
 
@@ -53,7 +63,7 @@ export default defineComponent({
 
         const save = wrapFnWithBusyState(busy, async () => {
             try {
-                const train = await injectAPIClient().train.update(props.entityId, {
+                const train = await apiClient.train.update(props.entityId, {
                     name: name.value,
                 });
 
@@ -113,7 +123,7 @@ export default defineComponent({
 
             return h('span', [
                 text,
-                ...(!editing.value && !!props.editable ? [
+                ...(!editing.value && props.editable ? [
                     h('a', {
                         class: 'ms-1',
                         // eslint-disable-next-line no-script-url

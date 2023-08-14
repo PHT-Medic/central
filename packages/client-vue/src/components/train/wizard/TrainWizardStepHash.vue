@@ -25,6 +25,7 @@ export default defineComponent({
     },
     emits: ['signed', 'generated', 'failed'],
     setup(props, { emit }) {
+        const apiClient = injectAPIClient();
         const refs = toRefs(props);
 
         const busy = ref(false);
@@ -73,7 +74,7 @@ export default defineComponent({
 
         const generate = wrapFnWithBusyState(busy, async () => {
             try {
-                const train = await injectAPIClient().train.runCommand(refs.train.value.id, TrainAPICommand.GENERATE_HASH);
+                const train = await apiClient.train.runCommand(refs.train.value.id, TrainAPICommand.GENERATE_HASH);
 
                 form.hash = train.hash;
 

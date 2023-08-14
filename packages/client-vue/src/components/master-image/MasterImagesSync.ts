@@ -22,6 +22,7 @@ export default defineComponent({
     components: { EntityDelete, MasterImageList },
     emits: ['failed'],
     setup(props, { emit }) {
+        const apiClient = injectAPIClient();
         const meta = reactive({
             busy: false,
             created: '?',
@@ -37,7 +38,7 @@ export default defineComponent({
             meta.busy = true;
 
             try {
-                const { images } = await injectAPIClient().masterImage
+                const { images } = await apiClient.masterImage
                     .runCommand(MasterImageCommand.SYNC);
 
                 meta.created = images.created.length;

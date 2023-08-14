@@ -41,6 +41,7 @@ export default defineComponent({
     },
     emits: ['failed', 'updated'],
     setup(props, setup) {
+        const apiClient = injectAPIClient();
         const busy = ref(false);
 
         const commandText = computed(() => {
@@ -112,7 +113,7 @@ export default defineComponent({
             }
 
             try {
-                const item = await injectAPIClient().trainStation.update(props.entityId, {
+                const item = await apiClient.trainStation.update(props.entityId, {
                     approval_status: status,
                 });
 

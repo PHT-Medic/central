@@ -31,6 +31,7 @@ export default defineComponent({
     },
     emits: ['created', 'updated', 'deleted', 'uploaded', 'failed', 'setEntrypointFile'],
     setup(props, { emit }) {
+        const apiClient = injectAPIClient();
         const refs = toRefs(props);
 
         const form = reactive({
@@ -113,7 +114,7 @@ export default defineComponent({
 
                 form.files = [];
 
-                const response = await injectAPIClient().trainFile.upload(formData);
+                const response = await apiClient.trainFile.upload(formData);
                 for (let i = 0; i < response.data.length; i++) {
                     handleCreated(response.data[i]);
                 }
@@ -129,7 +130,7 @@ export default defineComponent({
 
             try {
                 for (let i = 0; i < selected.value.length; i++) {
-                    const file = await injectAPIClient().trainFile.delete(selected.value[i]);
+                    const file = await apiClient.trainFile.delete(selected.value[i]);
                     handleDeleted(file);
                 }
             } catch (e) {

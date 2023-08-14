@@ -17,10 +17,11 @@ export default defineComponent({
     components: { EntityDelete, MasterImageList },
     emits: ['executed', 'failed'],
     setup(props, { emit }) {
+        const apiClient = injectAPIClient();
         const busy = ref(false);
         const sync = wrapFnWithBusyState(busy, async () => {
             try {
-                await injectAPIClient()
+                await apiClient
                     .service.runCommand(ServiceID.STATION_REGISTRY, StationRegistryAPICommand.SYNC);
 
                 emit('executed');

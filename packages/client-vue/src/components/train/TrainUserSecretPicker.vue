@@ -24,6 +24,7 @@ export default defineComponent({
         },
     },
     setup(props, { emit }) {
+        const apiClient = injectAPIClient();
         const refs = toRefs(props);
 
         const store = injectAuthupStore();
@@ -43,7 +44,7 @@ export default defineComponent({
                 }
             }
 
-            await injectAPIClient().train.update(refs.trainId.value, payload);
+            await apiClient.train.update(refs.trainId.value, payload);
 
             emit('updated', payload);
         };

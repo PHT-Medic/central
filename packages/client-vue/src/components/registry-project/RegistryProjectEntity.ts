@@ -37,6 +37,7 @@ export default defineComponent({
     emits: defineEntityManagerEvents<RegistryProject>(),
     slots: Object as SlotsType<EntityManagerSlotsType<RegistryProject>>,
     async setup(props, setup) {
+        const apiClient = injectAPIClient();
         const busy = ref(false);
         const entity = ref<null | RegistryProject>(null);
 
@@ -80,7 +81,7 @@ export default defineComponent({
             if (!entity.value) return;
 
             try {
-                await injectAPIClient().service.runCommand(ServiceID.REGISTRY, command, {
+                await apiClient.service.runCommand(ServiceID.REGISTRY, command, {
                     id: entity.value.id,
                     secret: form.secret,
                 });

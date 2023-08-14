@@ -44,6 +44,7 @@ export default defineComponent({
     },
     emits: ['finished', 'failed', 'updated'],
     async setup(props, { emit }) {
+        const apiClient = injectAPIClient();
         const refs = toRefs(props);
 
         const form = reactive({
@@ -107,7 +108,7 @@ export default defineComponent({
 
             if (keys.length === 0) return;
 
-            const item = await injectAPIClient().train.update(refs.entity.value.id, data);
+            const item = await apiClient.train.update(refs.entity.value.id, data);
             handleUpdated(item);
         };
 

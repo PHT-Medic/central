@@ -45,6 +45,7 @@ export default defineComponent({
     },
     emits: ['failed', 'updated', 'executed'],
     setup(props, { emit, slots }) {
+        const apiClient = injectAPIClient();
         const refs = toRefs(props);
         const busy = ref(false);
 
@@ -111,7 +112,7 @@ export default defineComponent({
 
         const execute = wrapFnWithBusyState(busy, async () => {
             try {
-                const train = await injectAPIClient().train.runCommand(refs.entity.value.id, refs.command.value);
+                const train = await apiClient.train.runCommand(refs.entity.value.id, refs.command.value);
 
                 emit('executed', props.command);
                 emit('updated', train);

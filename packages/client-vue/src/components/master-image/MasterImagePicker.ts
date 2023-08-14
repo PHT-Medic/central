@@ -32,6 +32,7 @@ export default defineComponent({
     emits: ['selected'],
     async setup(props, { emit }) {
         const refs = toRefs(props);
+        const apiClient = injectAPIClient();
 
         const busy = ref(false);
         const form = reactive({
@@ -74,11 +75,11 @@ export default defineComponent({
             }
 
             try {
-                masterImageEntity.value = await injectAPIClient().masterImage.getOne(form.master_image_id);
+                masterImageEntity.value = await apiClient.masterImage.getOne(form.master_image_id);
                 form.group_virtual_path = masterImageEntity.value.group_virtual_path;
 
                 if (!masterImageGroupEntity.value || form.group_virtual_path !== masterImageGroupEntity.value.virtual_path) {
-                    const { data } = await injectAPIClient().masterImageGroup.getMany({
+                    const { data } = await apiClient.masterImageGroup.getMany({
                         filters: {
                             virtual_path: form.group_virtual_path,
                         },

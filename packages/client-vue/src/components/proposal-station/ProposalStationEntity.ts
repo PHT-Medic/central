@@ -53,6 +53,7 @@ export default defineComponent({
     },
     emits: defineEntityManagerEvents<ProposalStation>(),
     async setup(props, setup) {
+        const apiClient = injectAPIClient();
         const manager = createEntityManager({
             realmId: (entity) => {
                 if (!entity) {
@@ -110,10 +111,10 @@ export default defineComponent({
             !manager.data.value[props.target]
         ) {
             if (props.target === Target.PROPOSAL) {
-                manager.data.value[props.target] = await injectAPIClient()
+                manager.data.value[props.target] = await apiClient
                     .proposal.getOne(manager.data.value.proposal_id);
             } else {
-                manager.data.value[props.target] = await injectAPIClient()
+                manager.data.value[props.target] = await apiClient
                     .station.getOne(manager.data.value.station_id);
             }
         }

@@ -23,6 +23,7 @@ export default defineComponent({
     },
     emits: ['executed', 'failed'],
     setup(props, { emit }) {
+        const apiClient = injectAPIClient();
         const busy = ref(false);
 
         const setup = async () => {
@@ -31,7 +32,7 @@ export default defineComponent({
             busy.value = true;
 
             try {
-                await injectAPIClient().service.runRegistryCommand(RegistryAPICommand.SETUP, {
+                await apiClient.service.runRegistryCommand(RegistryAPICommand.SETUP, {
                     id: props.entityId,
                 });
 

@@ -24,6 +24,7 @@ export default defineComponent({
     emits: ['executed', 'failed'],
     setup(props, { emit }) {
         const busy = ref(false);
+        const apiClient = injectAPIClient();
 
         const execute = async () => {
             if (busy.value) return;
@@ -31,7 +32,7 @@ export default defineComponent({
             busy.value = true;
 
             try {
-                await injectAPIClient().service.runRegistryCommand(RegistryAPICommand.CLEANUP, {
+                await apiClient.service.runRegistryCommand(RegistryAPICommand.CLEANUP, {
                     id: props.entityId,
                 });
 
