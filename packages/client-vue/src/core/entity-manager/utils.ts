@@ -49,8 +49,14 @@ export function defineEntityManagerProps<T>() {
         entityId: {
             type: String,
         },
-        filters: {
+        queryFilters: {
             type: Object as PropType<FiltersBuildInput<T extends Record<string, any> ? T : never>>,
+        },
+        queryFields: {
+            type: Object as PropType<FieldsBuildInput<T extends Record<string, any> ? T : never>>,
+        },
+        query: {
+            type: Object as PropType<T extends Record<string, any> ? BuildInput<T> : never>,
         },
     };
 }

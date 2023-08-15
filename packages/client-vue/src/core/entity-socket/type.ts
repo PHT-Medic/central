@@ -10,7 +10,8 @@ import type {
     DomainEntityID,
     DomainEventContext,
     DomainEventSubscriptionFullName,
-    DomainType, SocketServerToClientEventContext,
+    DomainType,
+    SocketServerToClientEventContext,
 } from '@personalhealthtrain/core';
 import type { MaybeRef } from 'vue';
 

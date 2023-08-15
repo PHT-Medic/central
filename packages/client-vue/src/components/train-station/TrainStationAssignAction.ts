@@ -31,7 +31,8 @@ export default defineComponent({
             setup,
             socket: {
                 processEvent(event) {
-                    return event.data.train_id === props.trainId;
+                    return event.data.train_id === props.trainId &&
+                        event.data.station_id === props.stationId;
                 },
             },
         });
