@@ -22,7 +22,7 @@
     },
     "dependencies": {
         "@authup/core": "^0.39.0",
-        "@authup/server-adapter": "^0.39.1",
+        "@authup/server-adapter": "^0.40.0",
         "@ebec/http": "^1.1.0",
         "@hapic/harbor": "^2.2.0",
         "@personalhealthtrain/core": "2.4.0-alpha.18",
