@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.19](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.18...v2.4.0-alpha.19) (2023-08-16)
+
+
+### Bug Fixes
+
+* render action command + incoming trains/proposals ([9693f0d](https://github.com/PHT-Medic/central/commit/9693f0dc0a661e1344603c225662199c0d6e9f59))
+* user-secret-management in settings area + vue instance access in entity-delete ([9b6be5b](https://github.com/PHT-Medic/central/commit/9b6be5b08d49889d48d741cba8ecad5e0da3a932))
+
+
+### Features
+
+* renamed and aligned package names ([d08547a](https://github.com/PHT-Medic/central/commit/d08547a3e03cf4c8feebd078cfeaa77b67b3ae9c))
+
+
+
+
+
 # [2.4.0-alpha.18](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.17...v2.4.0-alpha.18) (2023-08-10)
 
 

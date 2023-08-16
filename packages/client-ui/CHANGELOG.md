@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.19](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.18...v2.4.0-alpha.19) (2023-08-16)
+
+
+### Bug Fixes
+
+* component action render fn ([7009b5c](https://github.com/PHT-Medic/central/commit/7009b5c39434980b8bc92e67286bc02663f4eccb))
+* reduce explicit dependencies for client-ui package ([7dcb17f](https://github.com/PHT-Medic/central/commit/7dcb17fd9519f247ae76e3ea1cd230f09c27a3dc))
+* render action command + incoming trains/proposals ([9693f0d](https://github.com/PHT-Medic/central/commit/9693f0dc0a661e1344603c225662199c0d6e9f59))
+* user-secret-management in settings area + vue instance access in entity-delete ([9b6be5b](https://github.com/PHT-Medic/central/commit/9b6be5b08d49889d48d741cba8ecad5e0da3a932))
+
+
+### Features
+
+* remove dependence to vue-bootstrap-next library ([4cd5a9f](https://github.com/PHT-Medic/central/commit/4cd5a9f72a4c4bf6cbcdc74fc8d47a893ba59bb9))
+* renamed and aligned package names ([d08547a](https://github.com/PHT-Medic/central/commit/d08547a3e03cf4c8feebd078cfeaa77b67b3ae9c))
+* split ui components in extra package ([2c63dfe](https://github.com/PHT-Medic/central/commit/2c63dfe86bbf38831e967f3a166b6047e496f5ba))
+
+
+
+
+
 # [2.4.0-alpha.18](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.17...v2.4.0-alpha.18) (2023-08-10)
 
 
