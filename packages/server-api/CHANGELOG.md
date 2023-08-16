@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.20](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.19...v2.4.0-alpha.20) (2023-08-16)
+
+
+### Bug Fixes
+
+* proposal station assignment + start of compiled application ([dc13013](https://github.com/PHT-Medic/central/commit/dc13013162e2d779b54296631cbb961524468387))
+
+
+
+
+
 # [2.4.0-alpha.19](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.18...v2.4.0-alpha.19) (2023-08-16)
 
 

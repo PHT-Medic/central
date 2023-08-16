@@ -1,6 +1,6 @@
 {
     "name": "@personalhealthtrain/client-vue",
-    "version": "2.4.0-alpha.19",
+    "version": "2.4.0-alpha.20",
     "description": "This package contains vue components.",
     "main": "dist/index.cjs",
     "module": "dist/index.mjs",
