@@ -1,13 +1,12 @@
 <script lang="ts">
+import { storeToRefs } from '@authup/client-vue';
 import type { Train } from '@personalhealthtrain/core';
 import { SecretType } from '@personalhealthtrain/core';
-import { storeToRefs } from 'pinia';
 import { defineComponent, toRefs } from 'vue';
 import { injectAPIClient, injectAuthupStore } from '../../core';
 import UserSecretList from '../user-secret/UserSecretList';
 
 export default defineComponent({
-    name: 'TrainUserSecretPicker',
     components: { UserSecretList },
     props: {
         trainId: {

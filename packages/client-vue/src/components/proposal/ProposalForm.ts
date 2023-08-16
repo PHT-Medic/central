@@ -6,7 +6,6 @@
  */
 import { buildFormInput, buildFormSubmit, buildFormTextarea } from '@vue-layout/form-controls';
 import type { ListItemSlotProps } from '@vue-layout/list-controls';
-import { buildItemActionToggle } from '@vue-layout/list-controls';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
 import {
@@ -28,8 +27,8 @@ import {
     createEntityManager,
     defineEntityManagerEvents,
     initFormAttributesFromSource,
-    useValidationTranslator,
-    wrapFnWithBusyState,
+    injectAPIClient,
+    renderEntityAssignAction, useValidationTranslator, wrapFnWithBusyState,
 } from '../../core';
 import MasterImagePicker from '../master-image/MasterImagePicker';
 import StationList from '../station/StationList';
@@ -44,6 +43,7 @@ export default defineComponent({
     },
     emits: defineEntityManagerEvents<Proposal>(),
     setup(props, setup) {
+        const apiClient = injectAPIClient();
         const busy = ref(false);
         const form = reactive({
             title: '',
@@ -120,7 +120,17 @@ export default defineComponent({
         const submit = wrapFnWithBusyState(busy, async () => {
             if ($v.value.$invalid) return;
 
+            const existed = !!manager.data.value;
             await manager.createOrUpdate(form);
+
+            if (!existed && manager.data.value) {
+                for (let i = 0; i < stationIds.value.length; i++) {
+                    await apiClient.proposalStation.create({
+                        proposal_id: manager.data.value.id,
+                        station_id: stationIds.value[i],
+                    });
+                }
+            }
         });
 
         const toggleStationIds = (id: string) => {
@@ -190,7 +200,7 @@ export default defineComponent({
 
             const riskComment = buildFormTextarea({
                 validationTranslator: useValidationTranslator(),
-                validationResult: $v.value.name,
+                validationResult: $v.value.risk_comment,
                 label: true,
                 labelContent: 'Risk Comment',
                 value: form.risk_comment,
@@ -229,13 +239,12 @@ export default defineComponent({
                             });
                         }
 
-                        return buildItemActionToggle({
-                            busy: busy.value,
-                            value: props.data.id,
-                            currentValue: stationIds.value,
-                            onChange() {
-                                toggleStationIds(props.data.id);
-                            },
+                        const itemIndex = stationIds.value.indexOf(props.data.id);
+
+                        return renderEntityAssignAction({
+                            item: itemIndex === -1 ? undefined : stationIds.value[itemIndex],
+                            add: () => toggleStationIds(props.data.id),
+                            drop: () => toggleStationIds(props.data.id),
                         });
                     },
                 }),

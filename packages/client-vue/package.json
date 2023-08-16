@@ -41,7 +41,7 @@
     },
     "homepage": "https://github.com/PHT-Medic/central#readme",
     "devDependencies": {
-        "@authup/client-vue": "^0.40.0",
+        "@authup/client-vue": "^0.40.1",
         "@authup/core": "^0.40.0",
         "@personalhealthtrain/core": "2.4.0-alpha.19",
         "@types/node": "^20.4.2",
@@ -74,7 +74,6 @@
         "@vuelidate/core": "^2.x",
         "@vuelidate/validators": "^2.x",
         "ilingo": "^3.x",
-        "pinia": "^2.1.6",
         "rapiq": ">=0.8.0 <1.0.0",
         "smob": "^1.4.x",
         "socket.io-client": "^4.7.2",

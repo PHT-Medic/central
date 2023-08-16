@@ -23,7 +23,7 @@ import type {
 import {
     computed, isRef, onMounted, onUnmounted, watch,
 } from 'vue';
-import { storeToRefs } from 'pinia';
+import { storeToRefs } from '@authup/client-vue';
 import { injectAuthupStore } from '../authup';
 import type { EntitySocket, EntitySocketContext } from './type';
 import { injectSocketManager } from '../socket';
