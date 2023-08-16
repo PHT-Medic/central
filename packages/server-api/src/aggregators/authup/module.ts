@@ -6,7 +6,7 @@
  */
 
 import { DomainType } from '@authup/core';
-import type { DomainEventContext } from '@authup/core';
+import type { DomainsEventContext } from '@authup/core';
 import { createClient } from 'redis-extension';
 import { useEnv, useLogger } from '../../config';
 import type { Aggregator } from '../type';
@@ -27,7 +27,7 @@ export function buildAuthupAggregator() : Aggregator {
 
             redisSub.on('message', async (channel, message) => {
                 useLogger().info(`Received event from channel ${channel}`);
-                const event = JSON.parse(message) as DomainEventContext;
+                const event = JSON.parse(message) as DomainsEventContext;
 
                 switch (event.type) {
                     case DomainType.REALM: {
