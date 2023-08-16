@@ -12,8 +12,8 @@ import type {
 import type { BuildInput, FieldsBuildInput, FiltersBuildInput } from 'rapiq';
 import type {
     MaybeRef, Ref, SetupContext, SlotsType,
+    VNodeChild,
 } from 'vue';
-import type { VNodeChild } from 'vue/dist/vue';
 import type { EntitySocketContext } from '../entity-socket';
 
 type EntityWithID = {

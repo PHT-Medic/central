@@ -68,8 +68,8 @@ export default defineNuxtComponent({
                 <template #item="props">
                     <ProposalItem
                         :entity="props.data"
-                        @updated="props.handleUpdated"
-                        @deleted="props.handleDeleted"
+                        @updated="props.updated"
+                        @deleted="props.deleted"
                     />
                 </template>
             </ProposalList>

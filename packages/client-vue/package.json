@@ -41,8 +41,8 @@
     },
     "homepage": "https://github.com/PHT-Medic/central#readme",
     "devDependencies": {
-        "@authup/core": "^0.39.0",
-        "@authup/client-vue": "^0.39.1",
+        "@authup/core": "^0.40.0",
+        "@authup/client-vue": "^0.40.0",
         "@personalhealthtrain/core": "^2.4.0-alpha.18",
         "@types/node": "^20.4.2",
         "@vue-layout/form-controls": "^3.4.0",
@@ -64,8 +64,8 @@
         "vue3-form-wizard": "^0.2.1"
     },
     "peerDependencies": {
-        "@authup/core": ">=0.39.0 <1.0.0",
-        "@authup/client-vue": ">=0.39.1 <1.0.0",
+        "@authup/core": ">=0.40.0 <1.0.0",
+        "@authup/client-vue": ">=0.40.0 <1.0.0",
         "@personalhealthtrain/core": "^2.4.0-alpha.18",
         "@vue-layout/form-controls": "^3.4.0",
         "@vue-layout/list-controls": "^3.4.0",

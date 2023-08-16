@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { FiltersBuildInput } from 'rapiq';
+import type { BuildInput, FieldsBuildInput, FiltersBuildInput } from 'rapiq';
 import { unref } from 'vue';
-import type { PropType } from 'vue/dist/vue';
+import type { PropType } from 'vue';
 import type {
     EntityManager,
     EntityManagerEventsType,

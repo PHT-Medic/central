@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023.
+ * Copyright (c) 2022.
  * Author Peter Placzek (tada5hi)
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
@@ -12,14 +12,14 @@ type Context<T> = {
     add: () => Promise<void>,
     drop: () => Promise<void>,
     item: Ref<T>,
-    loaded: Ref<boolean>
+    busy: Ref<boolean>
 };
-export function renderEntityListItemAssignmentButton<T>(
+export function renderEntityAssignAction<T>(
     ctx: Context<T>,
 ) {
     let children: VNodeArrayChildren = [];
 
-    if (ctx.loaded.value) {
+    if (!ctx.busy.value) {
         children = [
             h('button', {
                 class: ['btn btn-xs', {

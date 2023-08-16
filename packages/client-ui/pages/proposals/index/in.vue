@@ -209,7 +209,7 @@ export default defineNuxtComponent({
                                         :with-icon="true"
                                         :element-type="'dropDownItem'"
                                         :command="'approve'"
-                                        @updated="props.handleUpdated"
+                                        @updated="props.updated"
                                     />
                                     <proposal-station-approval-command
                                         :entity-id="data.item.id"
@@ -217,7 +217,7 @@ export default defineNuxtComponent({
                                         :with-icon="true"
                                         :element-type="'dropDownItem'"
                                         :command="'reject'"
-                                        @updated="props.handleUpdated"
+                                        @updated="props.updated"
                                     />
                                 </b-dropdown>
                             </template>

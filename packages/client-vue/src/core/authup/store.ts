@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { StoreSymbol } from '@authup/client-vue';
 import type {
     Store,
     _ExtractActionsFromSetupStore,
@@ -22,10 +23,8 @@ _ExtractStateFromSetupStore<StoreData>,
 _ExtractGettersFromSetupStore<StoreData>,
 _ExtractActionsFromSetupStore<StoreData>
 >;
-
-const symbol = Symbol.for('AuthupStore');
 export function injectAuthupStore() : AuthupStore {
-    const store = inject(symbol);
+    const store = inject(StoreSymbol);
     if (!store) {
         throw new Error('The Authup Store is not set.');
     }
@@ -35,9 +34,9 @@ export function injectAuthupStore() : AuthupStore {
 
 export function provideAuthupStore(store: AuthupStore, instance?: App) {
     if (instance) {
-        instance.provide(symbol, store);
+        instance.provide(StoreSymbol, store);
         return;
     }
 
-    provide(symbol, store);
+    provide(StoreSymbol, store);
 }

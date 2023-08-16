@@ -76,6 +76,9 @@ export default defineNuxtComponent({
                 station: true,
                 train: true,
             },
+            sort: {
+                updated_at: 'DESC'
+            }
         };
 
         const download = (item: TrainStation) => {
@@ -112,7 +115,7 @@ export default defineNuxtComponent({
 
         <div class="m-t-10">
             <TrainStationList
-                ref="listNode"
+                :ref="listNode"
                 :target="'train'"
                 :realm-id="realmId"
                 :direction="'in'"
@@ -127,8 +130,6 @@ export default defineNuxtComponent({
                         :fields="fields"
                         :busy="props.busy"
                         head-variant="'dark'"
-                        sort-by="id"
-                        :sort-desc="true"
                         outlined
                     >
                         <template #cell(train_id)="data">
@@ -194,7 +195,7 @@ export default defineNuxtComponent({
                                         :with-icon="true"
                                         :element-type="'dropDownItem'"
                                         :command="'approve'"
-                                        @updated="props.handleUpdated"
+                                        @updated="props.updated"
                                     />
                                     <train-station-approval-command
                                         :entity-id="data.item.id"
@@ -202,7 +203,7 @@ export default defineNuxtComponent({
                                         :with-icon="true"
                                         :element-type="'dropDownItem'"
                                         :command="'reject'"
-                                        @updated="props.handleUpdated"
+                                        @updated="props.updated"
                                     />
                                 </b-dropdown>
                             </template>

@@ -18,11 +18,10 @@ import useVuelidate from '@vuelidate/core';
 import {
     helpers,
 } from '@vuelidate/validators';
-import type { VNodeChild } from 'vue';
+import type { SlotsType, VNodeChild } from 'vue';
 import {
     defineComponent, h, reactive, ref,
 } from 'vue';
-import type { SlotsType } from 'vue/dist/vue';
 import type { EntityManagerSlotsType } from '../../core';
 import {
     createEntityManager,
@@ -39,7 +38,6 @@ export default defineComponent({
     async setup(props, setup) {
         const apiClient = injectAPIClient();
         const busy = ref(false);
-        const entity = ref<null | RegistryProject>(null);
 
         const form = reactive({
             secret: '',
@@ -52,7 +50,7 @@ export default defineComponent({
         }, form);
 
         const manager = createEntityManager({
-            type: `${DomainType.TRAIN}`,
+            type: `${DomainType.REGISTRY_PROJECT}`,
             setup,
             props,
             onResolved(entity) {
@@ -78,15 +76,15 @@ export default defineComponent({
         });
 
         const execute = async (command: RegistryAPICommand) => wrapFnWithBusyState(busy, async () => {
-            if (!entity.value) return;
+            if (!manager.data.value) return;
 
             try {
                 await apiClient.service.runCommand(ServiceID.REGISTRY, command, {
-                    id: entity.value.id,
+                    id: manager.data.value.id,
                     secret: form.secret,
                 });
 
-                setup.emit('updated', entity.value);
+                setup.emit('updated', manager.data.value);
             } catch (e) {
                 if (e instanceof Error) {
                     setup.emit('failed', e);
@@ -94,7 +92,7 @@ export default defineComponent({
             }
         })();
 
-        if (!entity.value) {
+        if (!manager.data.value) {
             return () => h(
                 'div',
                 { class: 'alert alert-sm alert-warning' },
@@ -114,7 +112,7 @@ export default defineComponent({
                         h('input', {
                             class: 'form-control',
                             type: 'text',
-                            value: entity.value?.external_name || '',
+                            value: manager.data.value.external_name || '',
                             disabled: true,
                         }),
                     ]),
@@ -125,7 +123,7 @@ export default defineComponent({
                             h('input', {
                                 class: 'form-control',
                                 type: 'text',
-                                value: entity.value?.account_name || '',
+                                value: manager.data.value.account_name || '',
                                 placeholder: '...',
                                 disabled: true,
                             }),
@@ -149,8 +147,8 @@ export default defineComponent({
                         h('strong', { class: 'pe-1' }, 'Webhook:'),
                         h('i', {
                             class: {
-                                'fa fa-check text-success': entity.value?.webhook_exists,
-                                'fa fa-times text-danger': !entity.value?.webhook_exists,
+                                'fa fa-check text-success': manager.data.value?.webhook_exists,
+                                'fa fa-times text-danger': !manager.data.value?.webhook_exists,
                             },
                         }),
                     ]),

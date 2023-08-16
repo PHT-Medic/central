@@ -17,7 +17,7 @@ import type { Robot } from '@authup/core';
 import { buildFormInput, buildFormSubmit } from '@vue-layout/form-controls';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength } from '@vuelidate/validators';
-import { useValidationTranslator } from '../../core';
+import { initFormAttributesFromSource, useValidationTranslator } from '../../core';
 
 export default defineComponent({
     props: {
@@ -52,17 +52,23 @@ export default defineComponent({
                 maxLength: maxLength(256),
             },
         }, form);
+
         return () => h(RobotEntity, {
+            onResolved(entity) {
+                if (entity) {
+                    initFormAttributesFromSource(form, entity);
+                }
+            },
             onFailed: (e) => {
                 emit('failed', e);
             },
-            filters: {
+            queryFilters: {
                 name: props.entity.id,
                 realm_id: props.entity.realm_id,
             },
         }, {
             default: (slotProps: EntityManagerSlotProps<Robot>) => {
-                if (!slotProps.entity) {
+                if (!slotProps.data) {
                     return h(
                         'div',
                         { class: 'alert alert-sm alert-warning' },
@@ -102,7 +108,7 @@ export default defineComponent({
                     busy: slotProps.busy,
                     updateText: 'Update',
                     createText: 'Create',
-                    isEditing: !!slotProps.entity,
+                    isEditing: !!slotProps.data,
                 });
 
                 return h('div', [

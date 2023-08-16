@@ -10,11 +10,13 @@ import {
     ProposalStationApprovalStatus,
 } from '@personalhealthtrain/core';
 import type { PropType } from 'vue';
-import { computed, defineComponent, ref } from 'vue';
 import {
-    createActionRenderFn,
+    computed, defineComponent, ref,
+} from 'vue';
+import {
     injectAPIClient,
     injectAuthupStore,
+    renderActionCommand,
     wrapFnWithBusyState,
 } from '../../core';
 import type { ActionCommandProperties } from '../../core';
@@ -26,7 +28,6 @@ export default defineComponent({
             required: true,
         },
         approvalStatus: String as PropType<ProposalStationApprovalStatus>,
-
         command: {
             type: String as PropType<ProposalStationApprovalCommand>,
             required: true,
@@ -85,17 +86,19 @@ export default defineComponent({
         const store = injectAuthupStore();
 
         const isDisabled = computed(() => {
-            if (
-                props.approvalStatus &&
-                props.approvalStatus === ProposalStationApprovalStatus.APPROVED &&
-                props.command === ProposalStationApprovalCommand.APPROVE
-            ) {
-                return true;
+            if (props.approvalStatus) {
+                if (
+                    props.approvalStatus === ProposalStationApprovalStatus.APPROVED &&
+                    props.command === ProposalStationApprovalCommand.APPROVE
+                ) {
+                    return true;
+                }
+
+                return props.approvalStatus === ProposalStationApprovalStatus.REJECTED &&
+                    props.command === ProposalStationApprovalCommand.REJECT;
             }
 
-            return !!props.approvalStatus &&
-                props.approvalStatus === ProposalStationApprovalStatus.REJECTED &&
-                props.command === ProposalStationApprovalCommand.REJECT;
+            return props.command === ProposalStationApprovalCommand.REJECT;
         });
 
         const execute = wrapFnWithBusyState(busy, async () => {
@@ -124,7 +127,7 @@ export default defineComponent({
             }
         });
 
-        const renderFn = createActionRenderFn({
+        return () => renderActionCommand({
             execute,
             elementType: props.elementType,
             withIcon: props.withIcon,
@@ -136,7 +139,5 @@ export default defineComponent({
             classSuffix: classSuffix.value,
             slots,
         });
-
-        return () => renderFn();
     },
 });

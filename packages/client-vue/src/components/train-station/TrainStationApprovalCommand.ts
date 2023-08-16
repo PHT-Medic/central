@@ -4,14 +4,11 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import {
-    PermissionID, TrainStationApprovalCommand,
-    TrainStationApprovalStatus,
-} from '@personalhealthtrain/core';
+import { PermissionID, TrainStationApprovalCommand, TrainStationApprovalStatus } from '@personalhealthtrain/core';
 import type { PropType } from 'vue';
 import { computed, defineComponent, ref } from 'vue';
 import type { ActionCommandProperties } from '../../core';
-import { createActionRenderFn, injectAPIClient, injectAuthupStore } from '../../core';
+import { injectAPIClient, injectAuthupStore, renderActionCommand } from '../../core';
 
 export default defineComponent({
     name: 'TrainStationCommand',
@@ -80,17 +77,19 @@ export default defineComponent({
         const store = injectAuthupStore();
 
         const isDisabled = computed(() => {
-            if (
-                props.approvalStatus &&
-                props.approvalStatus === TrainStationApprovalStatus.APPROVED &&
-                props.command === TrainStationApprovalCommand.APPROVE
-            ) {
-                return true;
+            if (props.approvalStatus) {
+                if (
+                    props.approvalStatus === TrainStationApprovalStatus.APPROVED &&
+                    props.command === TrainStationApprovalCommand.APPROVE
+                ) {
+                    return true;
+                }
+
+                return props.approvalStatus === TrainStationApprovalStatus.REJECTED &&
+                    props.command === TrainStationApprovalCommand.REJECT;
             }
 
-            return !!props.approvalStatus &&
-                props.approvalStatus === TrainStationApprovalStatus.REJECTED &&
-                props.command === TrainStationApprovalCommand.REJECT;
+            return props.command === TrainStationApprovalCommand.REJECT;
         });
 
         const execute = async () => {
@@ -125,7 +124,7 @@ export default defineComponent({
             busy.value = false;
         };
 
-        const renderFn = createActionRenderFn({
+        return () => renderActionCommand({
             execute,
             elementType: props.elementType,
             withIcon: props.withIcon,
@@ -137,7 +136,5 @@ export default defineComponent({
             classSuffix: classSuffix.value,
             slots: setup.slots,
         });
-
-        return () => renderFn();
     },
 });

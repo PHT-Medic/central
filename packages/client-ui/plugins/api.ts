@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { setAPIClient } from '@authup/client-vue';
 import type {
     ClientResponseErrorTokenHookOptions,
 } from '@authup/core';
@@ -72,8 +71,6 @@ export default defineNuxtPlugin((ctx) => {
     const authupAPI = new AuthAPIClient({ baseURL: apiUrl });
 
     ctx.provide('authupAPI', authupAPI);
-
-    setAPIClient(authupAPI);
 
     // -----------------------------------------------------------------------------------
 

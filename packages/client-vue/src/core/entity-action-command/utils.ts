@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { isObject } from 'smob';
 import { h, resolveDynamicComponent } from 'vue';
 import type {
     Component, Slots, VNodeArrayChildren,
@@ -25,10 +26,9 @@ type Context = {
     slots: Slots
 };
 
-type RenderFn = () => VNodeChild;
-export function createActionRenderFn(ctx: Context) : RenderFn {
+export function renderActionCommand(ctx: Context) : VNodeChild {
     if (!ctx.isAllowed) {
-        return () => h('span', {}, ['']);
+        return h('span', {}, ['']);
     }
 
     const attributes : VNodeProps & Record<string, any> = {
@@ -46,7 +46,7 @@ export function createActionRenderFn(ctx: Context) : RenderFn {
 
     if (ctx.elementType === 'dropDownItem') {
         const component = resolveDynamicComponent('BDropdownItem');
-        if (component && typeof component !== 'string') {
+        if (isObject(component)) {
             tag = component as Component;
             iconClasses.push('ps-1', `text-${ctx.classSuffix}`);
         }
@@ -76,7 +76,7 @@ export function createActionRenderFn(ctx: Context) : RenderFn {
     }
 
     if (hasNormalizedSlot('default', ctx.slots)) {
-        return () => normalizeSlot('default', {
+        return normalizeSlot('default', {
             commandText: ctx.commandText,
             isDisabled: ctx.isDisabled,
             isAllowed: ctx.isAllowed,
@@ -84,5 +84,5 @@ export function createActionRenderFn(ctx: Context) : RenderFn {
         }, ctx.slots);
     }
 
-    return () => h(tag as string, attributes, text);
+    return h(tag as string, attributes, text);
 }
