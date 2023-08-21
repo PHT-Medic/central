@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.21](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.20...v2.4.0-alpha.21) (2023-08-21)
+
+**Note:** Version bump only for package @personalhealthtrain/server-core
+
+
+
+
+
 # [2.4.0-alpha.19](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.18...v2.4.0-alpha.19) (2023-08-16)
 
 

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.21](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.20...v2.4.0-alpha.21) (2023-08-21)
+
+
+### Bug Fixes
+
+* generating registry project id ([da18a4a](https://github.com/PHT-Medic/central/commit/da18a4a2f268e4216b9f57be48de817935806ebc))
+
+
+
+
+
 # [2.4.0-alpha.20](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.19...v2.4.0-alpha.20) (2023-08-16)
 
 
