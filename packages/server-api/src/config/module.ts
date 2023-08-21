@@ -6,7 +6,7 @@
  */
 
 import { APIClient, ROBOT_SYSTEM_NAME, mountClientResponseErrorTokenHook } from '@authup/core';
-import { Client, setClient } from 'hapic';
+import { Client, createClient, setClient } from 'hapic';
 import { setConfig as setAmqpConfig } from 'amqp-extension';
 import { setConfig as setRedisConfig } from 'redis-extension';
 import { VaultClient, setClient as setVaultClient } from '@hapic/vault';

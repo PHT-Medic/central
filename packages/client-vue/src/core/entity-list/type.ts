@@ -103,7 +103,6 @@ export type EntityListCreateContext<
     props: EntityListProps<T>,
     loadAll?: boolean,
     query?: BuildInput<Entity<T>> | (() => BuildInput<Entity<T>>),
-    queryFilters?: FiltersBuildInput<Entity<T>> | ((q: string) => FiltersBuildInput<Entity<T>>),
     onCreated?: (entity: T, meta: EntityListMeta) => void | Promise<void>,
     socket?: boolean | Omit<EntitySocketContext<A, T>, 'type'>
 };

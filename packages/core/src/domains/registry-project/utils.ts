@@ -8,5 +8,5 @@
 import { createNanoID } from '../../utils';
 
 export function generateRegistryProjectId() {
-    return createNanoID('0123456789abcdefghijklmnopqrstuvwxyz-_');
+    return createNanoID('0123456789abcdefghijklmnopqrstuvwxyz');
 }

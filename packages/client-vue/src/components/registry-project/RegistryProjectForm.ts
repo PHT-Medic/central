@@ -23,6 +23,7 @@ import {
 } from '../../core';
 import RegistryList from '../registry/RegistryList';
 
+// todo: must start with character or number!!
 const alphaNumHyphenUnderscore = helpers.regex(
     /^[a-z0-9-_]*$/,
 );
