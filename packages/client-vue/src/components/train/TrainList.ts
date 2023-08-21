@@ -10,15 +10,15 @@ import type {
 } from '@personalhealthtrain/core';
 import type { SetupContext, SlotsType } from 'vue';
 import { defineComponent, h } from 'vue';
-import type { EntityListEventsType, EntityListSlotsType } from '../../core';
-import { createEntityList, defineDomainListEvents, defineDomainListProps } from '../../core';
+import type { ListEventsType, ListSlotsType } from '../../core';
+import { createList, defineListEvents, defineListProps } from '../../core';
 import TrainItem from './TrainItem';
 
 export default defineComponent({
-    props: defineDomainListProps<Train>(),
-    slots: Object as SlotsType<EntityListSlotsType<Train>>,
+    props: defineListProps<Train>(),
+    slots: Object as SlotsType<ListSlotsType<Train>>,
     emits: {
-        ...defineDomainListEvents<Train>(),
+        ...defineListEvents<Train>(),
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         executed: (_component: string, _command :string) => true,
     },
@@ -28,21 +28,13 @@ export default defineComponent({
             setDefaults,
             handleUpdated,
             handleDeleted,
-        } = createEntityList({
+        } = createList({
             type: `${DomainType.TRAIN}`,
             props,
-            setup: setup as unknown as SetupContext<EntityListEventsType<Train>>,
+            setup: setup as unknown as SetupContext<ListEventsType<Train>>,
         });
 
         setDefaults({
-            footerPagination: true,
-
-            headerSearch: true,
-            headerTitle: {
-                content: 'Trains',
-                icon: 'fa fa-train-tram',
-            },
-
             item: {
                 content(item) {
                     return h(TrainItem, {

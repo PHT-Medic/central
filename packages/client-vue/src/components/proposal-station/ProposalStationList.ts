@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { ListTitle } from '@authup/client-vue';
 import type {
     ProposalStation,
 } from '@personalhealthtrain/core';
@@ -19,9 +20,9 @@ import type { FiltersBuildInput } from 'rapiq';
 
 import type { PropType, SlotsType, VNodeChild } from 'vue';
 import { computed, defineComponent, h } from 'vue';
-import type { EntityListSlotsType } from '../../core';
+import type { ListSlotsType } from '../../core';
 import {
-    createEntityList, defineDomainListEvents, defineDomainListProps,
+    createList, defineListEvents, defineListProps,
 } from '../../core';
 import type { DomainDetailsSlotProps } from '../type';
 import ProposalStationDetails from './ProposalStationEntity';
@@ -34,7 +35,7 @@ enum Direction {
 export default defineComponent({
     name: 'ProposalStationList',
     props: {
-        ...defineDomainListProps<ProposalStation>(),
+        ...defineListProps<ProposalStation>(),
         realmId: {
             type: String,
         },
@@ -51,8 +52,8 @@ export default defineComponent({
             default: Direction.OUT,
         },
     },
-    slots: Object as SlotsType<EntityListSlotsType<ProposalStation>>,
-    emits: defineDomainListEvents<ProposalStation>(),
+    slots: Object as SlotsType<ListSlotsType<ProposalStation>>,
+    emits: defineListEvents<ProposalStation>(),
     async setup(props, ctx) {
         const source = computed(() => (props.target === DomainType.STATION ?
             DomainType.PROPOSAL :
@@ -95,7 +96,7 @@ export default defineComponent({
         const {
             render,
             setDefaults,
-        } = createEntityList({
+        } = createList({
             type: `${DomainType.PROPOSAL_STATION}`,
             props,
             setup: ctx,
@@ -182,16 +183,16 @@ export default defineComponent({
         });
 
         setDefaults({
-            footerPagination: true,
-
-            headerSearch: true,
-            headerTitle: {
-                content: props.target === DomainType.STATION ?
-                    'Stations' :
-                    'Trains',
-                icon: props.target === DomainType.STATION ?
-                    'fa fa-hospital' :
-                    'fa-solid fa-file',
+            header: {
+                content: () => h(ListTitle, {
+                    text: props.target === DomainType.STATION ?
+                        'Stations' :
+                        'Trains',
+                    icon: true,
+                    iconClass: props.target === DomainType.STATION ?
+                        'fa fa-hospital' :
+                        'fa-solid fa-file',
+                }),
             },
 
             item: {

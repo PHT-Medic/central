@@ -5,16 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { ListSearch } from '@authup/client-vue';
 import type { MasterImage } from '@personalhealthtrain/core';
 import {
     DomainType,
     MasterImageCommand,
 } from '@personalhealthtrain/core';
+import type { ListHeaderSlotProps } from '@vue-layout/list-controls';
 import {
     defineComponent, h, reactive, ref,
 } from 'vue';
-import { injectAPIClient } from '../../core';
-import { EntityListSlotName } from '../../core/entity-list/constants';
+import { EntityListSlotName, injectAPIClient } from '../../core';
 import EntityDelete from '../EntityDelete';
 import MasterImageList from './MasterImageList';
 
@@ -100,9 +101,16 @@ export default defineComponent({
                 ]),
 
                 h(MasterImageList, {
-                    ref: 'itemList',
+                    ref: itemList,
                     scopedSlots: {
-                        [EntityListSlotName.HEADER_TITLE]: () => h('strong', ['Overview']),
+                        [EntityListSlotName.HEADER]: (props: ListHeaderSlotProps<MasterImage>) => [
+                            h(ListSearch, {
+                                load: props.load,
+                                meta: props.meta,
+                                busy: props.busy,
+                            }),
+                            h('strong', ['Overview']),
+                        ],
                         [EntityListSlotName.ITEM_ACTIONS]: (props : { data: MasterImage }) => h(EntityDelete, {
                             class: 'btn btn-xs btn-danger',
                             elementType: 'button',

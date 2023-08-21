@@ -14,14 +14,23 @@ import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { computed, nextTick, ref } from 'vue';
 import type { Ref } from 'vue';
-import { EntityDelete, UserSecretForm, UserSecretList } from '@personalhealthtrain/client-vue';
+import {
+    EntityDelete,
+    ListPagination,
+    ListSearch,
+    ListTitle,
+    UserSecretForm,
+    UserSecretList,
+} from '@personalhealthtrain/client-vue';
 import { useAPI } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { wrapFnWithBusyState } from '../../../core';
 import { useAuthStore } from '../../../store/auth';
 
 export default defineNuxtComponent({
-    components: { EntityDelete, UserSecretList, UserSecretForm },
+    components: {
+        ListPagination, ListSearch, ListTitle, EntityDelete, UserSecretList, UserSecretForm,
+    },
     setup() {
         const toast = useToast();
 
@@ -123,8 +132,18 @@ export default defineNuxtComponent({
                 :query="query"
                 @deleted="handleDeleted"
             >
-                <template #headerTitle>
-                    <h6><i class="fa-solid fa-list pe-1" /> Overview</h6>
+                <template #header="props">
+                    <ListTitle />
+                    <ListSearch
+                        :load="props.load"
+                        :meta="props.meta"
+                    />
+                </template>
+                <template #footer="props">
+                    <ListPagination
+                        :load="props.load"
+                        :meta="props.meta"
+                    />
                 </template>
                 <template #itemActions="props">
                     <div class="me-1">

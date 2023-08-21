@@ -4,11 +4,15 @@ import type { Realm } from '@authup/core';
 import { PermissionName, isRealmResourceWritable } from '@authup/core';
 import { EntityDelete, RealmList } from '@authup/client-vue';
 import { storeToRefs } from 'pinia';
+import { ListPagination, ListSearch, ListTitle } from '@personalhealthtrain/client-vue';
 import { defineNuxtComponent } from '#app';
 import { useAuthStore } from '../../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
+        ListPagination,
+        ListSearch,
+        ListTitle,
         BTable,
         EntityDelete,
         RealmList,
@@ -62,9 +66,21 @@ export default defineNuxtComponent({
 </script>
 <template>
     <RealmList
-        :header-title="{ icon: 'fa-solid fa-list pe-1', content: 'Overview' }"
         @deleted="handleDeleted"
     >
+        <template #header="props">
+            <ListTitle />
+            <ListSearch
+                :load="props.load"
+                :meta="props.meta"
+            />
+        </template>
+        <template #footer="props">
+            <ListPagination
+                :load="props.load"
+                :meta="props.meta"
+            />
+        </template>
         <template #body="props">
             <BTable
                 :items="props.data"

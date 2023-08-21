@@ -12,21 +12,21 @@ import {
 } from '@personalhealthtrain/core';
 import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
-import type { EntityListSlotsType } from '../../core';
-import { createEntityList, defineDomainListEvents, defineDomainListProps } from '../../core';
+import type { ListSlotsType } from '../../core';
+import { createList, defineListEvents, defineListProps } from '../../core';
 
 export default defineComponent({
     props: {
-        ...defineDomainListProps<Proposal>(),
+        ...defineListProps<Proposal>(),
         realmId: {
             type: String,
             default: undefined,
         },
     },
-    slots: Object as SlotsType<EntityListSlotsType<Proposal>>,
-    emits: defineDomainListEvents<Proposal>(),
+    slots: Object as SlotsType<ListSlotsType<Proposal>>,
+    emits: defineListEvents<Proposal>(),
     setup(props, setup) {
-        const { render, setDefaults } = createEntityList({
+        const { render, setDefaults } = createList({
             type: `${DomainType.PROPOSAL}`,
             props,
             setup,
@@ -36,14 +36,6 @@ export default defineComponent({
         });
 
         setDefaults({
-            footerPagination: true,
-
-            headerSearch: true,
-            headerTitle: {
-                content: 'Proposals',
-                icon: 'fa fa-scroll',
-            },
-
             noMore: {
                 content: 'No more proposals available...',
             },

@@ -15,8 +15,8 @@ import type { ListItemSlotProps } from '@vue-layout/list-controls';
 import {
     defineComponent, h, ref,
 } from 'vue';
-import type { EntityListMeta } from '../../core';
-import { createEntityList } from '../../core';
+import type { ListMeta } from '../../core';
+import { createList } from '../../core';
 import TrainLogComponent from './TrainLog';
 
 export default defineComponent({
@@ -33,7 +33,7 @@ export default defineComponent({
     setup(props, setup) {
         const rootNode = ref<null | HTMLElement>(null);
 
-        const scrollToLastLine = (meta: EntityListMeta) => {
+        const scrollToLastLine = (meta: ListMeta<TrainLog>) => {
             if (!rootNode.value) {
                 return;
             }
@@ -48,7 +48,7 @@ export default defineComponent({
         const {
             render,
             setDefaults,
-        } = createEntityList({
+        } = createList({
             type: `${DomainType.TRAIN_LOG}`,
             onCreated(_entity, meta) {
                 scrollToLastLine(meta);
@@ -76,13 +76,7 @@ export default defineComponent({
         });
 
         setDefaults({
-            footerPagination: false,
-
-            headerSearch: false,
-            headerTitle: false,
-
             noMore: {
-                class: { presets: { bootstrap: false }, value: 'list-no-more' },
                 content: 'No more logs available...',
             },
             item: {

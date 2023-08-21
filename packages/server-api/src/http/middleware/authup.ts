@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { AbilityManager, CookieName, ROBOT_SYSTEM_NAME } from '@authup/core';
 import { setInterval } from 'node:timers';
+import { AbilityManager, CookieName, ROBOT_SYSTEM_NAME } from '@authup/core';
 import type { OAuth2TokenGrantResponse } from '@authup/core';
 import { createHTTPMiddleware } from '@authup/server-adapter';
 import { useClient as useVaultClient } from '@hapic/vault';

@@ -6,11 +6,15 @@ import type { Permission } from '@authup/core';
 import { PermissionName, isRealmResourceWritable } from '@authup/core';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
+import { ListPagination, ListSearch, ListTitle } from '@personalhealthtrain/client-vue';
 import { defineNuxtComponent } from '#app';
 import { useAuthStore } from '../../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
+        ListPagination,
+        ListSearch,
+        ListTitle,
         BTable,
         EntityDelete,
         PermissionList,
@@ -63,10 +67,22 @@ export default defineNuxtComponent({
 </script>
 <template>
     <PermissionList
-        :header-title="{ icon: 'fa-solid fa-list pe-1', content: 'Overview' }"
         :query="query"
         @deleted="handleDeleted"
     >
+        <template #header="props">
+            <ListTitle />
+            <ListSearch
+                :load="props.load"
+                :meta="props.meta"
+            />
+        </template>
+        <template #footer="props">
+            <ListPagination
+                :load="props.load"
+                :meta="props.meta"
+            />
+        </template>
         <template #body="props">
             <BTable
                 :items="props.data"

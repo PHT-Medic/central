@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 import { buildFormInput, buildFormSubmit, buildFormTextarea } from '@vue-layout/form-controls';
-import type { ListItemSlotProps } from '@vue-layout/list-controls';
+import type { ListHeaderSlotProps, ListItemSlotProps } from '@vue-layout/list-controls';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
 import {
@@ -21,7 +21,7 @@ import type {
 import type { MasterImage, Proposal, Station } from '@personalhealthtrain/core';
 import { DomainType, ProposalRisk } from '@personalhealthtrain/core';
 import { useUpdatedAt } from '../../composables';
-import type { EntityListProps } from '../../core';
+import type { ListProps } from '../../core';
 import {
     EntityListSlotName,
     createEntityManager,
@@ -33,6 +33,7 @@ import {
 import MasterImagePicker from '../master-image/MasterImagePicker';
 import StationList from '../station/StationList';
 import ProposalStationAssignAction from '../proposal-station/ProposalStationAssignAction';
+import { ListSearch } from '../list-search';
 
 export default defineComponent({
     props: {
@@ -228,8 +229,14 @@ export default defineComponent({
                             hidden: false,
                         },
                     },
-                } satisfies EntityListProps<Station>, {
-                    [EntityListSlotName.HEADER_TITLE]: () => h('label', 'Stations'),
+                } satisfies ListProps<Station>, {
+                    [EntityListSlotName.HEADER]: (props: ListHeaderSlotProps<Station>) => [
+                        h('label', 'Stations'),
+                        h(ListSearch, {
+                            load: props.load,
+                            meta: props.meta,
+                        }),
+                    ],
                     [EntityListSlotName.ITEM_ACTIONS]: (props: ListItemSlotProps<Station>) => {
                         if (manager.data.value) {
                             return h(ProposalStationAssignAction, {

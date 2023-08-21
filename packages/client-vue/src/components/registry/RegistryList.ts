@@ -8,29 +8,21 @@ import { DomainType } from '@personalhealthtrain/core';
 import type { Registry } from '@personalhealthtrain/core';
 import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
-import type { EntityListSlotsType } from '../../core';
-import { createEntityList, defineDomainListEvents, defineDomainListProps } from '../../core';
+import type { ListSlotsType } from '../../core';
+import { createList, defineListEvents, defineListProps } from '../../core';
 
 export default defineComponent({
-    props: defineDomainListProps<Registry>(),
-    slots: Object as SlotsType<EntityListSlotsType<Registry>>,
-    emits: defineDomainListEvents<Registry>(),
+    props: defineListProps<Registry>(),
+    slots: Object as SlotsType<ListSlotsType<Registry>>,
+    emits: defineListEvents<Registry>(),
     setup(props, setup) {
-        const { render, setDefaults } = createEntityList({
+        const { render, setDefaults } = createList({
             type: `${DomainType.REGISTRY}`,
             props,
             setup,
         });
 
         setDefaults({
-            footerPagination: true,
-
-            headerSearch: true,
-            headerTitle: {
-                content: 'Registries',
-                icon: 'fa-brands fa-docker',
-            },
-
             noMore: {
                 content: 'No more registries available...',
             },

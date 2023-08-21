@@ -17,6 +17,9 @@ import { storeToRefs } from 'pinia';
 import type { Ref } from 'vue';
 import { computed, ref } from 'vue';
 import {
+    ListPagination,
+    ListSearch,
+    ListTitle,
     ProposalInForm,
     ProposalStationApprovalCommand,
     ProposalStationApprovalStatus,
@@ -30,6 +33,9 @@ import { useAuthStore } from '../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
+        ListPagination,
+        ListSearch,
+        ListTitle,
         BDropdown,
         BModal,
         BDropdownDivider,
@@ -148,8 +154,18 @@ export default defineNuxtComponent({
                 :realm-id="realmId"
                 :source-id="stationId"
             >
-                <template #headerTitle>
-                    <h6><i class="fa-solid fa-list pe-1" /> Overview</h6>
+                <template #header="props">
+                    <ListTitle />
+                    <ListSearch
+                        :load="props.load"
+                        :meta="props.meta"
+                    />
+                </template>
+                <template #footer="props">
+                    <ListPagination
+                        :load="props.load"
+                        :meta="props.meta"
+                    />
                 </template>
                 <template #body="props">
                     <BTable

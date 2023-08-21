@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import tar from 'tar-stream';
 import { createGzip } from 'node:zlib';
+import tar from 'tar-stream';
 import { useDocker } from './instance';
 import { findErrorInDockerModemResponse } from './modem-response';
 import type { DockerAuthConfig } from './type';

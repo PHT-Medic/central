@@ -9,7 +9,7 @@ export * from './api-client';
 export * from './authup';
 export * from './entity-action-command';
 export * from './entity-assign-action';
-export * from './entity-list';
+export * from './list';
 export * from './entity-manager';
 export * from './form';
 export * from './query';

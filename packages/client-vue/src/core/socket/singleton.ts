@@ -9,7 +9,7 @@ import type { App } from 'vue';
 import { inject, provide } from 'vue';
 import type { SocketManager } from './module';
 
-const SocketSymbol = Symbol.for('Socket');
+const SocketSymbol = Symbol.for('PSocket');
 
 export function provideSocketManager(manager: SocketManager, instance?: App) {
     if (instance) {

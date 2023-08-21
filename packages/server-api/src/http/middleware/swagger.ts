@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import path from 'node:path';
 import { createUIHandler } from '@routup/swagger';
 import { loadSync } from 'locter';
-import path from 'node:path';
 import type { Router } from 'routup';
 import { getWritableDirPath } from '../../config';
 

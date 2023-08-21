@@ -13,6 +13,9 @@ import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { computed, ref } from 'vue';
 import {
+    ListPagination,
+    ListSearch,
+    ListTitle,
     TrainName,
     TrainStationApprovalCommand,
     TrainStationApprovalStatus,
@@ -26,6 +29,9 @@ import { useAuthStore } from '../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
+        ListPagination,
+        ListSearch,
+        ListTitle,
         TrainName,
         BDropdown,
         BTable,
@@ -77,8 +83,8 @@ export default defineNuxtComponent({
                 train: true,
             },
             sort: {
-                updated_at: 'DESC'
-            }
+                updated_at: 'DESC',
+            },
         };
 
         const download = (item: TrainStation) => {
@@ -121,8 +127,18 @@ export default defineNuxtComponent({
                 :direction="'in'"
                 :query="query"
             >
-                <template #headerTitle>
-                    <h6><i class="fa-solid fa-list pe-1" /> Overview</h6>
+                <template #header="props">
+                    <ListTitle />
+                    <ListSearch
+                        :load="props.load"
+                        :meta="props.meta"
+                    />
+                </template>
+                <template #footer="props">
+                    <ListPagination
+                        :load="props.load"
+                        :meta="props.meta"
+                    />
                 </template>
                 <template #body="props">
                     <BTable

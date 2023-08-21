@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { isObject } from 'smob';
+import { isObject } from '@personalhealthtrain/core';
 import type { RouterRoutePayload } from '../type';
 
 export function isRouterRoutePayload(input: unknown) : input is RouterRoutePayload {

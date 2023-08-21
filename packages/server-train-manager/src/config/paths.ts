@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Train } from '@personalhealthtrain/core';
 import path from 'node:path';
+import type { Train } from '@personalhealthtrain/core';
 
 let writableDirPath : string | undefined;
 

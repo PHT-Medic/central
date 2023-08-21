@@ -8,15 +8,15 @@ import { DomainType } from '@personalhealthtrain/core';
 import type { Station } from '@personalhealthtrain/core';
 import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
-import { createEntityList, defineDomainListEvents, defineDomainListProps } from '../../core';
-import type { EntityListSlotsType } from '../../core';
+import { createList, defineListEvents, defineListProps } from '../../core';
+import type { ListSlotsType } from '../../core';
 
 export default defineComponent({
-    props: defineDomainListProps<Station>(),
-    slots: Object as SlotsType<EntityListSlotsType<Station>>,
-    emits: defineDomainListEvents<Station>(),
+    props: defineListProps<Station>(),
+    slots: Object as SlotsType<ListSlotsType<Station>>,
+    emits: defineListEvents<Station>(),
     setup(props, setup) {
-        const { render, setDefaults } = createEntityList({
+        const { render, setDefaults } = createList({
             type: `${DomainType.STATION}`,
             props,
             setup,
@@ -28,14 +28,6 @@ export default defineComponent({
         });
 
         setDefaults({
-            footerPagination: true,
-
-            headerSearch: true,
-            headerTitle: {
-                content: 'Stations',
-                icon: 'fa fa-house-medical',
-            },
-
             noMore: {
                 content: 'No more stations available...',
             },

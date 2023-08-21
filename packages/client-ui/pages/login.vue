@@ -15,6 +15,7 @@ import {
 } from 'vue';
 import type { IdentityProvider } from '@authup/core';
 import type { BuildInput } from 'rapiq';
+import { ListPagination, ListSearch, ListTitle } from '@personalhealthtrain/client-vue';
 import { definePageMeta, useRuntimeConfig } from '#imports';
 import {
     defineNuxtComponent, navigateTo, useNuxtApp, useRoute,
@@ -27,6 +28,9 @@ import { useAuthStore } from '../store/auth';
 
 export default defineNuxtComponent({
     components: {
+        ListPagination,
+        ListSearch,
+        ListTitle,
         IdentityProviderList,
         MedicineWorker,
     },
@@ -180,10 +184,21 @@ export default defineNuxtComponent({
                         ref="identityProviderRef"
                         :query="identityProviderQuery"
                     >
-                        <template #header>
-                            <h6 class="mb-2">
-                                <i class="fa-solid fa-atom" /> Providers
-                            </h6>
+                        <template #header="props">
+                            <ListTitle
+                                text="Providers"
+                                icon-class="fa-solid fa-atom"
+                            />
+                            <ListSearch
+                                :load="props.load"
+                                :meta="props.meta"
+                            />
+                        </template>
+                        <template #footer="props">
+                            <ListPagination
+                                :load="props.load"
+                                :meta="props.meta"
+                            />
                         </template>
                         <template #item="props">
                             <div>

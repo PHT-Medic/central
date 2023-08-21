@@ -11,13 +11,22 @@ import { BModal, BTable, useToast } from 'bootstrap-vue-next';
 import type { BuildInput } from 'rapiq';
 import { computed, ref, toRefs } from 'vue';
 import type { PropType, Ref } from 'vue';
-import { EntityDelete, RegistryProjectDetails, RegistryProjectList } from '@personalhealthtrain/client-vue';
+import {
+    EntityDelete, ListPagination,
+    ListSearch,
+    ListTitle,
+    RegistryProjectDetails,
+    RegistryProjectList,
+} from '@personalhealthtrain/client-vue';
 import { definePageMeta } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../../../../config/layout';
 import { useAuthStore } from '../../../../../../store/auth';
 
 export default {
     components: {
+        ListPagination,
+        ListSearch,
+        ListTitle,
         BModal,
         BTable,
         EntityDelete,
@@ -114,6 +123,19 @@ export default {
             :query="query"
             :load-on-init="true"
         >
+            <template #header="props">
+                <ListTitle />
+                <ListSearch
+                    :load="props.load"
+                    :meta="props.meta"
+                />
+            </template>
+            <template #footer="props">
+                <ListPagination
+                    :load="props.load"
+                    :meta="props.meta"
+                />
+            </template>
             <template #body="props">
                 <BTable
                     :items="props.data"

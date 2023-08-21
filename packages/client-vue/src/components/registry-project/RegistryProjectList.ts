@@ -8,29 +8,21 @@ import { DomainType } from '@personalhealthtrain/core';
 import type { RegistryProject } from '@personalhealthtrain/core';
 import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
-import type { EntityListSlotsType } from '../../core';
-import { createEntityList, defineDomainListEvents, defineDomainListProps } from '../../core';
+import type { ListSlotsType } from '../../core';
+import { createList, defineListEvents, defineListProps } from '../../core';
 
 export default defineComponent({
-    props: defineDomainListProps<RegistryProject>(),
-    slots: Object as SlotsType<EntityListSlotsType<RegistryProject>>,
-    emits: defineDomainListEvents<RegistryProject>(),
+    props: defineListProps<RegistryProject>(),
+    slots: Object as SlotsType<ListSlotsType<RegistryProject>>,
+    emits: defineListEvents<RegistryProject>(),
     setup(props, setup) {
-        const { render, setDefaults } = createEntityList({
+        const { render, setDefaults } = createList({
             type: `${DomainType.REGISTRY_PROJECT}`,
             props,
             setup,
         });
 
         setDefaults({
-            footerPagination: true,
-
-            headerSearch: true,
-            headerTitle: {
-                content: 'Registry-Projects',
-                icon: 'fa fa-diagram-project',
-            },
-
             noMore: {
                 content: 'No more registry projects available...',
             },

@@ -5,11 +5,11 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import path from 'node:path';
 import {
     Version, generate,
 } from '@routup/swagger';
 import { load } from 'locter';
-import path from 'node:path';
 import { getRootDirPath, getWritableDirPath, useEnv } from '../config';
 
 export async function generateSwaggerDocumentation() {

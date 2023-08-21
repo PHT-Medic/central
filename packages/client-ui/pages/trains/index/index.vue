@@ -10,14 +10,18 @@ import { PermissionID } from '@personalhealthtrain/core';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { computed } from 'vue';
-import { TrainList } from '@personalhealthtrain/client-vue';
+import {
+    ListPagination, ListSearch, ListTitle, TrainList,
+} from '@personalhealthtrain/client-vue';
 import { definePageMeta } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 import { useAuthStore } from '../../../store/auth';
 
 export default defineNuxtComponent({
-    components: { TrainList },
+    components: {
+        ListPagination, ListSearch, ListTitle, TrainList,
+    },
     setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
@@ -56,11 +60,21 @@ export default defineNuxtComponent({
         </div>
 
         <div class="m-t-10">
-            <train-list :query="query">
-                <template #headerTitle>
-                    <h6><i class="fa-solid fa-list pe-1" /> Overview</h6>
+            <TrainList :query="query">
+                <template #header="props">
+                    <ListTitle />
+                    <ListSearch
+                        :load="props.load"
+                        :meta="props.meta"
+                    />
                 </template>
-            </train-list>
+                <template #footer="props">
+                    <ListPagination
+                        :load="props.load"
+                        :meta="props.meta"
+                    />
+                </template>
+            </TrainList>
         </div>
     </div>
 </template>

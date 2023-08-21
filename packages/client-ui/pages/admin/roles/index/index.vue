@@ -6,12 +6,15 @@ import { PermissionName, isRealmResourceWritable } from '@authup/core';
 import { EntityDelete, RoleList } from '@authup/client-vue';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
+import { ListPagination, ListSearch, ListTitle } from '@personalhealthtrain/client-vue';
 import { defineNuxtComponent } from '#app';
 import { resolveComponent } from '#imports';
 import { useAuthStore } from '../../../../store/auth';
 
 export default defineNuxtComponent({
-    components: { BTable, RoleList, EntityDelete },
+    components: {
+        ListPagination, ListSearch, ListTitle, BTable, RoleList, EntityDelete,
+    },
     emits: ['deleted'],
     setup(props, { emit }) {
         const handleDeleted = (e: Role) => {
@@ -63,10 +66,22 @@ export default defineNuxtComponent({
 </script>
 <template>
     <RoleList
-        :header-title="{ icon: 'fa-solid fa-list pe-1', content: 'Overview' }"
         :query="query"
         @deleted="handleDeleted"
     >
+        <template #header="props">
+            <ListTitle />
+            <ListSearch
+                :load="props.load"
+                :meta="props.meta"
+            />
+        </template>
+        <template #footer="props">
+            <ListPagination
+                :load="props.load"
+                :meta="props.meta"
+            />
+        </template>
         <template #body="props">
             <BTable
                 :items="props.data"

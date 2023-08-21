@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { createClient } from 'hapic';
 import fs from 'node:fs';
 import path from 'node:path';
 import { Readable } from 'node:stream';
+import { createClient } from 'hapic';
 import tar from 'tar';
 import { scanDirectory } from 'docker-scan';
 import type { Request, Response } from 'routup';

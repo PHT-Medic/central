@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { randomBytes } from 'crypto';
 import type { Train } from '@personalhealthtrain/core';
 import { TrainType } from '@personalhealthtrain/core';
 import type { SuperTest, Test } from 'supertest';
-import { randomBytes } from 'crypto';
 
 export const TEST_DEFAULT_TRAIN : Partial<Train> = {
     name: 'development',

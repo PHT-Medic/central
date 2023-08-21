@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import path from 'node:path';
 import type { Logger } from 'winston';
 import { createLogger, format, transports } from 'winston';
-import path from 'node:path';
 import { getWritableDirPath } from '../../config';
 
 let logger : undefined | any;

@@ -5,9 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { Buffer } from 'node:buffer';
 import { NotFoundError } from '@ebec/http';
 import { PermissionID, SecretType, isHex } from '@personalhealthtrain/core';
-import { Buffer } from 'node:buffer';
 import type { Request, Response } from 'routup';
 import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';

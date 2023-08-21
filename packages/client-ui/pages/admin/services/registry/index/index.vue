@@ -11,7 +11,9 @@ import { PermissionID } from '@personalhealthtrain/core';
 import { BSpinner, BTable } from 'bootstrap-vue-next';
 import type { BuildInput } from 'rapiq';
 import { computed, ref } from 'vue';
-import { EntityDelete, RegistryList } from '@personalhealthtrain/client-vue';
+import {
+    EntityDelete, ListPagination, ListSearch, ListTitle, RegistryList,
+} from '@personalhealthtrain/client-vue';
 import { defineNuxtComponent } from '#app';
 import { definePageMeta } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
@@ -19,7 +21,14 @@ import { useAuthStore } from '../../../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
-        BSpinner, BTable, EntityDelete, RegistryList, Timeago,
+        ListPagination,
+        ListSearch,
+        ListTitle,
+        BSpinner,
+        BTable,
+        EntityDelete,
+        RegistryList,
+        Timeago,
     },
     setup(props, { emit }) {
         definePageMeta({
@@ -75,8 +84,18 @@ export default defineNuxtComponent({
         :load-on-init="true"
         :query="query"
     >
-        <template #headerTitle>
-            <h6><i class="fa-solid fa-list pe-1" /> Overview</h6>
+        <template #header="props">
+            <ListTitle />
+            <ListSearch
+                :load="props.load"
+                :meta="props.meta"
+            />
+        </template>
+        <template #footer="props">
+            <ListPagination
+                :load="props.load"
+                :meta="props.meta"
+            />
         </template>
         <template #body="props">
             <BTable

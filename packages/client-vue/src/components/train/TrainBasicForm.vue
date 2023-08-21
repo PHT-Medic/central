@@ -157,7 +157,7 @@ export default defineComponent({
                 class="col"
             >
                 <proposal-list :query="proposalQuery">
-                    <template #headerTitle>
+                    <template #header>
                         <label>Proposals</label>
                     </template>
                     <template #item="props">

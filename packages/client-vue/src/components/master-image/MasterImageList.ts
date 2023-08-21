@@ -9,19 +9,19 @@ import { DomainType } from '@personalhealthtrain/core';
 import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
 import type { MasterImage } from '@personalhealthtrain/core';
-import type { EntityListSlotsType } from '../../core';
+import type { ListSlotsType } from '../../core';
 import {
-    createEntityList,
-    defineDomainListEvents,
-    defineDomainListProps,
+    createList,
+    defineListEvents,
+    defineListProps,
 } from '../../core';
 
 export default defineComponent({
-    props: defineDomainListProps<MasterImage>(),
-    slots: Object as SlotsType<EntityListSlotsType<MasterImage>>,
-    emits: defineDomainListEvents<MasterImage>(),
+    props: defineListProps<MasterImage>(),
+    slots: Object as SlotsType<ListSlotsType<MasterImage>>,
+    emits: defineListEvents<MasterImage>(),
     setup(props, ctx) {
-        const { render, setDefaults } = createEntityList({
+        const { render, setDefaults } = createList({
             type: `${DomainType.MASTER_IMAGE}`,
             props,
             setup: ctx,
@@ -36,14 +36,6 @@ export default defineComponent({
         });
 
         setDefaults({
-            footerPagination: true,
-
-            headerSearch: true,
-            headerTitle: {
-                content: 'Master Images',
-                icon: 'fa fa-compact-disc',
-            },
-
             item: {
                 textPropName: 'virtual_path',
             },

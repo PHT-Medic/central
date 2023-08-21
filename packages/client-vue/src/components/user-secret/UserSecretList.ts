@@ -8,29 +8,21 @@ import type { UserSecret } from '@personalhealthtrain/core';
 import { DomainType, SecretType } from '@personalhealthtrain/core';
 import type { SlotsType } from 'vue';
 import { defineComponent, h } from 'vue';
-import { createEntityList, defineDomainListEvents, defineDomainListProps } from '../../core';
-import type { EntityListSlotsType } from '../../core';
+import { createList, defineListEvents, defineListProps } from '../../core';
+import type { ListSlotsType } from '../../core';
 
 export default defineComponent({
-    props: defineDomainListProps<UserSecret>(),
-    slots: Object as SlotsType<EntityListSlotsType<UserSecret>>,
-    emits: defineDomainListEvents<UserSecret>(),
+    props: defineListProps<UserSecret>(),
+    slots: Object as SlotsType<ListSlotsType<UserSecret>>,
+    emits: defineListEvents<UserSecret>(),
     setup(props, setup) {
-        const { render, setDefaults } = createEntityList({
+        const { render, setDefaults } = createList({
             type: `${DomainType.USER_SECRET}`,
             props,
             setup,
         });
 
         setDefaults({
-            footerPagination: true,
-
-            headerSearch: true,
-            headerTitle: {
-                content: 'Secrets',
-                icon: 'fa fa-key',
-            },
-
             item: {
                 icon: false,
                 content(item, props, sections) {

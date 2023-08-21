@@ -15,9 +15,13 @@ import MasterImagePicker from '../../master-image/MasterImagePicker';
 import TrainStationList from '../../train-station/TrainStationList';
 import TrainStationAssignAction from '../../train-station/TrainStationAssignAction';
 import { injectAPIClient } from '../../../core';
+import { ListSearch } from '../../list-search';
+import { ListPagination } from '../../list-pagination';
 
 export default defineComponent({
     components: {
+        ListPagination,
+        ListSearch,
         TrainStationAssignAction,
         TrainStationList,
         MasterImagePicker,
@@ -107,8 +111,19 @@ export default defineComponent({
                         :direction="'out'"
                         :query="{filters: {proposal_id: train.proposal_id}}"
                     >
-                        <template #headerTitle>
+                        <template #header="props">
                             <span>Stations <span class="text-info">available</span></span>
+
+                            <ListSearch
+                                :load="props.load"
+                                :meta="props.meta"
+                            />
+                        </template>
+                        <template #footer="props">
+                            <ListPagination
+                                :load="props.load"
+                                :meta="props.meta"
+                            />
                         </template>
 
                         <template #itemActions="props">
@@ -130,7 +145,7 @@ export default defineComponent({
                         :direction="'out'"
                         :query="{filters: {train_id: train.id}}"
                     >
-                        <template #headerTitle>
+                        <template #header>
                             <span>Stations <span class="text-success">selected</span></span>
                         </template>
                     </TrainStationList>

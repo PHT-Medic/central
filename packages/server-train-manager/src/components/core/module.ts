@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { extendPayload } from '../utils';
 import {
     executeCoreConfigureCommand, executeCoreDestroyCommand,
 

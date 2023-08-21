@@ -12,7 +12,9 @@ import { BSpinner, BTable, useToast } from 'bootstrap-vue-next';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { computed, ref } from 'vue';
-import { EntityDelete, StationList } from '@personalhealthtrain/client-vue';
+import {
+    EntityDelete, ListPagination, ListSearch, ListTitle, StationList,
+} from '@personalhealthtrain/client-vue';
 import { definePageMeta } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
@@ -20,6 +22,9 @@ import { useAuthStore } from '../../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
+        ListPagination,
+        ListSearch,
+        ListTitle,
         EntityDelete,
         BTable,
         StationList,
@@ -90,8 +95,18 @@ export default defineNuxtComponent({
         :query="query"
         :load-on-init="true"
     >
-        <template #headerTitle>
-            <h6><i class="fa-solid fa-list pe-1" /> Overview</h6>
+        <template #header="props">
+            <ListTitle />
+            <ListSearch
+                :load="props.load"
+                :meta="props.meta"
+            />
+        </template>
+        <template #footer="props">
+            <ListPagination
+                :load="props.load"
+                :meta="props.meta"
+            />
         </template>
         <template #body="props">
             <BTable

@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { APIClient } from '@personalhealthtrain/core';
-import { TrainContainerFileName, TrainContainerPath } from '@personalhealthtrain/core';
 import stream from 'node:stream';
 import crypto from 'node:crypto';
+import type { APIClient } from '@personalhealthtrain/core';
+import { TrainContainerFileName, TrainContainerPath } from '@personalhealthtrain/core';
 import type { Container } from 'dockerode';
 import { useClient } from 'hapic';
 import tar from 'tar-stream';

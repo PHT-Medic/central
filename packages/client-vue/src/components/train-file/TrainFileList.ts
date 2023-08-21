@@ -10,40 +10,32 @@ import type {
 } from '@personalhealthtrain/core';
 import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
-import type { EntityListSlotsType } from '../../core';
-import { createEntityList, defineDomainListEvents, defineDomainListProps } from '../../core';
+import type { ListSlotsType } from '../../core';
+import { createList, defineListEvents, defineListProps } from '../../core';
 
 export default defineComponent({
     props: {
-        ...defineDomainListProps<TrainFile>(),
+        ...defineListProps<TrainFile>(),
         realmId: {
             type: String,
             default: undefined,
         },
     },
-    slots: Object as SlotsType<EntityListSlotsType<TrainFile>>,
-    emits: defineDomainListEvents<TrainFile>(),
+    slots: Object as SlotsType<ListSlotsType<TrainFile>>,
+    emits: defineListEvents<TrainFile>(),
     setup(props, setup) {
         // todo: include sort
 
         const {
             render,
             setDefaults,
-        } = createEntityList({
+        } = createList({
             type: `${DomainType.TRAIN_FILE}`,
             props,
             setup,
         });
 
         setDefaults({
-            footerPagination: true,
-
-            headerSearch: true,
-            headerTitle: {
-                content: 'Train Files',
-                icon: 'fa-train-tram',
-            },
-
             noMore: {
                 content: 'No more train files available...',
             },

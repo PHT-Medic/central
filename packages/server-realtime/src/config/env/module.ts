@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import path from 'node:path';
 import { readFromProcessEnv, readIntFromProcessEnv } from '@personalhealthtrain/server-core';
 import { hasOwnProperty } from '@personalhealthtrain/core';
 import { config } from 'dotenv';
-import path from 'node:path';
 import type { EnvironmentName } from './constants';
 import type { Environment } from './type';
 

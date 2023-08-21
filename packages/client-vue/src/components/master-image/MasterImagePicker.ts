@@ -160,9 +160,6 @@ export default defineComponent({
                 }, [
                     h(MasterImageList, {
                         ref: itemListNode,
-                        headerSearch: false,
-                        headerTitle: false,
-                        footerPagination: false,
                         query: imageQuery.value,
                     }, {
                         [EntityListSlotName.BODY]: (props: ListBodySlotProps<MasterImage>) => {
@@ -207,11 +204,7 @@ export default defineComponent({
                     'div',
                     { class: 'col' },
                     [
-                        h(MasterImageGroupList, {
-                            headerSearch: false,
-                            headerTitle: false,
-                            footerPagination: false,
-                        }, {
+                        h(MasterImageGroupList, { }, {
                             [EntityListSlotName.BODY]: (props: ListBodySlotProps<MasterImageGroup>) => {
                                 const options : FormSelectOption[] = props.data.map((entity) => ({
                                     id: entity.virtual_path,

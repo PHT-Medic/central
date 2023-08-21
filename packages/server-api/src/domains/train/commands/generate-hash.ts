@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { TrainConfigurationStatus } from '@personalhealthtrain/core';
 import crypto from 'node:crypto';
+import { TrainConfigurationStatus } from '@personalhealthtrain/core';
 import { useDataSource } from 'typeorm-extension';
 import { useMinio } from '../../../core/minio';
 import { streamToBuffer } from '../../../core/utils';

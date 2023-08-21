@@ -8,13 +8,17 @@
 import { PermissionID } from '@personalhealthtrain/core';
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
-import { ProposalItem, ProposalList } from '@personalhealthtrain/client-vue';
+import {
+    ListPagination, ListSearch, ListTitle, ProposalItem, ProposalList,
+} from '@personalhealthtrain/client-vue';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 import { defineNuxtComponent, definePageMeta } from '#imports';
 import { useAuthStore } from '~/store/auth';
 
 export default defineNuxtComponent({
-    components: { ProposalList, ProposalItem },
+    components: {
+        ListPagination, ListSearch, ListTitle, ProposalList, ProposalItem,
+    },
     setup() {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
@@ -62,8 +66,18 @@ export default defineNuxtComponent({
             <ProposalList
                 :query="query"
             >
-                <template #headerTitle>
-                    <h6><i class="fa-solid fa-list pe-1" /> Overview</h6>
+                <template #header="props">
+                    <ListTitle />
+                    <ListSearch
+                        :load="props.load"
+                        :meta="props.meta"
+                    />
+                </template>
+                <template #footer="props">
+                    <ListPagination
+                        :load="props.load"
+                        :meta="props.meta"
+                    />
                 </template>
                 <template #item="props">
                     <ProposalItem

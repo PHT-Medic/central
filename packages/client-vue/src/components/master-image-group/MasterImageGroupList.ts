@@ -10,31 +10,24 @@ import type { MasterImageGroup } from '@personalhealthtrain/core';
 import type { SlotsType } from 'vue';
 import { defineComponent } from 'vue';
 import {
-    createEntityList,
-    defineDomainListEvents,
-    defineDomainListProps,
+    createList,
+    defineListEvents,
+    defineListProps,
 } from '../../core';
-import type { EntityListSlotsType } from '../../core';
+import type { ListSlotsType } from '../../core';
 
 export default defineComponent({
-    props: defineDomainListProps<MasterImageGroup>(),
-    slots: Object as SlotsType<EntityListSlotsType<MasterImageGroup>>,
-    emits: defineDomainListEvents<MasterImageGroup>(),
+    props: defineListProps<MasterImageGroup>(),
+    slots: Object as SlotsType<ListSlotsType<MasterImageGroup>>,
+    emits: defineListEvents<MasterImageGroup>(),
     setup(props, ctx) {
-        const { render, setDefaults } = createEntityList({
+        const { render, setDefaults } = createList({
             type: `${DomainType.MASTER_IMAGE_GROUP}`,
             props,
             setup: ctx,
         });
 
         setDefaults({
-            footerPagination: true,
-
-            headerSearch: true,
-            headerTitle: {
-                content: 'Master Image Groups',
-            },
-
             noMore: {
                 content: 'No more master-image-groups available...',
             },

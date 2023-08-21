@@ -5,38 +5,17 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { StoreSymbol } from '@authup/client-vue';
-import type {
-    Store,
-    _ExtractActionsFromSetupStore,
-    _ExtractGettersFromSetupStore,
-    _ExtractStateFromSetupStore,
-} from 'pinia';
-import type { createStore } from '@authup/client-vue';
+import { injectStore, provideStore } from '@authup/client-vue';
 import type { App } from 'vue';
-import { inject, provide } from 'vue';
 
-type StoreData = ReturnType<typeof createStore>;
-export type AuthupStore = Store<
-string,
-_ExtractStateFromSetupStore<StoreData>,
-_ExtractGettersFromSetupStore<StoreData>,
-_ExtractActionsFromSetupStore<StoreData>
->;
+export type AuthupStore = ReturnType<typeof injectStore>;
 export function injectAuthupStore() : AuthupStore {
-    const store = inject(StoreSymbol);
-    if (!store) {
-        throw new Error('The Authup Store is not set.');
-    }
-
-    return store as AuthupStore;
+    return injectStore();
 }
 
-export function provideAuthupStore(store: AuthupStore, instance?: App) {
-    if (instance) {
-        instance.provide(StoreSymbol, store);
-        return;
-    }
-
-    provide(StoreSymbol, store);
+export function provideAuthupStore(
+    store: AuthupStore,
+    instance?: App,
+) {
+    provideStore(store, instance);
 }

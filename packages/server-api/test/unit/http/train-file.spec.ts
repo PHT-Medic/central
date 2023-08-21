@@ -5,8 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { TrainFile } from '@personalhealthtrain/core';
 import path from 'node:path';
+import type { TrainFile } from '@personalhealthtrain/core';
 import tar from 'tar-stream';
 import {
     dropTestDatabase,

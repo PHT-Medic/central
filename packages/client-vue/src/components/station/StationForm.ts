@@ -172,11 +172,7 @@ export default defineComponent({
                 realm = [
                     h(
                         RealmList,
-                        {
-                            headerTitle: false,
-                            headerSearch: false,
-                            footerPagination: false,
-                        },
+                        {},
                         {
                             [EntityListSlotName.BODY]: (props: ListBodySlotProps<Station>) => buildFormSelect({
                                 validationTranslator: useValidationTranslator(),
