@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.22](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.21...v2.4.0-alpha.22) (2023-08-31)
+
+
+### Features
+
+* expose login form in vue package ([ebe1eb9](https://github.com/PHT-Medic/central/commit/ebe1eb92d58f3072dbccb05b98749a998f50c063))
+
+
+
+
+
 # [2.4.0-alpha.21](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.20...v2.4.0-alpha.21) (2023-08-21)
 
 
