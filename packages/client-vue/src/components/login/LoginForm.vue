@@ -1,7 +1,6 @@
 <script lang="ts">
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
-import { isClientError } from 'hapic';
 import {
     defineComponent, reactive, ref, toRef, watch,
 } from 'vue';
@@ -66,14 +65,11 @@ export default defineComponent({
 
                 emit('done');
             } catch (e: any) {
-                if (isClientError(e)) {
+                if (e instanceof Error) {
                     emit('failed', e);
                 }
             }
         };
-
-        Promise.resolve()
-            .then(store.logout);
 
         const translator = useValidationTranslator();
 
