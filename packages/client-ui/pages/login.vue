@@ -65,7 +65,6 @@ export default defineNuxtComponent({
         return {
             handleDone,
             handleFailed,
-            translateValidationMessage,
             buildIdentityProviderURL,
         };
     },
