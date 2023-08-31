@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.23](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.22...v2.4.0-alpha.23) (2023-08-31)
+
+
+### Bug Fixes
+
+* login form, don't call logout method ([c6c90a6](https://github.com/PHT-Medic/central/commit/c6c90a63ccd63f0966d3cdc0aa9a664743920844))
+
+
+
+
+
 # [2.4.0-alpha.22](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.21...v2.4.0-alpha.22) (2023-08-31)
 
 

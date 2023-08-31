@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.23](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.22...v2.4.0-alpha.23) (2023-08-31)
+
+**Note:** Version bump only for package @personalhealthtrain/client-ui
+
+
+
+
+
 # [2.4.0-alpha.22](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.21...v2.4.0-alpha.22) (2023-08-31)
 
 
