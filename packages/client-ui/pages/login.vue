@@ -6,28 +6,22 @@
   -->
 <script lang="ts">
 import { IdentityProviderList } from '@authup/client-vue';
-import useVuelidate from '@vuelidate/core';
-import { maxLength, minLength, required } from '@vuelidate/validators';
 import { useToast } from 'bootstrap-vue-next';
-import { isClientError } from 'hapic';
 import {
-    reactive, ref, toRef, watch,
-} from 'vue';
-import type { IdentityProvider } from '@authup/core';
-import type { BuildInput } from 'rapiq';
-import { ListPagination, ListSearch, ListTitle } from '@personalhealthtrain/client-vue';
-import { definePageMeta, useRuntimeConfig } from '#imports';
+    ListPagination, ListSearch, ListTitle, LoginForm,
+} from '@personalhealthtrain/client-vue';
 import {
-    defineNuxtComponent, navigateTo, useNuxtApp, useRoute,
+    definePageMeta, navigateTo, useAuthupAPI, useRoute,
+} from '#imports';
+import {
+    defineNuxtComponent,
 } from '#app';
 import MedicineWorker from '../components/svg/MedicineWorker';
-import { useAuthupAPI } from '../composables/api';
-import { translateValidationMessage } from '../composables/ilingo';
 import { LayoutKey, LayoutNavigationID } from '../config/layout';
-import { useAuthStore } from '../store/auth';
 
 export default defineNuxtComponent({
     components: {
+        LoginForm,
         ListPagination,
         ListSearch,
         ListTitle,
@@ -40,102 +34,38 @@ export default defineNuxtComponent({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
         });
 
-        const runtimeConfig = useRuntimeConfig();
-
-        const form = reactive({
-            name: '',
-            password: '',
-            realm_id: '',
-        });
-
-        const vuelidate = useVuelidate({
-            name: {
-                required,
-                minLength: minLength(3),
-                maxLength: maxLength(255),
-            },
-            password: {
-                required,
-                minLength: minLength(3),
-                maxLength: maxLength(255),
-            },
-            realm_id: {
-
-            },
-        }, form);
-
         const toast = useToast();
+        const route = useRoute();
 
-        const store = useAuthStore();
+        const handleDone = () => {
+            const { redirect, ...query } = route.query;
 
-        const busy = ref(false);
-
-        const realmId = toRef(form, 'realm_id');
-
-        let identityProviderQuery : BuildInput<IdentityProvider> = {
-            filters: {
-                realm_id: realmId.value || '',
-            },
-        };
-        const identityProviderRef = ref<null | { load:() => any, [key: string]: any}>(null);
-
-        watch(realmId, async (val, oldVal) => {
-            if (val !== oldVal) {
-                if (identityProviderRef.value) {
-                    identityProviderQuery = {
-                        filters: {
-                            realm_id: realmId.value || '',
-                        },
-                    };
-                    identityProviderRef.value.load();
-                }
-            }
-        });
-
-        const submit = async () => {
-            try {
-                await store.login({
-                    name: form.name,
-                    password: form.password,
-                    realmId: form.realm_id,
-                });
-
-                const route = useRoute();
-                const { redirect, ...query } = route.query;
-
-                navigateTo({
-                    path: (redirect || '/') as string,
-                    query,
-                });
-            } catch (e: any) {
-                if (isClientError(e)) {
-                    toast.warning({ body: e.message }, {
-                        pos: 'top-center',
-                    });
-                }
-            }
+            navigateTo({
+                path: (redirect || '/') as string,
+                query,
+            });
         };
 
-        Promise.resolve()
-            .then(store.logout);
+        const handleFailed = (e: Error) => {
+            if (toast) {
+                toast.warning({ body: e.message }, {
+                    pos: 'top-center',
+                });
+            }
+        };
 
         const buildIdentityProviderURL = (id: string) => {
             const apiClient = useAuthupAPI();
             return apiClient.identityProvider.getAuthorizeUri(
-                runtimeConfig.public.authupApiUrl,
+                apiClient.getBaseURL() as string,
                 id,
             );
         };
 
         return {
-            vuelidate,
+            handleDone,
+            handleFailed,
             translateValidationMessage,
-            form,
-            submit,
-            busy,
-
-            identityProviderQuery,
-            identityProviderRef,
             buildIdentityProviderURL,
         };
     },
@@ -150,72 +80,47 @@ export default defineNuxtComponent({
         <div class="text-center">
             <MedicineWorker :height="320" />
         </div>
-        <form @submit.prevent="submit">
-            <div class="row">
-                <div class="col-6">
-                    <FormInput
-                        v-model="form.name"
-                        :validation-result="vuelidate.name"
-                        :validation-translator="translateValidationMessage"
-                        :label="true"
-                        :label-content="'Name'"
-                    />
 
-                    <FormInput
-                        v-model="form.password"
-                        type="password"
-                        :validation-result="vuelidate.password"
-                        :validation-translator="translateValidationMessage"
-                        :label="true"
-                        :label-content="'Password'"
-                    />
-
-                    <FormSubmit
-                        v-model="busy"
-                        :validation-result="vuelidate"
-                        :create-text="'Login'"
-                        :create-button-class="{value: 'btn btn-sm btn-dark btn-block', presets: { bootstrap: false }}"
-                        :create-icon-class="'fa-solid fa-right-to-bracket'"
-                        :submit="submit"
-                    />
-                </div>
-                <div class="col-6">
-                    <IdentityProviderList
-                        ref="identityProviderRef"
-                        :query="identityProviderQuery"
-                    >
-                        <template #header="props">
-                            <ListTitle
-                                text="Providers"
-                                icon-class="fa-solid fa-atom"
-                            />
-                            <ListSearch
-                                :load="props.load"
-                                :meta="props.meta"
-                            />
-                        </template>
-                        <template #footer="props">
-                            <ListPagination
-                                :load="props.load"
-                                :meta="props.meta"
-                            />
-                        </template>
-                        <template #item="props">
-                            <div>
-                                <strong>{{ props.data.name }}</strong>
-                            </div>
-                            <div class="ms-auto">
-                                <a
-                                    :href="buildIdentityProviderURL(props.data.id)"
-                                    class="btn btn-primary btn-xs"
-                                >
-                                    {{ props.data.name }}
-                                </a>
-                            </div>
-                        </template>
-                    </IdentityProviderList>
-                </div>
+        <div class="row">
+            <div class="col-6">
+                <LoginForm
+                    @done="handleDone"
+                    @failed="handleFailed"
+                />
             </div>
-        </form>
+            <div class="col-6">
+                <IdentityProviderList>
+                    <template #header="props">
+                        <ListTitle
+                            text="Providers"
+                            icon-class="fa-solid fa-atom"
+                        />
+                        <ListSearch
+                            :load="props.load"
+                            :meta="props.meta"
+                        />
+                    </template>
+                    <template #footer="props">
+                        <ListPagination
+                            :load="props.load"
+                            :meta="props.meta"
+                        />
+                    </template>
+                    <template #item="props">
+                        <div>
+                            <strong>{{ props.data.name }}</strong>
+                        </div>
+                        <div class="ms-auto">
+                            <a
+                                :href="buildIdentityProviderURL(props.data.id)"
+                                class="btn btn-primary btn-xs"
+                            >
+                                {{ props.data.name }}
+                            </a>
+                        </div>
+                    </template>
+                </IdentityProviderList>
+            </div>
+        </div>
     </div>
 </template>
