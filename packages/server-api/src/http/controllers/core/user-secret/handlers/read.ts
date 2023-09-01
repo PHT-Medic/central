@@ -22,7 +22,7 @@ export async function getOneUserSecretRouteHandler(req: Request, res: Response) 
     const realm = useRequestEnv(req, 'realm');
     const dataSource = await useDataSource();
     const repository = dataSource.getRepository(UserSecretEntity);
-    const query = await repository.createQueryBuilder('userSecret')
+    const query = repository.createQueryBuilder('userSecret')
         .where('userSecret.realm_id = :realmId', { realmId: realm.id })
         .where('userSecret.id = :id', { id });
 
@@ -64,10 +64,10 @@ export async function getManyUserSecretRouteHandler(req: Request, res: Response)
     const { pagination } = applyQuery(query, useRequestQuery(req), {
         defaultAlias: 'userSecret',
         fields: {
-            default: ['id', 'key', 'type', 'content', 'user_id', 'realm_id', 'created_at', 'updated_at'],
+            default: ['id', 'key', 'hash', 'type', 'content', 'user_id', 'realm_id', 'created_at', 'updated_at'],
         },
         filters: {
-            allowed: ['id', 'type', 'user_id', 'key'],
+            allowed: ['id', 'key', 'hash', 'type', 'content', 'user_id', 'realm_id'],
         },
         pagination: {
             maxLimit: 50,

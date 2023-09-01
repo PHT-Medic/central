@@ -5,5 +5,8 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-export * from './entity';
-export * from './hash';
+import { createHash } from 'node:crypto';
+
+export function createUserSecretHash(content: string) : string {
+    return createHash('sha256').update(content).digest('hex');
+}

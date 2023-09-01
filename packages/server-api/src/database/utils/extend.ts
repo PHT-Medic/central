@@ -4,9 +4,10 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { CodeTransformation, isCodeTransformation } from 'typeorm-extension';
+import { adjustFilePath } from 'typeorm-extension';
 import { hasClient, hasConfig } from 'redis-extension';
 import type { DataSourceOptions } from 'typeorm';
+import { useEnv } from '../../config';
 import {
     MasterImageEntity,
     MasterImageGroupEntity,
@@ -33,7 +34,7 @@ import { TrainFileSubscriber } from '../subscribers/train-file';
 import { TrainLogSubscriber } from '../subscribers/train-log';
 import { TrainStationSubscriber } from '../subscribers/train-station';
 
-export function extendDataSourceOptions(options: DataSourceOptions) : DataSourceOptions {
+export async function extendDataSourceOptions(options: DataSourceOptions) : Promise<DataSourceOptions> {
     options = {
         ...options,
         logging: false,
@@ -70,19 +71,18 @@ export function extendDataSourceOptions(options: DataSourceOptions) : DataSource
         ],
     };
 
-    if (isCodeTransformation(CodeTransformation.JUST_IN_TIME)) {
-        Object.assign(options, {
-            migrations: [
-                `src/database/migrations/${options.type}/*.ts`,
-            ],
-        } satisfies Partial<DataSourceOptions>);
-    } else {
-        Object.assign(options, {
-            migrations: [
-                `dist/database/migrations/${options.type}/*.js`,
-            ],
-        } satisfies Partial<DataSourceOptions>);
+    const migrations : string[] = [];
+    if (useEnv('env') !== 'test') {
+        const migration = await adjustFilePath(
+            `src/database/migrations/${options.type}/*.{ts,js}`,
+        );
+
+        migrations.push(migration);
     }
+
+    Object.assign(options, {
+        migrations,
+    } as DataSourceOptions);
 
     if (hasClient() || hasConfig()) {
         Object.assign(options, {

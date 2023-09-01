@@ -11,7 +11,7 @@ import { sendCreated } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../request';
 import { runUserSecretValidation } from '../utils';
-import { UserSecretEntity } from '../../../../../domains';
+import { UserSecretEntity, createUserSecretHash } from '../../../../../domains';
 
 export async function createUserSecretRouteHandler(req: Request, res: Response) : Promise<any> {
     const data = await runUserSecretValidation(req, 'create');
@@ -32,6 +32,8 @@ export async function createUserSecretRouteHandler(req: Request, res: Response) 
         realm_id: realm.id,
         ...data,
     });
+
+    entity.hash = createUserSecretHash(entity.content);
 
     await repository.save(entity);
 

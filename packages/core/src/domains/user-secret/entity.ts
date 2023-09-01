@@ -19,6 +19,8 @@ export interface UserSecret {
 
     content: string;
 
+    hash: string | null;
+
     user_id: User['id'];
 
     realm_id: Realm['id'];

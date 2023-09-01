@@ -33,8 +33,11 @@ export class UserSecretEntity implements UserSecret {
     @Column({ type: 'varchar', length: 64 })
         type: SecretType;
 
-    @Column({ type: 'text', nullable: true })
+    @Column({ type: 'text' })
         content: string;
+
+    @Column({ type: 'varchar', length: 128, nullable: true })
+        hash: string | null;
 
     @Column({ type: 'uuid' })
         user_id: User['id'];

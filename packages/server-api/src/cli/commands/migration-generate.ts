@@ -20,7 +20,7 @@ export class MigrationGenerateCommand implements CommandModule {
 
     describe = 'Generate database migrations.';
 
-    async handler(args: any) {
+    async handler(_args: any) {
         createConfig();
 
         const connections : DataSourceOptions[] = [

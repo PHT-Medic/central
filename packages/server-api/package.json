@@ -69,7 +69,8 @@
         "dev": "npm run cli -- start",
         "start": "node dist/cli/index.js start",
         "build": "rimraf dist/ && tsc -p tsconfig.build.json",
-        "cli": "ts-node src/cli/index.ts",
+        "cli": "node dist/cli/index.js",
+        "cli-dev": "ts-node src/cli/index.ts",
         "test": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 NODE_ENV=test jest --config ./test/jest.config.js --runInBand --testTimeout=120000 --forceExit",
         "test:coverage": "npm run test -- --coverage"
     },

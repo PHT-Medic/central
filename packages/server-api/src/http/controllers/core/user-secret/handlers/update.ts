@@ -13,7 +13,7 @@ import { sendAccepted, useRequestParam } from 'routup';
 import { useDataSource } from 'typeorm-extension';
 import { useRequestEnv } from '../../../../request';
 import { runUserSecretValidation } from '../utils';
-import { UserSecretEntity } from '../../../../../domains';
+import { UserSecretEntity, createUserSecretHash } from '../../../../../domains';
 
 export async function updateUserSecretRouteHandler(req: Request, res: Response) : Promise<any> {
     const id = useRequestParam(req, 'id');
@@ -45,6 +45,8 @@ export async function updateUserSecretRouteHandler(req: Request, res: Response) 
     }
 
     entity = repository.merge(entity, data);
+
+    entity.hash = createUserSecretHash(entity.content);
 
     await repository.save(entity);
 
