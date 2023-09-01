@@ -7,7 +7,6 @@
 import { adjustFilePath } from 'typeorm-extension';
 import { hasClient, hasConfig } from 'redis-extension';
 import type { DataSourceOptions } from 'typeorm';
-import { useEnv } from '../../config';
 import {
     MasterImageEntity,
     MasterImageGroupEntity,
@@ -72,13 +71,11 @@ export async function extendDataSourceOptions(options: DataSourceOptions) : Prom
     };
 
     const migrations : string[] = [];
-    if (useEnv('env') !== 'test') {
-        const migration = await adjustFilePath(
-            `src/database/migrations/${options.type}/*.{ts,js}`,
-        );
+    const migration = await adjustFilePath(
+        `src/database/migrations/${options.type}/*.{ts,js}`,
+    );
 
-        migrations.push(migration);
-    }
+    migrations.push(migration);
 
     Object.assign(options, {
         migrations,
