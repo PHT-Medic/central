@@ -59,7 +59,16 @@ export async function getManyTrainRouteHandler(req: Request, res: Response) : Pr
     const { pagination, filters } = applyQuery(query, useRequestQuery(req), {
         defaultAlias: 'train',
         filters: {
-            allowed: ['id', 'name', 'proposal_id', 'realm_id'],
+            allowed: [
+                'id',
+                'name',
+                'proposal_id',
+                'realm_id',
+                'build_status',
+                'run_status',
+                'configuration_status',
+                'result_status',
+            ],
         },
         pagination: {
             maxLimit: 50,

@@ -6,7 +6,7 @@
  */
 
 import { Timeago } from '@vue-layout/timeago';
-import type { PropType, VNodeArrayChildren } from 'vue';
+import type { PropType, VNodeArrayChildren, VNodeChild } from 'vue';
 import {
     defineComponent, h, ref,
 } from 'vue';
@@ -61,7 +61,7 @@ export default defineComponent({
                 emit('failed', e);
             },
         }, {
-            default: (slotProps: EntityManagerSlotProps<Train>) => {
+            default: (slotProps: EntityManagerSlotProps<Train>) : VNodeChild => {
                 if (!slotProps.data) {
                     return [];
                 }
