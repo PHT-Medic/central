@@ -11,6 +11,7 @@ import type {
 import {
     SecretType,
 } from '@personalhealthtrain/core';
+import { createUserSecretHash } from '../../../src/domains';
 import {
     dropTestDatabase,
     expectPropertiesEqualToSrc,
@@ -82,6 +83,7 @@ describe('src/controllers/core/user-secret', () => {
         expect(response.body).toBeDefined();
 
         details.content = Buffer.from(details.content, 'utf-8').toString('hex');
+        details.hash = createUserSecretHash(details.content);
 
         expectPropertiesEqualToSrc(details, response.body);
     });

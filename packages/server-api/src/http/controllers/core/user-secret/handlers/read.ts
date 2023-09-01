@@ -36,7 +36,7 @@ export async function getOneUserSecretRouteHandler(req: Request, res: Response) 
     applyQuery(query, useRequestQuery(req), {
         defaultAlias: 'userSecret',
         fields: {
-            default: ['id', 'key', 'type', 'content', 'user_id', 'realm_id', 'created_at', 'updated_at'],
+            default: ['id', 'key', 'hash', 'type', 'content', 'user_id', 'realm_id', 'created_at', 'updated_at'],
         },
     });
 

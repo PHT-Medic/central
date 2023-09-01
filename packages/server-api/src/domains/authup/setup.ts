@@ -17,7 +17,7 @@ import { PresetRoleName, getPresetRolePermissions, useLogger } from '../../confi
 import { useAuthupClient } from '../../core';
 
 export async function setupAuthupService(): Promise<any> {
-    const authupClient = await useAuthupClient();
+    const authupClient = useAuthupClient();
 
     // -------------------------------------------------
 
