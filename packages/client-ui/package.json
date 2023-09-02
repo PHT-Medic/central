@@ -7,7 +7,7 @@
         "url": "https://tada5hi.net"
     },
     "license": "MIT",
-    "version": "2.4.0-alpha.23",
+    "version": "2.4.0-alpha.24",
     "description": "This package contains the Central UI frontend application of the PHT. It was initially developed as part of my Bachelor Thesis.",
     "scripts": {
         "dev": "nuxi dev",
@@ -23,8 +23,8 @@
         "@bootstrap-vue-next/nuxt": "^0.1.3",
         "@fortawesome/fontawesome-free": "^6.4.0",
         "@nuxtjs/google-fonts": "^3.0.2",
-        "@personalhealthtrain/client-vue": "2.4.0-alpha.23",
-        "@personalhealthtrain/core": "2.4.0-alpha.21",
+        "@personalhealthtrain/client-vue": "2.4.0-alpha.24",
+        "@personalhealthtrain/core": "2.4.0-alpha.24",
         "@pinia/nuxt": "^0.4.11",
         "@vue-layout/countdown": "^3.0.0",
         "@vue-layout/form-controls": "^3.4.0",

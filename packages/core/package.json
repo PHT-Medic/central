@@ -1,6 +1,6 @@
 {
     "name": "@personalhealthtrain/core",
-    "version": "2.4.0-alpha.21",
+    "version": "2.4.0-alpha.24",
     "description": "",
     "exports": {
         "./package.json": "./package.json",

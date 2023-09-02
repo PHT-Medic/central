@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.24](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.23...v2.4.0-alpha.24) (2023-09-02)
+
+
+### Bug Fixes
+
+* **deps:** bump authup + hapic ([31646e5](https://github.com/PHT-Medic/central/commit/31646e5d329098d1b4af52a4eb673f4998f26542))
+
+
+### Features
+
+* add hash attribute/column for user secrets ([16ae5dd](https://github.com/PHT-Medic/central/commit/16ae5dd76a6d8a6b0815e5b5726d0fd3ddf9064b))
+
+
+
+
+
 # [2.4.0-alpha.21](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.20...v2.4.0-alpha.21) (2023-08-21)
 
 

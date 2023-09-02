@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.24](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.23...v2.4.0-alpha.24) (2023-09-02)
+
+
+### Bug Fixes
+
+* allways use migration files ([894510f](https://github.com/PHT-Medic/central/commit/894510f581e85807aee55961f95abfdd1c7c55f9))
+* **deps:** bump authup + hapic ([31646e5](https://github.com/PHT-Medic/central/commit/31646e5d329098d1b4af52a4eb673f4998f26542))
+* **deps:** bump pg from 8.11.2 to 8.11.3 ([#1108](https://github.com/PHT-Medic/central/issues/1108)) ([08a4cd0](https://github.com/PHT-Medic/central/commit/08a4cd081a3cdfe0c3f5e6c8a8ec2d34545c6d1d))
+* **deps:** bump zod from 3.21.4 to 3.22.2 ([#1112](https://github.com/PHT-Medic/central/issues/1112)) ([5a780c4](https://github.com/PHT-Medic/central/commit/5a780c4db24190cf420f1a9e444a945eb3b93214))
+* user secret test suite + add hash field for single resource endpoint ([a3454a8](https://github.com/PHT-Medic/central/commit/a3454a89a811bfd095ddd14a1288da9ac07c34bd))
+
+
+### Features
+
+* add hash attribute/column for user secrets ([16ae5dd](https://github.com/PHT-Medic/central/commit/16ae5dd76a6d8a6b0815e5b5726d0fd3ddf9064b))
+* allow train filtering by {configuration,run,result}-status ([e0b0859](https://github.com/PHT-Medic/central/commit/e0b085941c3a6a225f34a9cb61c654e2a08802f1))
+
+
+
+
+
 # [2.4.0-alpha.21](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.20...v2.4.0-alpha.21) (2023-08-21)
 
 
