@@ -25,7 +25,7 @@
         "@routup/prometheus": "^1.0.1",
         "@routup/query": "^1.0.1",
         "@routup/rate-limit": "^1.0.2",
-        "@routup/swagger": "^1.0.1",
+        "@routup/swagger": "^1.0.4",
         "@socket.io/redis-emitter": "^5.1.0",
         "amqp-extension": "^2.0.0",
         "busboy": "^1.6.0",
