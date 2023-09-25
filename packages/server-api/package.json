@@ -19,7 +19,7 @@
         "@personalhealthtrain/core": "2.4.0-alpha.24",
         "@personalhealthtrain/server-core": "2.4.0-alpha.24",
         "@personalhealthtrain/server-train-manager": "2.4.0-alpha.24",
-        "@routup/body": "^1.0.1",
+        "@routup/body": "^1.0.3",
         "@routup/cookie": "^1.0.2",
         "@routup/decorators": "^1.0.1",
         "@routup/prometheus": "^1.0.1",
