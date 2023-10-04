@@ -22,7 +22,7 @@
         "@routup/body": "^1.0.3",
         "@routup/cookie": "^1.0.2",
         "@routup/decorators": "^1.0.1",
-        "@routup/prometheus": "^1.0.1",
+        "@routup/prometheus": "^2.0.0",
         "@routup/query": "^1.0.1",
         "@routup/rate-limit": "^1.0.2",
         "@routup/swagger": "^1.0.1",
