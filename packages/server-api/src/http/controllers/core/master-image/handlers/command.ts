@@ -7,7 +7,7 @@
 
 import { MasterImageCommand } from '@personalhealthtrain/core';
 import { BadRequestError, NotFoundError } from '@ebec/http';
-import { useRequestBody } from '@routup/body';
+import { useRequestBody } from '@routup/basic/body';
 import type { Request, Response } from 'routup';
 import { syncMasterImages } from '../../../../../domains/master-image';
 

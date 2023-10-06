@@ -49,5 +49,8 @@
   },
   "resolutions": {
     "minimatch": "^5.1.6"
+  },
+  "dependencies": {
+    "ebec": "^2.3.0"
   }
 }

@@ -8,17 +8,20 @@
 import { BadRequestError } from '@ebec/http';
 import { ErrorCode } from '@personalhealthtrain/core';
 import { useClient } from 'redis-extension';
-import type { Next, Request, Response } from 'routup';
+import { coreHandler } from 'routup';
+import type {
+    Next, Request, Response, Router,
+} from 'routup';
 import { useAuthupClient } from '../../core';
 import { useRequestEnv } from '../request';
 
 function buildRedisKey(id: string) {
     return `user-license-agreement:${id}`;
 }
-export function setupLicenseAgreementMiddleware() {
+export function registerLicenseAgreementMiddleware(router: Router) {
     const redis = useClient();
 
-    return async (req: Request, res: Response, next: Next) => {
+    router.use(coreHandler(async (req: Request, res: Response, next: Next) => {
         const userId = useRequestEnv(req, 'userId');
         if (!userId) {
             next();
@@ -52,5 +55,5 @@ export function setupLicenseAgreementMiddleware() {
             code: ErrorCode.LICENSE_AGREEMENT,
             message: 'The license agreement must be accepted!',
         }));
-    };
+    }));
 }

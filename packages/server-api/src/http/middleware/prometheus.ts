@@ -5,11 +5,9 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { createHandler, registerMetrics } from '@routup/prometheus';
+import { prometheus } from '@routup/prometheus';
 import type { Router } from 'routup';
 
 export function registerPrometheusMiddleware(router: Router) {
-    registerMetrics(router);
-
-    router.get('/metrics', createHandler());
+    router.use(prometheus());
 }

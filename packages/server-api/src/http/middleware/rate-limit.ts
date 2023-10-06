@@ -7,13 +7,11 @@
 
 import { REALM_MASTER_NAME, ROBOT_SYSTEM_NAME } from '@authup/core';
 import type { OptionsInput } from '@routup/rate-limit';
-import {
-    createHandler,
-} from '@routup/rate-limit';
+import { rateLimit } from '@routup/rate-limit';
 import type { Request, Router } from 'routup';
 import { useRequestEnv } from '../request';
 
-export function registerRateLimitMiddleware(router: Router) {
+export function registerRateLimiterMiddleware(router: Router) {
     const options : OptionsInput = {
         skip(req: Request) {
             const robot = useRequestEnv(req, 'robotId');
@@ -45,5 +43,5 @@ export function registerRateLimitMiddleware(router: Router) {
         windowMs: 60 * 1000, // 60 sec
     };
 
-    router.use(createHandler(options));
+    router.use(rateLimit(options));
 }

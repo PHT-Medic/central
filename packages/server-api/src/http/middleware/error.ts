@@ -5,72 +5,42 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { BaseError } from 'ebec';
-import type { Next, Request, Response } from 'routup';
-import { send } from 'routup';
-import { hasOwnProperty } from 'typeorm-extension';
-import {
-    ConflictError,
-    InsufficientStorageError,
-    InternalServerError,
-    InternalServerErrorOptions,
-    extendsBaseError,
-} from '@ebec/http';
+import { isObject } from '@personalhealthtrain/core';
+import type { Router } from 'routup';
+import { errorHandler } from 'routup';
 import { useLogger } from '../../config';
 
-export function errorMiddleware(
-    error: Error,
-    request: Request,
-    response: Response,
-    next: Next,
-) {
-    const code : string | undefined = hasOwnProperty(error, 'code') && typeof error.code === 'string' ?
-        error.code :
-        undefined;
+export function registerErrorHandler(router: Router) {
+    router.use(errorHandler((error) => {
+        // catch and decorate some db errors :)
+        switch (error.code) {
+            case 'ER_DUP_ENTRY':
+            case 'SQLITE_CONSTRAINT_UNIQUE': {
+                error.statusCode = 409;
+                error.message = 'An entry with some unique attributes already exist.';
+                error.expose = true;
+                break;
+            }
+            case 'ER_DISK_FULL':
+                error.statusCode = 507;
+                error.message = 'No database operation possible, due the leak of free disk space.';
+                error.expose = true;
+                break;
+        }
 
-    console.log(error);
+        if (error.logMessage) {
+            useLogger().warn(error.message);
+        }
 
-    // catch and decorate some mysql errors :)
-    switch (code) {
-        case 'ER_DUP_ENTRY':
-        case 'SQLITE_CONSTRAINT_UNIQUE':
-            error = new ConflictError('An entry with some unique attributes already exist.', { previous: error });
-            break;
-        case 'ER_DISK_FULL':
-            error = new InsufficientStorageError('No database operation possible, due the leak of free disk space.', { previous: error });
-            break;
-    }
+        if (!error.expose) {
+            error.message = 'An error occurred.';
+        }
 
-    let baseError : BaseError;
-    if (extendsBaseError(error)) {
-        baseError = error;
-    } else {
-        baseError = new InternalServerError(error, { decorateMessage: true });
-
-        useLogger().warn('Unhandled error occurred.', {
-            error,
-        });
-    }
-
-    const statusCode : number = baseError.getOption('statusCode') ?? InternalServerErrorOptions.statusCode;
-
-    if (baseError.getOption('logMessage')) {
-        const isInspected = extendsBaseError(error);
-        useLogger().warn(`${!isInspected ? error.message : (baseError.message || baseError)}`);
-    }
-
-    if (baseError.getOption('decorateMessage')) {
-        baseError.message = 'An error occurred.';
-    }
-
-    response.statusCode = statusCode;
-
-    const extra = baseError.getOption('extra');
-
-    send(response, {
-        code: baseError.getOption('code') ?? InternalServerErrorOptions.code,
-        message: baseError.message ?? InternalServerErrorOptions.message,
-        statusCode,
-        ...(extra ? { extra } : {}),
-    });
+        return {
+            statusCode: error.statusCode,
+            code: `${error.code}`,
+            message: error.message,
+            ...(isObject(error.data) && error.expose ? error.data : {}),
+        };
+    }));
 }

@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ErrorOptionsExtended } from '../error';
+import type { ComponentErrorOptions } from '@personalhealthtrain/server-core';
 import { BaseError } from '../error';
 import { RouterErrorCode } from './constants';
 
@@ -20,7 +20,7 @@ export class RouterError extends BaseError {
     }
 
     static operatorInvalid(
-        options?: ErrorOptionsExtended,
+        options?: ComponentErrorOptions,
     ) {
         return new RouterError({
             code: RouterErrorCode.OPERATOR_INVALID,

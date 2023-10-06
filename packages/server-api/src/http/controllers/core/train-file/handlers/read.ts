@@ -8,7 +8,7 @@
 import { PermissionID } from '@personalhealthtrain/core';
 import { ForbiddenError, NotFoundError } from '@ebec/http';
 import { isRealmResourceReadable } from '@authup/core';
-import { useRequestQuery } from '@routup/query';
+import { useRequestQuery } from '@routup/basic/query';
 import type { Request, Response } from 'routup';
 import { send, useRequestParam } from 'routup';
 import { applyFilters, useDataSource } from 'typeorm-extension';

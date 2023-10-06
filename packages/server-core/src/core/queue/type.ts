@@ -10,7 +10,7 @@ import type { ObjectLiteral } from '../../type';
 export type QueuePayloadError = {
     code: string,
     message: string,
-    step?: string,
+    step?: string | number,
 };
 
 export type QueuePayload<

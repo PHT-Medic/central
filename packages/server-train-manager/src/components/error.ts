@@ -5,28 +5,14 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { Options } from '@ebec/http';
+import type { ComponentErrorOptions } from '@personalhealthtrain/server-core';
 import { ComponentError } from '@personalhealthtrain/server-core';
 import { ErrorCode } from './constants';
 
-export type ErrorOptionsExtended = Options & {
-    type?: string,
-    command?: string,
-    step?: string | number
-};
-
 export class BaseError extends ComponentError {
-    public getStep() : string {
-        return this.getOption('step');
-    }
-
-    public getCode() : string {
-        return `${this.getOption('code')}`;
-    }
-
     // --------------------------------------------------------------------
 
-    static notFound(options?: ErrorOptionsExtended) {
+    static notFound(options?: ComponentErrorOptions) {
         return new BaseError({
             code: ErrorCode.NOT_FOUND,
             ...(options || {}),
@@ -34,7 +20,7 @@ export class BaseError extends ComponentError {
     }
 
     static registryNotFound(
-        options?: ErrorOptionsExtended,
+        options?: ComponentErrorOptions,
     ) {
         return new BaseError({
             code: ErrorCode.REGISTRY_NOT_FOUND,
@@ -43,7 +29,7 @@ export class BaseError extends ComponentError {
     }
 
     static registryProjectNotFound(
-        options?: ErrorOptionsExtended,
+        options?: ComponentErrorOptions,
     ) {
         return new BaseError({
             code: ErrorCode.REGISTRY_PROJECT_NOT_FOUND,

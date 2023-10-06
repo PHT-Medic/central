@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import type { Options } from '@ebec/http';
 import type { ObjectLiteral } from '../../type';
 import type { QueuePayload, QueuePayloadError } from '../queue';
 import type { ComponentError } from './error';
@@ -12,6 +13,14 @@ import type { ComponentError } from './error';
 export type Component = {
     start: () => void
 };
+
+export type ComponentErrorOptions = Options & {
+    type?: string,
+    command?: string,
+    step?: string
+};
+
+export type ComponentErrorInput = Error | string | ComponentErrorOptions;
 
 export type ComponentContextWithError<
     T extends ObjectLiteral = ObjectLiteral,

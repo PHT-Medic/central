@@ -71,8 +71,8 @@ export async function handleTrainManagerBuilderEvent(
                     statusMessage: context.error.message,
 
                     error: true,
-                    errorCode: `${context.error.getCode()}`,
-                    step: context.error.getStep(),
+                    errorCode: `${context.error.code}`,
+                    step: `${context.error.step}`,
                 };
             }
 

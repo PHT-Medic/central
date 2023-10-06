@@ -12,7 +12,8 @@ import { createHTTPMiddleware } from '@authup/server-adapter';
 import { useClient as useVaultClient } from '@hapic/vault';
 import { parseAuthorizationHeader } from 'hapic';
 import { useClient as useRedisClient } from 'redis-extension';
-import { useRequestCookie } from 'routup';
+import { coreHandler } from 'routup';
+import { useRequestCookie } from '@routup/basic/cookie';
 import type { Router } from 'routup';
 import { EnvironmentName, useEnv, useLogger } from '../../config';
 import { useAuthupClient } from '../../core';
@@ -25,7 +26,7 @@ export function registerAuthupMiddleware(router: Router) {
         cache = {};
     }, 120 * 1000);
 
-    router.use(async (req, res, next) => {
+    router.use(coreHandler(async (req, res, next) => {
         if (!req.headers.authorization) {
             const cookie = useRequestCookie(req, CookieName.ACCESS_TOKEN);
             if (typeof cookie === 'string') {
@@ -74,9 +75,9 @@ export function registerAuthupMiddleware(router: Router) {
         }
 
         next();
-    });
+    }));
 
-    router.use(createHTTPMiddleware({
+    const middleware = createHTTPMiddleware({
         tokenByCookie: (req, cookieName) => useRequestCookie(req, cookieName),
         tokenVerifier: {
             baseURL: useEnv('authupApiUrl'),
@@ -114,15 +115,17 @@ export function registerAuthupMiddleware(router: Router) {
                 }
             }
         },
-    }));
+    });
+
+    router.use(coreHandler((req, res, next) => middleware(req, res, next)));
 
     // todo: permissions should be created and set for test suite :)
     if (useEnv('env') === EnvironmentName.TEST) {
-        router.use(async (req, res, next) => {
+        router.use(coreHandler(async (req, res, next) => {
             const ability = useRequestEnv(req, 'ability');
             ability.has = (_input: any) => true;
 
             next();
-        });
+        }));
     }
 }

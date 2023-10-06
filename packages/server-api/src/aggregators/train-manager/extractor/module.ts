@@ -75,8 +75,8 @@ export async function handleTrainManagerExtractorEvent(
                     statusMessage: context.error.message,
 
                     error: true,
-                    errorCode: `${context.error.getCode()}`,
-                    step: context.error.getStep(),
+                    errorCode: `${context.error.code}`,
+                    step: `${context.error.step}`,
                 };
             }
             break;

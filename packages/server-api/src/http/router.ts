@@ -8,15 +8,14 @@
 import { Router } from 'routup';
 import { registerMiddlewares } from './middlewares';
 import { registerControllers } from './routes';
-import { errorMiddleware } from './middleware';
+import { registerErrorHandler } from './middleware';
 
 export function createRouter() : Router {
     const router = new Router();
 
     registerMiddlewares(router);
     registerControllers(router);
-
-    router.use(errorMiddleware);
+    registerErrorHandler(router);
 
     return router;
 }

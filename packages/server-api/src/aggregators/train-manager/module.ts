@@ -32,9 +32,11 @@ export function buildTrainManagerAggregator() : Aggregator {
                 let error : ComponentError | undefined;
 
                 if (payload.error) {
-                    error = new ComponentError(payload.error.message);
-                    error.setOption('code', payload.error.code);
-                    error.setOption('step', payload.error.step);
+                    error = new ComponentError({
+                        message: payload.error.message,
+                        code: payload.error.code,
+                        step: `${payload.error.step}`,
+                    });
                 }
 
                 useLogger().debug('Event received', {

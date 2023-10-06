@@ -7,6 +7,7 @@
 
 import type { Server } from 'node:http';
 import http from 'node:http';
+import { createNodeDispatcher } from 'routup';
 import type { Router } from 'routup';
 import { useLogger } from '../config';
 
@@ -21,5 +22,5 @@ export interface HttpServerInterface extends Server {
 export function createHttpServer({ router } : HttpServerContext) : HttpServerInterface {
     useLogger().debug('setup http server...', { service: 'http' });
 
-    return new http.Server(router.createListener());
+    return new http.Server(createNodeDispatcher(router));
 }

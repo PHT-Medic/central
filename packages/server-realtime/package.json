@@ -10,9 +10,9 @@
     "version": "2.4.0-alpha.24",
     "description": "This package contains the central realtime application of the PHT.",
     "dependencies": {
-        "@authup/core": "^0.41.0",
-        "@authup/server-adapter": "^0.41.0",
-        "@ebec/http": "^2.2.1",
+        "@authup/core": "^0.43.0",
+        "@authup/server-adapter": "^0.43.0",
+        "@ebec/http": "^2.2.2",
         "@personalhealthtrain/core": "2.4.0-alpha.24",
         "@personalhealthtrain/server-core": "2.4.0-alpha.24",
         "@socket.io/redis-adapter": "^8.2.1",

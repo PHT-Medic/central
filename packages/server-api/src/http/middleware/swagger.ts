@@ -6,12 +6,12 @@
  */
 
 import path from 'node:path';
-import { createUIHandler } from '@routup/swagger';
+import { swaggerUI } from '@routup/swagger';
 import { loadSync } from 'locter';
 import type { Router } from 'routup';
 import { getWritableDirPath } from '../../config';
 
 export function registerSwaggerMiddleware(router: Router) {
     const document = loadSync(path.join(getWritableDirPath(), 'swagger.json'));
-    router.use('/docs', createUIHandler(document));
+    router.use('/docs', swaggerUI(document));
 }

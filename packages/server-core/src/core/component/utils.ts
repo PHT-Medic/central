@@ -10,7 +10,11 @@ import type { ObjectLiteral } from '../../type';
 import { isQueuePayload } from '../queue';
 import type { QueuePayloadError } from '../queue';
 import { ComponentError } from './error';
-import type { ComponentCommandQueuePayload, ComponentContextWithError, ComponentEventQueuePayload } from './type';
+import type {
+    ComponentCommandQueuePayload,
+    ComponentContextWithError,
+    ComponentEventQueuePayload,
+} from './type';
 
 export function isComponentContextWithError(input: unknown) : input is ComponentContextWithError {
     return isObject(input) &&
@@ -23,8 +27,8 @@ export function transformComponentErrorForQueuePayload<T extends ObjectLiteral =
     if (isComponentContextWithError(context)) {
         if (context.error instanceof ComponentError) {
             return {
-                code: context.error.getCode(),
-                step: context.error.getStep(),
+                code: `${context.error.code}`,
+                step: context.error.step,
                 message: context.error.message,
             };
         }

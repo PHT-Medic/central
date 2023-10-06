@@ -31,7 +31,7 @@ export async function extendPayload<T extends Partial<ComponentPayloadExtended<{
         } catch (e) {
             if (isClientErrorWithStatusCode(e, 404)) {
                 throw BaseError.notFound({
-                    previous: e,
+                    cause: e,
                 });
             }
 
@@ -49,7 +49,7 @@ export async function extendPayload<T extends Partial<ComponentPayloadExtended<{
         } catch (e) {
             if (isClientErrorWithStatusCode(e, 404)) {
                 throw BaseError.registryNotFound({
-                    previous: e,
+                    cause: e,
                 });
             }
 

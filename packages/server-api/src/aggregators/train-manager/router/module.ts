@@ -176,8 +176,8 @@ export async function handleTrainManagerRouterEvent(
                     status: TrainRunStatus.FAILED,
 
                     error: true,
-                    errorCode: `${context.error.getCode()}`,
-                    step: context.error.getStep(),
+                    errorCode: `${context.error.code}`,
+                    step: `${context.error.step}`,
                 };
             }
             break;

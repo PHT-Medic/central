@@ -12,19 +12,15 @@ import type {
 } from 'routup';
 import { useRequestEnv } from '../request';
 
-export function forceLoggedInMiddleware(req: Request, res: Response, next: Next) {
-    if (
-        typeof useRequestEnv(req, 'userId') === 'undefined' &&
-        typeof useRequestEnv(req, 'robotId') === 'undefined'
-    ) {
-        throw new UnauthorizedError();
-    }
-
-    next();
-}
-
 export class ForceLoggedInMiddleware implements HandlerInterface {
     public run(request: Request, response: Response, next: Next) {
-        forceLoggedInMiddleware(request, response, next);
+        if (
+            typeof useRequestEnv(request, 'userId') === 'undefined' &&
+            typeof useRequestEnv(request, 'robotId') === 'undefined'
+        ) {
+            throw new UnauthorizedError();
+        }
+
+        next();
     }
 }

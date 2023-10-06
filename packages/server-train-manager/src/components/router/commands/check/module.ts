@@ -50,7 +50,7 @@ export async function executeRouterCheckCommand(
     } catch (e) {
         throw RouterError.registryProjectNotFound({
             message: `The train ${RegistryProjectType.INCOMING} registry-project was not found.`,
-            previous: e,
+            cause: e,
         });
     }
 
@@ -126,7 +126,7 @@ export async function executeRouterCheckCommand(
         } catch (e) {
             throw RouterError.registryProjectNotFound({
                 message: `The train ${RegistryProjectType.OUTGOING} registry-project was not found.`,
-                previous: e,
+                cause: e,
             });
         }
 

@@ -6,7 +6,7 @@
  */
 
 import { hasOwnProperty, isObject } from '@personalhealthtrain/core';
-import type { QueueEventPayload, QueuePayload } from './type';
+import type { QueuePayload } from './type';
 
 export function isQueuePayload(input: unknown) : input is QueuePayload {
     return isObject(input) &&
@@ -14,13 +14,4 @@ export function isQueuePayload(input: unknown) : input is QueuePayload {
         isObject(input.data) &&
         hasOwnProperty(input, 'metadata') &&
         isObject(input.metadata);
-}
-
-export function isQueuePayloadWithError(input: unknown) : input is QueueEventPayload {
-    return isObject(input) &&
-        hasOwnProperty(input, 'error') &&
-        isObject(input.error) &&
-        typeof input.error.message === 'string' &&
-        typeof input.error.code === 'string' &&
-        (!hasOwnProperty(input.error, 'step') || typeof input.error.step === 'string');
 }
