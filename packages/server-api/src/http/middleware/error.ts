@@ -11,7 +11,7 @@ import { errorHandler } from 'routup';
 import { useLogger } from '../../config';
 
 export function registerErrorHandler(router: Router) {
-    router.use(errorHandler((error) => {
+    router.use(errorHandler((error, req, res) => {
         // catch and decorate some db errors :)
         switch (error.code) {
             case 'ER_DUP_ENTRY':
@@ -35,6 +35,8 @@ export function registerErrorHandler(router: Router) {
         if (!error.expose) {
             error.message = 'An error occurred.';
         }
+
+        res.statusCode = error.statusCode;
 
         return {
             statusCode: error.statusCode,
