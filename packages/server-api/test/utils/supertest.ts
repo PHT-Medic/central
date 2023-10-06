@@ -5,6 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
+import { createNodeDispatcher } from 'routup';
 import type { SuperTest, Test } from 'supertest';
 import supertest from 'supertest';
 import { createConfig } from '../../src';
@@ -14,5 +15,5 @@ export function useSuperTest() : SuperTest<Test> {
     createConfig();
 
     const router = createRouter();
-    return supertest(router.createListener());
+    return supertest(createNodeDispatcher(router));
 }
