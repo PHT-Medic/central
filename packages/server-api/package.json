@@ -55,7 +55,7 @@
         "@types/cors": "^2.8.13",
         "@types/module-alias": "^2.0.1",
         "@types/mysql": "^2.15.21",
-        "@types/supertest": "^2.0.12",
+        "@types/supertest": "^2.0.14",
         "@types/tar": "^6.1.6",
         "@types/tar-stream": "^2.2.2",
         "@types/yargs": "^17.0.24",
