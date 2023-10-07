@@ -5,7 +5,6 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { isClientError } from '@ebec/http';
 import { isObject } from '@personalhealthtrain/core';
 import type { Router } from 'routup';
 import { errorHandler } from 'routup';
@@ -33,10 +32,10 @@ export function registerErrorHandler(router: Router) {
             useLogger().warn(error.message);
         }
 
-        if (
-            error.statusCode > 500 &&
-            error.statusCode < 600
-        ) {
+        const isServerError = (typeof error.expose !== 'undefined' && !error.expose) ||
+            (error.statusCode >= 500 && error.statusCode < 600);
+
+        if (isServerError) {
             error.message = 'An internal server error occurred.';
         }
 
@@ -46,7 +45,7 @@ export function registerErrorHandler(router: Router) {
             statusCode: error.statusCode,
             code: `${error.code}`,
             message: error.message,
-            ...(isObject(error.data) && isClientError(error) ? error.data : {}),
+            ...(isObject(error.data) && !isServerError ? error.data : {}),
         };
     }));
 }

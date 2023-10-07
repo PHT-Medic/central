@@ -1,56 +1,53 @@
 {
-  "name": "central",
-  "private": true,
-  "author": {
-    "name": "Peter Placzek",
-    "email": "contact@tada5hi.net",
-    "url": "https://tada5hi.net"
-  },
-  "license": "MIT",
-  "version": "1.0.0",
-  "description": "This package contains all central packages. It was initially developed as part of my Bachelor Thesis.",
-  "workspaces": [
-    "packages/*"
-  ],
-  "devDependencies": {
-    "@rollup/plugin-node-resolve": "^15.2.2",
-    "@swc/core": "^1.3.92",
-    "@swc/jest": "^0.2.27",
-    "@tada5hi/commitlint-config": "^1.1.0",
-    "@tada5hi/eslint-config-vue-typescript": "^1.3.4",
-    "@types/jest": "^29.5.3",
-    "@types/node": "^20.8.2",
-    "cross-env": "^7.0.3",
-    "eslint": "^8.49.0",
-    "husky": "^8.0.3",
-    "jest": "^29.6.2",
-    "jest-serial-runner": "^1.2.0",
-    "lerna": "^7.1.4",
-    "rimraf": "^5.0.1",
-    "rollup": "^3.29.3",
-    "ts-jest": "^29.1.1",
-    "typescript": "5.2.2"
-  },
-  "scripts": {
-    "commit": "npx git-cz",
-    "clean": "lerna run clean",
-    "build": "lerna run build",
-    "test": "lerna run test",
-    "pub": "lerna publish",
-    "lint": "eslint --ext .ts,.vue,.js ./packages/",
-    "lint:fix": "npm run lint -- --fix",
-    "prepare": "husky install",
-    "prepublishOnly": "npm run build",
-    "cli": "npm run cli --workspace=packages/server-api",
-    "client-ui": "npm run dev --workspace=packages/client-ui",
-    "server-api": "npm run dev --workspace=packages/server-api",
-    "server-realtime": "npm run dev --workspace=packages/server-realtime",
-    "server-train-manager": "npm run dev --workspace=packages/server-train-manager"
-  },
-  "resolutions": {
-    "minimatch": "^5.1.6"
-  },
-  "dependencies": {
-    "ebec": "^2.3.0"
-  }
+    "name": "central",
+    "private": true,
+    "author": {
+        "name": "Peter Placzek",
+        "email": "contact@tada5hi.net",
+        "url": "https://tada5hi.net"
+    },
+    "license": "MIT",
+    "version": "1.0.0",
+    "description": "This package contains all central packages. It was initially developed as part of my Bachelor Thesis.",
+    "workspaces": [
+        "packages/*"
+    ],
+    "devDependencies": {
+        "@rollup/plugin-node-resolve": "^15.2.2",
+        "@swc/core": "^1.3.92",
+        "@swc/jest": "^0.2.27",
+        "@tada5hi/commitlint-config": "^1.1.0",
+        "@tada5hi/eslint-config-vue-typescript": "^1.3.4",
+        "@types/jest": "^29.5.3",
+        "@types/node": "^20.8.2",
+        "cross-env": "^7.0.3",
+        "eslint": "^8.49.0",
+        "husky": "^8.0.3",
+        "jest": "^29.6.2",
+        "jest-serial-runner": "^1.2.0",
+        "lerna": "^7.1.4",
+        "rimraf": "^5.0.1",
+        "rollup": "^3.29.3",
+        "ts-jest": "^29.1.1",
+        "typescript": "5.2.2"
+    },
+    "scripts": {
+        "commit": "npx git-cz",
+        "clean": "lerna run clean",
+        "build": "lerna run build",
+        "test": "lerna run test",
+        "pub": "lerna publish",
+        "lint": "eslint --ext .ts,.vue,.js ./packages/",
+        "lint:fix": "npm run lint -- --fix",
+        "prepare": "husky install",
+        "prepublishOnly": "npm run build",
+        "cli": "npm run cli --workspace=packages/server-api",
+        "client-ui": "npm run dev --workspace=packages/client-ui",
+        "server-api": "npm run dev --workspace=packages/server-api",
+        "server-realtime": "npm run dev --workspace=packages/server-realtime",
+        "server-train-manager": "npm run dev --workspace=packages/server-train-manager"
+    },
+    "resolutions": {
+        "minimatch": "^5.1.6"
+    }
 }
