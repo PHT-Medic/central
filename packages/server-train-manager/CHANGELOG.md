@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.24...v2.4.0) (2023-10-07)
+
+
+### Bug Fixes
+
+* **deps:** bump @ebec/http from 1.1.1 to 2.2.1 ([#1147](https://github.com/PHT-Medic/central/issues/1147)) ([463e52b](https://github.com/PHT-Medic/central/commit/463e52bd4ad53b5b5a8fc508d0cbf576228824e7))
+* **deps:** bump uuid and @types/uuid ([#1142](https://github.com/PHT-Medic/central/issues/1142)) ([fa10d8f](https://github.com/PHT-Medic/central/commit/fa10d8f33a5844336250a948e2a921bad4244d1b))
+* exposing client errors via API ([4f9a157](https://github.com/PHT-Medic/central/commit/4f9a15777b28c0b31eb8df9364db592236d8e30a))
+
+
+### Features
+
+* bump authup, routup & ebec ([39c1673](https://github.com/PHT-Medic/central/commit/39c1673a919e0d10cefa0899e47ed21cee2c2fb6))
+
+
+
+
+
 # [2.4.0-alpha.24](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.23...v2.4.0-alpha.24) (2023-09-02)
 
 

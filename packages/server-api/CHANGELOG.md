@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.24...v2.4.0) (2023-10-07)
+
+
+### Bug Fixes
+
+* **deps:** bump @ebec/http from 1.1.1 to 2.2.1 ([#1147](https://github.com/PHT-Medic/central/issues/1147)) ([463e52b](https://github.com/PHT-Medic/central/commit/463e52bd4ad53b5b5a8fc508d0cbf576228824e7))
+* **deps:** bump @routup/body from 1.0.1 to 1.0.3 ([#1133](https://github.com/PHT-Medic/central/issues/1133)) ([abfaec2](https://github.com/PHT-Medic/central/commit/abfaec263be904588f9bee22b7e72215d941a004))
+* **deps:** bump @routup/cookie from 1.0.1 to 1.0.2 ([#1134](https://github.com/PHT-Medic/central/issues/1134)) ([f9204f5](https://github.com/PHT-Medic/central/commit/f9204f5804eb7f7ef563880376ee7020f4e4c00c))
+* **deps:** bump @routup/rate-limit from 1.0.1 to 1.0.2 ([#1141](https://github.com/PHT-Medic/central/issues/1141)) ([440e14a](https://github.com/PHT-Medic/central/commit/440e14a9e3d1da48ce41d85fe34546f25ac53f6c))
+* **deps:** bump locter from 1.2.1 to 1.2.2 ([#1136](https://github.com/PHT-Medic/central/issues/1136)) ([005ea59](https://github.com/PHT-Medic/central/commit/005ea593e0b0d7b0f819b196064d8c36a8a30ae2))
+* **deps:** bump tar and @types/tar ([#1135](https://github.com/PHT-Medic/central/issues/1135)) ([d5415a0](https://github.com/PHT-Medic/central/commit/d5415a03a041a4b66b635316175262612ad03e66))
+* **deps:** bump typeorm-extension from 3.0.1 to 3.0.2 ([#1160](https://github.com/PHT-Medic/central/issues/1160)) ([3996104](https://github.com/PHT-Medic/central/commit/39961042bbc9bb8bdd388b9a3b378178eb0a9674))
+* error middleware + registering routes ([65ba364](https://github.com/PHT-Medic/central/commit/65ba3649ea6335ee7162b44285da480ee45412be))
+* exposing client errors via API ([4f9a157](https://github.com/PHT-Medic/central/commit/4f9a15777b28c0b31eb8df9364db592236d8e30a))
+* only decorate 5xx error codes ([4f1541b](https://github.com/PHT-Medic/central/commit/4f1541b1a78035c69e37e3c5b19161c44da80979))
+
+
+### Features
+
+* bump authup, routup & ebec ([39c1673](https://github.com/PHT-Medic/central/commit/39c1673a919e0d10cefa0899e47ed21cee2c2fb6))
+
+
+
+
+
 # [2.4.0-alpha.24](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.23...v2.4.0-alpha.24) (2023-09-02)
 
 

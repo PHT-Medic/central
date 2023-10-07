@@ -1,6 +1,6 @@
 {
     "name": "@personalhealthtrain/client-vue",
-    "version": "2.4.0-alpha.24",
+    "version": "2.4.0",
     "description": "This package contains vue components.",
     "main": "dist/index.cjs",
     "module": "dist/index.mjs",
@@ -43,7 +43,7 @@
     "devDependencies": {
         "@authup/client-vue": "^0.44.0",
         "@authup/core": "^0.44.0",
-        "@personalhealthtrain/core": "2.4.0-alpha.24",
+        "@personalhealthtrain/core": "2.4.0",
         "@types/node": "^20.8.2",
         "@vitejs/plugin-vue": "^4.3.4",
         "@vue-layout/form-controls": "^3.4.0",
