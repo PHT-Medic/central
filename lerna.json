@@ -1,21 +1,22 @@
 {
-  "$schema": "node_modules/lerna/schemas/lerna-schema.json",
-  "packages": [
-    "packages/*"
-  ],
-  "command": {
-    "create": {
-      "homepage": "https://github.com/PHT-Medic/central",
-      "license": "MIT"
+    "$schema": "node_modules/lerna/schemas/lerna-schema.json",
+    "packages": [
+        "packages/*"
+    ],
+    "command": {
+        "create": {
+            "homepage": "https://github.com/PHT-Medic/central",
+            "license": "MIT"
+        },
+        "publish": {
+            "tempTag": true
+        },
+        "version": {
+            "conventionalCommits": true,
+            "exact": true,
+            "message": "chore(release): %s",
+            "createRelease": "github"
+        }
     },
-    "publish": {
-      "tempTag": true
-    },
-    "version": {
-      "conventionalCommits": true,
-      "exact": true,
-      "message": "chore(release): %s"
-    }
-  },
-  "version": "2.4.0-alpha.24"
+    "version": "2.4.0-alpha.24"
 }
