@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.4.1](https://github.com/PHT-Medic/central/compare/v2.4.0...v2.4.1) (2023-10-23)
+
+
+### Bug Fixes
+
+* bump authup & routup ([a6ef036](https://github.com/PHT-Medic/central/commit/a6ef0365c288ae86b5fdd543225fc0ad319d3b49))
+* **deps:** bump dockerode from 3.3.5 to 4.0.0 ([#1184](https://github.com/PHT-Medic/central/issues/1184)) ([03dd5e3](https://github.com/PHT-Medic/central/commit/03dd5e317a582c15e77586ffc127138115abd30a))
+* **deps:** bump minio from 7.1.1 to 7.1.3 ([#1165](https://github.com/PHT-Medic/central/issues/1165)) ([f489f59](https://github.com/PHT-Medic/central/commit/f489f59fa175217ed5f2826e5433dec2807f9c96))
+* **deps:** bump pascal-case from 3.1.2 to 4.0.0 ([#1159](https://github.com/PHT-Medic/central/issues/1159)) ([2880438](https://github.com/PHT-Medic/central/commit/2880438c465851f143a8c4bf6a22d52b9b9b30a8))
+* **deps:** bump typeorm-extension from 3.0.2 to 3.1.0 ([#1189](https://github.com/PHT-Medic/central/issues/1189)) ([8aa40bf](https://github.com/PHT-Medic/central/commit/8aa40bfe4654eba9e57e63d2916851368e7e9d84))
+* **deps:** bump winston from 3.10.0 to 3.11.0 ([#1194](https://github.com/PHT-Medic/central/issues/1194)) ([e6dcaca](https://github.com/PHT-Medic/central/commit/e6dcaca9d3ca26b88c21af552136f8da46fa3a70))
+* **deps:** bump zod from 3.22.2 to 3.22.4 ([#1193](https://github.com/PHT-Medic/central/issues/1193)) ([d08d487](https://github.com/PHT-Medic/central/commit/d08d487c7f3cacc1ff325734ff06aebe8c7f41b3))
+
+
+
+
+
 # [2.4.0](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.24...v2.4.0) (2023-10-07)
 
 

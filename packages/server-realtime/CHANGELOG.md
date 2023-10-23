@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.4.1](https://github.com/PHT-Medic/central/compare/v2.4.0...v2.4.1) (2023-10-23)
+
+
+### Bug Fixes
+
+* bump authup & routup ([a6ef036](https://github.com/PHT-Medic/central/commit/a6ef0365c288ae86b5fdd543225fc0ad319d3b49))
+* **deps:** bump winston from 3.10.0 to 3.11.0 ([#1194](https://github.com/PHT-Medic/central/issues/1194)) ([e6dcaca](https://github.com/PHT-Medic/central/commit/e6dcaca9d3ca26b88c21af552136f8da46fa3a70))
+
+
+
+
+
 # [2.4.0](https://github.com/PHT-Medic/central/compare/v2.4.0-alpha.24...v2.4.0) (2023-10-07)
 
 
