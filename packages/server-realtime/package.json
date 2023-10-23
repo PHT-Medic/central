@@ -7,14 +7,14 @@
         "url": "https://tada5hi.net"
     },
     "license": "MIT",
-    "version": "2.4.0",
+    "version": "2.4.1",
     "description": "This package contains the central realtime application of the PHT.",
     "dependencies": {
         "@authup/core": "^0.45.0",
         "@authup/server-adapter": "^0.45.0",
         "@ebec/http": "^2.3.0",
-        "@personalhealthtrain/core": "2.4.0",
-        "@personalhealthtrain/server-core": "2.4.0",
+        "@personalhealthtrain/core": "2.4.1",
+        "@personalhealthtrain/server-core": "2.4.1",
         "@socket.io/redis-adapter": "^8.2.1",
         "dotenv": "^16.3.1",
         "hapic": "^2.3.0",
