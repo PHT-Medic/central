@@ -51,7 +51,7 @@
         "@vue-layout/pagination": "^3.4.0",
         "@vue-layout/timeago": "^3.0.0",
         "@vuelidate/core": "^2.0.3",
-        "@vuelidate/validators": "^2.0.3",
+        "@vuelidate/validators": "^2.0.4",
         "cross-env": "^7.0.3",
         "ilingo": "^3.0.0",
         "pinia": "^2.1.7",
