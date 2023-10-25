@@ -21,7 +21,7 @@
         "test:coverage": "npm run test -- --coverage"
     },
     "dependencies": {
-        "@authup/core": "^0.45.0",
+        "@authup/core": "^0.45.5",
         "@authup/server-adapter": "^0.45.0",
         "@ebec/http": "^2.3.0",
         "@hapic/harbor": "^2.3.0",

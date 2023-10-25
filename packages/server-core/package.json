@@ -15,7 +15,7 @@
         "build": "tsc -p tsconfig.build.json"
     },
     "dependencies": {
-        "@authup/core": "^0.45.0",
+        "@authup/core": "^0.45.5",
         "@ebec/http": "^2.3.0",
         "@personalhealthtrain/core": "2.4.1",
         "@socket.io/redis-emitter": "^5.1.0"
