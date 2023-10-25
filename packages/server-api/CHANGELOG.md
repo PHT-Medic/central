@@ -1,5 +1,16 @@
 # Change Log
 
+## 2.4.4
+
+### Patch Changes
+
+- [`db756115`](https://github.com/PHT-Medic/central/commit/db756115e1e068b9efa00565a19d976476d53713) Thanks [@tada5hi](https://github.com/tada5hi)! - bump
+
+- Updated dependencies [[`db756115`](https://github.com/PHT-Medic/central/commit/db756115e1e068b9efa00565a19d976476d53713)]:
+  - @personalhealthtrain/core@2.4.4
+  - @personalhealthtrain/server-core@2.4.4
+  - @personalhealthtrain/server-train-manager@2.4.4
+
 ## 2.4.3
 
 ### Patch Changes
