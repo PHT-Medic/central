@@ -1,5 +1,5 @@
 {
-    "name": "@personalhealthtrain/central-api",
+    "name": "@personalhealthtrain/server-api",
     "private": true,
     "author": {
         "name": "Peter Placzek",
