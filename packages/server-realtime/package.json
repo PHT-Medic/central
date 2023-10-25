@@ -10,7 +10,7 @@
     "version": "2.4.4",
     "description": "This package contains the central realtime application of the PHT.",
     "dependencies": {
-        "@authup/core": "^0.45.0",
+        "@authup/core": "^0.45.6",
         "@authup/server-adapter": "^0.45.0",
         "@ebec/http": "^2.3.0",
         "@personalhealthtrain/core": "2.4.4",
