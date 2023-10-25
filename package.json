@@ -48,7 +48,8 @@
         "client-ui": "npm run dev --workspace=packages/client-ui",
         "server-api": "npm run dev --workspace=packages/server-api",
         "server-realtime": "npm run dev --workspace=packages/server-realtime",
-        "server-train-manager": "npm run dev --workspace=packages/server-train-manager"
+        "server-train-manager": "npm run dev --workspace=packages/server-train-manager",
+        "release": "changeset publish"
     },
     "resolutions": {
         "minimatch": "^5.1.6"
