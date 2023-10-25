@@ -1,5 +1,14 @@
 # Change Log
 
+## 2.4.3
+
+### Patch Changes
+
+- [`d860fff4`](https://github.com/PHT-Medic/central/commit/d860fff408e4405594614719d879d59ccbe517ee) Thanks [@tada5hi](https://github.com/tada5hi)! - release failed
+
+- Updated dependencies [[`d860fff4`](https://github.com/PHT-Medic/central/commit/d860fff408e4405594614719d879d59ccbe517ee)]:
+  - @personalhealthtrain/core@2.4.3
+
 ## 2.4.2
 
 ### Patch Changes
