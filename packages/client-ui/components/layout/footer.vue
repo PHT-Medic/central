@@ -5,12 +5,12 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { BContainer } from 'bootstrap-vue-next';
+import { BToaster } from 'bootstrap-vue-next';
 import { defineComponent } from 'vue';
 import { LicenseAgreement } from '../license-agreement';
 
 export default defineComponent({
-    components: { BContainer, LicenseAgreement },
+    components: { BToaster, LicenseAgreement },
     data() {
         return {
             startYear: 2020,
@@ -35,11 +35,6 @@ export default defineComponent({
                 <a href="https://pht-medic.github.io/documentation/about/team.html">PHT-meDIC</a>
             </div>
         </div>
-        <BContainer
-            :toast="{root: true}"
-            fluid="sm"
-            position="position-fixed"
-            style="z-index: 9999"
-        />
+        <BToaster />
     </div>
 </template>
