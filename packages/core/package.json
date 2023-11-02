@@ -26,7 +26,7 @@
     },
     "license": "MIT",
     "devDependencies": {
-        "@authup/core": "^0.45.6",
+        "@authup/core": "^0.45.7",
         "hapic": "^2.3.0",
         "rapiq": "^0.9.0"
     },
