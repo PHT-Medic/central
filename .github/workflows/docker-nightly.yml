@@ -14,8 +14,7 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
-            - uses: tada5hi/action-docker-image-publish@master
+            - uses: tada5hi/action-docker-image-publish@v3
               with:
                   registryPassword: ${{ secrets.GITHUB_TOKEN }}
-                  registryRepository: central
                   registryTag: next
