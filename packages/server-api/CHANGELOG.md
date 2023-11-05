@@ -1,5 +1,16 @@
 # Change Log
 
+## 2.4.5
+
+### Patch Changes
+
+- [`00add408`](https://github.com/PHT-Medic/central/commit/00add40800cfdec382332c92f0828b66f6961253) Thanks [@tada5hi](https://github.com/tada5hi)! - fix docker build
+
+- Updated dependencies [[`00add408`](https://github.com/PHT-Medic/central/commit/00add40800cfdec382332c92f0828b66f6961253)]:
+  - @personalhealthtrain/core@2.4.5
+  - @personalhealthtrain/server-core@2.4.5
+  - @personalhealthtrain/server-train-manager@2.4.5
+
 ## 2.4.4
 
 ### Patch Changes
