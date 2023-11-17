@@ -61,7 +61,7 @@ export default defineComponent({
             realm_id: '',
             registry_id: '',
             hidden: false,
-            ecosystem: Ecosystem.DEFAULT,
+            ecosystem: '',
         });
 
         const $v = useVuelidate({

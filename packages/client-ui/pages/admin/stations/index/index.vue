@@ -69,17 +69,11 @@ export default defineNuxtComponent({
             },
         }));
 
-        const listNode = ref<null | typeof StationList>(null);
         const handleDeleted = async (item: Station) => {
-            if (listNode.value) {
-                listNode.value.handleDeleted(item);
-            }
-
             emit('deleted', item);
         };
 
         return {
-            listNode,
             fields,
             realmManagementId,
             canView,
@@ -92,9 +86,9 @@ export default defineNuxtComponent({
 </script>
 <template>
     <StationList
-        ref="listNode"
         :query="query"
         :load-on-init="true"
+        @deleted="handleDeleted"
     >
         <template #header="props">
             <ListTitle />
@@ -131,7 +125,7 @@ export default defineNuxtComponent({
                         :entity-id="data.item.id"
                         :entity-type="'station'"
                         :with-text="false"
-                        @deleted="handleDeleted"
+                        @deleted="props.deleted"
                     />
                 </template>
                 <template #cell(created_at)="data">

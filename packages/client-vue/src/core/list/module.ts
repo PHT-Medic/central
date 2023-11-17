@@ -209,20 +209,27 @@ export function createList<
             noMore: options.noMore,
             body: options.body,
             loading: options.loading,
-            total,
+            total: total.value,
             load,
             busy: busy.value,
             data: data.value as Entity<T>[],
-            meta: meta.value,
+            meta: {
+                ...meta.value,
+                total: total.value,
+            },
             onCreated(value: T) {
                 if (context.setup.emit) {
                     context.setup.emit('created', value);
                 }
+
+                total.value++;
             },
             onDeleted(value: T) {
                 if (context.setup.emit) {
                     context.setup.emit('deleted', value);
                 }
+
+                total.value--;
             },
             onUpdated(value: T) {
                 if (context.setup.emit) {

@@ -38,10 +38,7 @@ export function buildListCreatedHandler<T>(
     };
 }
 
-export function buildListUpdatedHandler<T>(
-    items: Ref<T[]>,
-    cb?: (entity: T) => void | Promise<void>,
-) {
+export function buildListUpdatedHandler<T>(items: Ref<T[]>) {
     return (item: T) => {
         if (!isObject(item)) {
             return;
