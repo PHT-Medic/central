@@ -155,7 +155,7 @@ export default defineComponent({
         const submit = wrapFnWithBusyState(busy, async () => {
             if ($v.value.$invalid) return;
 
-            await manager.createOrUpdate(form);
+            await manager.createOrUpdate(form as Partial<Station>);
         });
 
         const toggleFormData = <T extends keyof typeof form>(key: T, id: any) => {
