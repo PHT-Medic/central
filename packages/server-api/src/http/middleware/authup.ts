@@ -54,8 +54,6 @@ export function registerAuthupMiddleware(router: Router) {
         if (header.type === 'Basic') {
             const authupClient = useAuthupClient();
 
-            useLogger().info(`Using basic auth type for: ${header.username}`);
-
             let token : OAuth2TokenGrantResponse;
 
             if (header.username === 'admin') {

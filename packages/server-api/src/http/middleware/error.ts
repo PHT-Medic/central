@@ -28,12 +28,12 @@ export function registerErrorHandler(router: Router) {
                 break;
         }
 
-        if (error.logMessage) {
-            useLogger().warn(error.message);
-        }
-
         const isServerError = (typeof error.expose !== 'undefined' && !error.expose) ||
             (error.statusCode >= 500 && error.statusCode < 600);
+
+        if (isServerError || error.logMessage) {
+            useLogger().error(error);
+        }
 
         if (isServerError) {
             error.message = 'An internal server error occurred.';
