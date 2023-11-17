@@ -7,17 +7,17 @@
 <script lang="ts">
 import type { Station } from '@personalhealthtrain/core';
 import { PermissionID } from '@personalhealthtrain/core';
-import { useToast } from 'bootstrap-vue-next';
 import { storeToRefs } from 'pinia';
 import { StationForm } from '@personalhealthtrain/client-vue';
-import { defineNuxtComponent, navigateTo } from '#app';
+import { defineNuxtComponent } from '#app';
 import { definePageMeta } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 import { useAuthStore } from '../../../../store/auth';
 
 export default defineNuxtComponent({
     components: { StationForm },
-    setup() {
+    emits: ['created', 'failed'],
+    setup(props, { emit }) {
         definePageMeta({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
@@ -26,23 +26,15 @@ export default defineNuxtComponent({
             ],
         });
 
-        const toast = useToast();
-
         const store = useAuthStore();
         const { realmManagementId, realmManagementName } = storeToRefs(store);
 
         const handleCreated = async (e: Station) => {
-            if (toast) {
-                toast.success({ body: 'The station was successfully created.' });
-            }
-
-            await navigateTo(`/admin/stations/${e.id}`);
+            emit('created', e);
         };
 
         const handleFailed = (e: Error) => {
-            if (toast) {
-                toast.danger({ body: e.message });
-            }
+            emit('failed', e);
         };
 
         return {

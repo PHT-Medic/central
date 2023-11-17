@@ -6,10 +6,6 @@
   -->
 <script lang="ts">
 import type { UserSecret } from '@personalhealthtrain/core';
-import {
-    SecretStorageAPICommand, buildUserSecretsSecretStorageKey,
-} from '@personalhealthtrain/core';
-import { useToast } from 'bootstrap-vue-next';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { computed, nextTick, ref } from 'vue';
@@ -22,9 +18,8 @@ import {
     UserSecretForm,
     UserSecretList,
 } from '@personalhealthtrain/client-vue';
-import { useAPI } from '#imports';
+import { useToast } from '#imports';
 import { defineNuxtComponent } from '#app';
-import { wrapFnWithBusyState } from '../../../core';
 import { useAuthStore } from '../../../store/auth';
 
 export default defineNuxtComponent({
@@ -67,7 +62,7 @@ export default defineNuxtComponent({
             }
 
             if (toast) {
-                toast.success({ body: 'The secret was successfully created.' });
+                toast.show({ variant: 'success', body: 'The secret was successfully created.' });
             }
         };
 
@@ -77,7 +72,7 @@ export default defineNuxtComponent({
             }
 
             if (toast) {
-                toast.success({ body: 'The secret was successfully updated.' });
+                toast.show({ variant: 'success', body: 'The secret was successfully updated.' });
             }
         };
 
@@ -87,13 +82,13 @@ export default defineNuxtComponent({
             }
 
             if (toast) {
-                toast.success({ body: 'The secret was successfully deleted.' });
+                toast.show({ variant: 'success', body: 'The secret was successfully deleted.' });
             }
         };
 
         const handleFailed = (e: Error) => {
             if (toast) {
-                toast.warning({ body: e.message });
+                toast.show({ variant: 'warning', body: e.message });
             }
         };
 

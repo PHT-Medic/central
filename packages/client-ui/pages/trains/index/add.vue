@@ -10,12 +10,13 @@ import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
 import { TrainBasicForm } from '@personalhealthtrain/client-vue';
 import { defineNuxtComponent } from '#app';
-import { navigateTo, useRoute } from '#imports';
+import { useRoute } from '#imports';
 import { useAuthStore } from '../../../store/auth';
 
 export default defineNuxtComponent({
     components: { TrainBasicForm },
-    setup() {
+    emits: ['created'],
+    setup(_props, { emit }) {
         const proposalId = ref<string | null>(null);
 
         const store = useAuthStore();
@@ -27,7 +28,7 @@ export default defineNuxtComponent({
         }
 
         const handleCreated = async (train: Train) => {
-            await navigateTo(`/trains/${train.id}/setup`);
+            emit('created', train);
         };
 
         return {

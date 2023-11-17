@@ -6,11 +6,11 @@
   -->
 <script lang="ts">
 
-import { useToast } from 'bootstrap-vue-next';
 import type { Registry } from '@personalhealthtrain/core';
 import { Ecosystem } from '@personalhealthtrain/core';
 import type { PropType } from 'vue';
 import { RegistryCleanup } from '@personalhealthtrain/client-vue';
+import { useToast } from '#imports';
 import { defineNuxtComponent, navigateTo } from '#app';
 
 export default defineNuxtComponent({
@@ -30,17 +30,13 @@ export default defineNuxtComponent({
 
         const handleExecuted = () => {
             if (toast) {
-                toast.success({ body: 'You successfully executed the cleanup routine.' }, {
-                    pos: 'top-center',
-                });
+                toast.show({ variant: 'success', body: 'You successfully executed the cleanup routine.' });
             }
         };
 
         const handleFailed = (e: Error) => {
             if (toast) {
-                toast.danger({ body: e.message }, {
-                    pos: 'top-center',
-                });
+                toast.show({ variant: 'warning', body: e.message });
             }
         };
 

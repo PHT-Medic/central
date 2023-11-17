@@ -19,13 +19,19 @@ export default defineNuxtComponent({
         },
     },
     emits: ['failed', 'updated'],
-    methods: {
-        handleUpdated(e) {
-            this.$emit('updated', e);
-        },
-        handleFailed(e) {
-            this.$emit('failed', e);
-        },
+    setup(props, { emit }) {
+        const handleUpdated = (e: Station) => {
+            emit('updated', e);
+        };
+
+        const handleFailed = (e: Error) => {
+            emit('failed', e);
+        };
+
+        return {
+            handleUpdated,
+            handleFailed,
+        };
     },
 });
 </script>

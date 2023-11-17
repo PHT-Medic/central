@@ -8,9 +8,8 @@
 <script lang="ts">
 import type { Registry } from '@personalhealthtrain/core';
 import { PermissionID } from '@personalhealthtrain/core';
-import { useToast } from 'bootstrap-vue-next';
+import { definePageMeta, useToast } from '#imports';
 import { defineNuxtComponent } from '#app';
-import { definePageMeta } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
 
 export default defineNuxtComponent({
@@ -39,7 +38,7 @@ export default defineNuxtComponent({
         ];
 
         const handleDeleted = (item: Registry) => {
-            toast.success({ body: `The registry ${item.name} was successfully deleted.` });
+            toast.show({ variant: 'success', body: `The registry ${item.name} was successfully deleted.` });
         };
 
         return {

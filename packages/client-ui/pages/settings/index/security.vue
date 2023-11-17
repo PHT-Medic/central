@@ -1,9 +1,8 @@
 <script lang="ts">
 import { storeToRefs } from 'pinia';
-import { useToast } from 'bootstrap-vue-next';
 import { UserPasswordForm } from '@authup/client-vue';
+import { definePageMeta, useToast } from '#imports';
 import { defineNuxtComponent } from '#app';
-import { definePageMeta } from '#imports';
 import { LayoutKey } from '~/config/layout';
 import { useAuthStore } from '~/store/auth';
 
@@ -16,17 +15,17 @@ export default defineNuxtComponent({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
         });
 
+        const toast = useToast();
+
         const store = useAuthStore();
-        const { userId } = storeToRefs(store) as { userId: string };
+        const { userId } = storeToRefs(store);
 
         const handleUpdated = () => {
-            const toast = useToast();
-            toast.success({ body: 'The account was successfully updated.' });
+            toast.show({ variant: 'success', body: 'The account was successfully updated.' });
         };
 
-        const handleFailed = (e) => {
-            const toast = useToast();
-            toast.warning({ body: e.message });
+        const handleFailed = (e: Error) => {
+            toast.show({ variant: 'warning', body: e.message });
         };
 
         return {

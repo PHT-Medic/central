@@ -6,9 +6,10 @@
   -->
 
 <script lang="ts">
+import type { Station } from '@personalhealthtrain/core';
 import { PermissionID } from '@personalhealthtrain/core';
-import { definePageMeta } from '#imports';
-import { defineNuxtComponent } from '#app';
+import { definePageMeta, useToast } from '#imports';
+import { defineNuxtComponent, navigateTo } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default defineNuxtComponent({
@@ -36,7 +37,26 @@ export default defineNuxtComponent({
             },
         ];
 
+        const toast = useToast();
+
+        const handleCreated = async (e: Station) => {
+            toast.show({ variant: 'success', body: 'The station was successfully created.' });
+
+            await navigateTo(`/admin/stations/${e.id}`);
+        };
+
+        const handleDeleted = (e: Station) => {
+            toast.show({ variant: 'success', body: 'The station was successfully deleted.' });
+        };
+
+        const handleFailed = (e: Error) => {
+            toast.show({ variant: 'warning', body: e.message });
+        };
+
         return {
+            handleCreated,
+            handleDeleted,
+            handleFailed,
             tabs,
         };
     },
@@ -56,7 +76,11 @@ export default defineNuxtComponent({
                 />
             </div>
             <div class="content-container">
-                <NuxtPage />
+                <NuxtPage
+                    @created="handleCreated"
+                    @deleted="handleDeleted"
+                    @failed="handleFailed"
+                />
             </div>
         </div>
     </div>

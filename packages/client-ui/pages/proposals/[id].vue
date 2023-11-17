@@ -14,13 +14,13 @@ import {
     PermissionID,
 } from '@personalhealthtrain/core';
 import { createEntityManager } from '@personalhealthtrain/client-vue';
-import { useToast } from 'bootstrap-vue-next';
 import type { Ref } from 'vue';
 import {
     computed, ref,
 } from 'vue';
 import {
-    definePageMeta, useAPI,
+    definePageMeta,
+    useAPI, useToast,
 } from '#imports';
 import {
     createError, defineNuxtComponent, navigateTo, useRoute,
@@ -39,21 +39,19 @@ export default defineNuxtComponent({
 
         const toast = useToast();
 
-        const manager = createEntityManager({
+        const manager = createEntityManager<`${DomainType.PROPOSAL}`>({
             type: `${DomainType.PROPOSAL}`,
             props: {
                 entityId: useRoute().params.id as string,
             },
             onUpdated() {
                 if (toast) {
-                    toast.success({ body: 'The proposal was successfully updated.' });
+                    toast.show({ variant: 'success', body: 'The proposal was successfully updated.' });
                 }
             },
             onFailed(e) {
                 if (toast) {
-                    toast.show({ body: e.message }, {
-                        pos: 'top-center',
-                    });
+                    toast.show({ variant: 'warning', body: e.message });
                 }
             },
             onDeleted() {

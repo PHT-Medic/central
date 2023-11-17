@@ -5,8 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { defineNuxtComponent } from '#app';
-import { definePageMeta } from '#imports';
+import type { Proposal } from '@personalhealthtrain/core';
+import { defineNuxtComponent, navigateTo } from '#app';
+import { definePageMeta, useToast } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 
 export default defineNuxtComponent({
@@ -34,7 +35,18 @@ export default defineNuxtComponent({
             },
         ];
 
+        const toast = useToast();
+
+        const handleCreated = (entity: Proposal) => {
+            toast.show({ variant: 'success', body: 'The proposal was successfully created.' });
+
+            navigateTo({
+                path: `/proposals/${entity.id}`,
+            });
+        };
+
         return {
+            handleCreated,
             tabs,
         };
     },
@@ -55,7 +67,7 @@ export default defineNuxtComponent({
                 />
             </div>
             <div class="content-container">
-                <NuxtPage />
+                <NuxtPage @craeted="handleCreated" />
             </div>
         </div>
     </div>

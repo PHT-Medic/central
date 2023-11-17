@@ -8,7 +8,7 @@
 import { Timeago } from '@vue-layout/timeago';
 import type { Station } from '@personalhealthtrain/core';
 import { PermissionID } from '@personalhealthtrain/core';
-import { BSpinner, BTable, useToast } from 'bootstrap-vue-next';
+import { BTable } from 'bootstrap-vue-next';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { computed, ref } from 'vue';
@@ -30,13 +30,12 @@ export default defineNuxtComponent({
         StationList,
         Timeago,
     },
-    setup() {
+    emits: ['deleted'],
+    setup(props, { emit }) {
         definePageMeta({
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.ADMIN,
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
         });
-
-        const toast = useToast();
 
         const fields = [
             {
@@ -70,11 +69,13 @@ export default defineNuxtComponent({
             },
         }));
 
-        const listNode = ref<null | StationList>(null);
+        const listNode = ref<null | typeof StationList>(null);
         const handleDeleted = async (item: Station) => {
-            toast.success({ body: 'The station was successfully deleted.' });
+            if (listNode.value) {
+                listNode.value.handleDeleted(item);
+            }
 
-            this.$refs.itemsList.handleDeleted(item);
+            emit('deleted', item);
         };
 
         return {

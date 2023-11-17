@@ -1,9 +1,8 @@
 <script lang="ts">
 import type { Realm } from '@authup/core';
 import { PermissionName } from '@authup/core';
-import { useToast } from 'bootstrap-vue-next';
+import { definePageMeta, useToast } from '#imports';
 import { defineNuxtComponent } from '#app';
-import { definePageMeta } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../config/layout';
 
 export default defineNuxtComponent({

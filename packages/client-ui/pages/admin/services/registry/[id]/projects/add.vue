@@ -7,10 +7,9 @@
 <script lang="ts">
 import type { Registry, RegistryProject } from '@personalhealthtrain/core';
 import { PermissionID } from '@personalhealthtrain/core';
-import { useToast } from 'bootstrap-vue-next';
 import type { PropType } from 'vue';
 import { RegistryProjectForm } from '@personalhealthtrain/client-vue';
-import { definePageMeta } from '#imports';
+import { definePageMeta, useToast } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../../../../config/layout';
 
@@ -34,11 +33,11 @@ export default defineNuxtComponent({
         const toast = useToast();
 
         const handleCreated = (e: RegistryProject) => {
-            toast.success({ body: 'The project was successfully created.' });
+            toast.show({ variant: 'success', body: 'The project was successfully created.' });
         };
 
         const handleFailed = (e: Error) => {
-            toast.danger({ body: e.message });
+            toast.show({ variant: 'danger', body: e.message });
         };
 
         return {

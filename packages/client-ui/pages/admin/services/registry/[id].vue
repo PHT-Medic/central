@@ -7,11 +7,11 @@
 <script lang="ts">
 import { DomainType, Ecosystem, PermissionID } from '@personalhealthtrain/core';
 import { createEntityManager } from '@personalhealthtrain/client-vue';
-import { useToast } from 'bootstrap-vue-next';
 import { computed } from 'vue';
 import {
     createError,
-    definePageMeta, navigateTo, useRoute,
+    definePageMeta,
+    navigateTo, useRoute, useToast,
 } from '#imports';
 import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '../../../../config/layout';
@@ -43,12 +43,12 @@ export default defineNuxtComponent({
             },
             onUpdated() {
                 if (toast) {
-                    toast.success({ body: 'The registry was successfully updated.' });
+                    toast.show({ variant: 'success', body: 'The registry was successfully updated.' });
                 }
             },
             onDeleted() {
                 if (toast) {
-                    toast.success({ body: 'The registry was successfully deleted.' });
+                    toast.show({ variant: 'success', body: 'The registry was successfully deleted.' });
                 }
 
                 return navigateTo('/admin/registries');

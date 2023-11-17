@@ -7,7 +7,7 @@
 <script lang="ts">
 import type { Registry, RegistryProject } from '@personalhealthtrain/core';
 import { PermissionID } from '@personalhealthtrain/core';
-import { BModal, BTable, useToast } from 'bootstrap-vue-next';
+import { BModal, BTable } from 'bootstrap-vue-next';
 import type { BuildInput } from 'rapiq';
 import { computed, ref, toRefs } from 'vue';
 import type { PropType, Ref } from 'vue';
@@ -18,7 +18,7 @@ import {
     RegistryProjectDetails,
     RegistryProjectList,
 } from '@personalhealthtrain/client-vue';
-import { definePageMeta } from '#imports';
+import { definePageMeta, useToast } from '#imports';
 import { LayoutKey, LayoutNavigationID } from '../../../../../../config/layout';
 import { useAuthStore } from '../../../../../../store/auth';
 
@@ -83,14 +83,14 @@ export default {
 
         const canDrop = computed(() => store.has(PermissionID.STATION_DROP));
 
-        const listNode = ref<null | RegistryProjectList>(null);
+        const listNode = ref<null | typeof RegistryProjectList>(null);
 
         const handleDeleted = (item: RegistryProject) => {
-            toast.success({ body: 'The project was successfully deleted.' });
-
             if (listNode.value) {
                 listNode.value.handleDeleted(item);
             }
+
+            toast.show({ variant: 'success', body: 'The project was successfully deleted.' });
         };
 
         const modalShow = ref<boolean>(false);

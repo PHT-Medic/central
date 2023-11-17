@@ -6,12 +6,12 @@
   -->
 <script lang="ts">
 import { IdentityProviderList } from '@authup/client-vue';
-import { useToast } from 'bootstrap-vue-next';
 import {
     ListPagination, ListSearch, ListTitle, LoginForm,
 } from '@personalhealthtrain/client-vue';
 import {
-    definePageMeta, navigateTo, useAuthupAPI, useRoute,
+    definePageMeta,
+    navigateTo, useAuthupAPI, useRoute, useToast,
 } from '#imports';
 import {
     defineNuxtComponent,
@@ -48,9 +48,7 @@ export default defineNuxtComponent({
 
         const handleFailed = (e: Error) => {
             if (toast) {
-                toast.warning({ body: e.message }, {
-                    pos: 'top-center',
-                });
+                toast.show({ variant: 'warning', body: e.message });
             }
         };
 

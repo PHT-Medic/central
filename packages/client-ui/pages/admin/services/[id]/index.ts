@@ -5,10 +5,10 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { useToast } from 'bootstrap-vue-next';
 import type { PropType } from 'vue';
 import { ServiceID } from '@personalhealthtrain/core';
 import { MasterImagesSync, StationRegistryManagement } from '@personalhealthtrain/client-vue';
+import { useToast } from '#imports';
 import { defineNuxtComponent } from '#app';
 
 export default defineNuxtComponent({
@@ -24,17 +24,13 @@ export default defineNuxtComponent({
 
         const handleExecuted = () => {
             if (toast) {
-                toast.success({ body: 'You successfully executed the sync routine.' }, {
-                    pos: 'top-center',
-                });
+                toast.show({ variant: 'success', body: 'You successfully executed the sync routine.' });
             }
         };
 
         const handleFailed = (e: Error) => {
             if (toast) {
-                toast.danger({ body: e.message }, {
-                    pos: 'top-center',
-                });
+                toast.show({ variant: 'warning', body: e.message });
             }
         };
 

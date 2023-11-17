@@ -6,7 +6,6 @@
   -->
 <script lang="ts">
 import { DomainType } from '@personalhealthtrain/core';
-import { useToast } from 'bootstrap-vue-next';
 import type { FieldsBuildInput } from 'rapiq';
 import type { PropType } from 'vue';
 import type {
@@ -14,6 +13,7 @@ import type {
     RegistryProject,
 } from '@personalhealthtrain/core';
 import { RegistryProjectForm, createEntityManager } from '@personalhealthtrain/client-vue';
+import { useToast } from '#imports';
 import {
     createError, defineNuxtComponent, navigateTo, useRoute,
 } from '#app';
@@ -51,12 +51,12 @@ export default defineNuxtComponent({
             },
             onUpdated() {
                 if (toast) {
-                    toast.success({ body: 'The project was successfully updated.' });
+                    toast.show({ variant: 'success', body: 'The project was successfully updated.' });
                 }
             },
             onDeleted() {
                 if (toast) {
-                    toast.success({ body: 'The project was successfully deleted.' });
+                    toast.show({ variant: 'success', body: 'The project was successfully deleted.' });
                 }
 
                 return navigateTo(`/admin/registries/${props.entity.id}/projects`);

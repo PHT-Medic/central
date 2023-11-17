@@ -8,7 +8,6 @@
 import { RobotForm } from '@authup/client-vue';
 import type { Robot } from '@authup/core';
 import type { ServiceID } from '@personalhealthtrain/core';
-import { useToast } from 'bootstrap-vue-next';
 import type { PropType, Ref } from 'vue';
 import { ref, toRefs } from 'vue';
 import {
@@ -17,6 +16,7 @@ import {
     navigateTo,
     updateObjectProperties,
     useAuthupAPI,
+    useToast,
 } from '#imports';
 
 export default defineNuxtComponent({
@@ -58,7 +58,7 @@ export default defineNuxtComponent({
         const handleUpdated = (item: Robot) => {
             updateObjectProperties(entity, item);
 
-            toast.success({ body: 'The robot was successfully updated.' });
+            toast.show({ variant: 'success', body: 'The robot was successfully updated.' });
         };
 
         return {

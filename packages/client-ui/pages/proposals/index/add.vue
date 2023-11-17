@@ -10,17 +10,17 @@ import {
     PermissionID,
 } from '@personalhealthtrain/core';
 
-import { useToast } from 'bootstrap-vue-next';
 import { ProposalForm } from '@personalhealthtrain/client-vue';
 import { definePageMeta } from '#imports';
-import { defineNuxtComponent, navigateTo } from '#app';
+import { defineNuxtComponent } from '#app';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 
 export default defineNuxtComponent({
     components: {
         ProposalForm,
     },
-    setup() {
+    emits: ['created'],
+    setup(props, { emit }) {
         definePageMeta({
             [LayoutKey.REQUIRED_LOGGED_IN]: true,
             [LayoutKey.NAVIGATION_ID]: LayoutNavigationID.DEFAULT,
@@ -28,16 +28,8 @@ export default defineNuxtComponent({
                 PermissionID.PROPOSAL_ADD,
             ],
         });
-        const toast = useToast();
-
         const handleCreated = (entity: Proposal) => {
-            toast.success({ body: 'The proposal was successfully created.' }, {
-                pos: 'top-center',
-            });
-
-            navigateTo({
-                path: `/proposals/${entity.id}`,
-            });
+            emit('created', entity);
         };
 
         return {

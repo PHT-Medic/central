@@ -6,7 +6,6 @@
   -->
 <script lang="ts">
 import { createEntityManager } from '@personalhealthtrain/client-vue';
-import { useToast } from 'bootstrap-vue-next';
 import type {
     Station,
 } from '@personalhealthtrain/core';
@@ -15,6 +14,7 @@ import {
 } from '@personalhealthtrain/core';
 import {
     useRoute,
+    useToast,
 } from '#imports';
 import { createError, defineNuxtComponent, navigateTo } from '#app';
 
@@ -31,14 +31,12 @@ export default defineNuxtComponent({
             },
             onFailed(e) {
                 if (toast) {
-                    toast.show({ body: e.message }, {
-                        pos: 'top-center',
-                    });
+                    toast.show({ variant: 'warning', body: e.message });
                 }
             },
             onUpdated() {
                 if (toast) {
-                    toast.success({ body: 'The station was successfully updated.' });
+                    toast.show({ variant: 'success', body: 'The station was successfully updated.' });
                 }
             },
         });

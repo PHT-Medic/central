@@ -7,11 +7,11 @@
 <script lang="ts">
 import { RobotForm } from '@authup/client-vue';
 import type { Robot } from '@authup/core';
-import { useToast } from 'bootstrap-vue-next';
 import { storeToRefs } from 'pinia';
 import type { Ref } from 'vue';
 import { h, ref } from 'vue';
 import { ServiceID } from '@personalhealthtrain/core';
+import { useToast } from '#imports';
 import { createError, defineNuxtComponent, navigateTo } from '#app';
 import { useAuthupAPI } from '../../../../composables/api';
 import { useAuthStore } from '../../../../store/auth';
@@ -45,7 +45,7 @@ export default defineNuxtComponent({
         const handleUpdated = (item: Robot) => {
             updateObjectProperties(entity, item);
 
-            toast.success({ body: 'The robot was successfully updated.' });
+            toast.show({ variant: 'success', body: 'The robot was successfully updated.' });
         };
 
         const store = useAuthStore();

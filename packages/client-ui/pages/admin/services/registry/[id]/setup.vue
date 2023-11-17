@@ -7,9 +7,9 @@
 <script lang="ts">
 import type { Registry } from '@personalhealthtrain/core';
 import { Ecosystem } from '@personalhealthtrain/core';
-import { useToast } from 'bootstrap-vue-next';
 import type { PropType } from 'vue';
 import { RegistryCleanup, RegistrySetup } from '@personalhealthtrain/client-vue';
+import { useToast } from '#imports';
 import { defineNuxtComponent, navigateTo } from '#app';
 
 export default defineNuxtComponent({
@@ -29,17 +29,13 @@ export default defineNuxtComponent({
 
         const handleExecuted = () => {
             if (toast) {
-                toast.success({ body: 'You successfully executed the setup routine.' }, {
-                    pos: 'top-center',
-                });
+                toast.show({ variant: 'success', body: 'You successfully executed the setup routine.' });
             }
         };
 
         const handleFailed = (e: Error) => {
             if (toast) {
-                toast.danger({ body: e.message }, {
-                    pos: 'top-center',
-                });
+                toast.show({ variant: 'danger', body: e.message });
             }
         };
 

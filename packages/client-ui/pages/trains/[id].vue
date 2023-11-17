@@ -9,9 +9,8 @@ import {
     DomainType,
 } from '@personalhealthtrain/core';
 import { TrainName, createEntityManager } from '@personalhealthtrain/client-vue';
-import { useToast } from 'bootstrap-vue-next';
 import { isClientErrorWithStatusCode } from 'hapic';
-import { definePageMeta } from '#imports';
+import { definePageMeta, useToast } from '#imports';
 import {
     createError, defineNuxtComponent, navigateTo, useRoute,
 } from '#app';
@@ -35,9 +34,7 @@ export default defineNuxtComponent({
             },
             onFailed(e) {
                 if (toast) {
-                    toast.show({ body: e.message }, {
-                        pos: 'top-center',
-                    });
+                    toast.show({ variant: 'warning', body: e.message });
                 }
             },
         });
