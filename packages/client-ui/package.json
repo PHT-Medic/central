@@ -26,7 +26,7 @@
         "@personalhealthtrain/client-vue": "2.4.7",
         "@personalhealthtrain/core": "2.4.7",
         "@pinia/nuxt": "^0.5.1",
-        "@vue-layout/countdown": "^3.0.0",
+        "@vue-layout/countdown": "^3.6.2",
         "@vue-layout/form-controls": "^3.4.0",
         "@vue-layout/gravatar": "^3.0.0",
         "@vue-layout/list-controls": "^3.6.1",
