@@ -27,7 +27,7 @@
         "@hapic/harbor": "^2.3.0",
         "@personalhealthtrain/core": "2.4.5",
         "@personalhealthtrain/server-core": "2.4.5",
-        "amqp-extension": "^2.0.0",
+        "amqp-extension": "^2.0.1",
         "dockerode": "^4.0.0",
         "dotenv": "^16.3.1",
         "gunzip-maybe": "^1.4.2",
