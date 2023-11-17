@@ -1,5 +1,16 @@
 # Change Log
 
+## 2.4.7
+
+### Patch Changes
+
+- [`be131cff`](https://github.com/PHT-Medic/central/commit/be131cfff473eff8c64a1bff01c2937b3892c0bd) Thanks [@tada5hi](https://github.com/tada5hi)! - minor fixes
+
+- Updated dependencies [[`be131cff`](https://github.com/PHT-Medic/central/commit/be131cfff473eff8c64a1bff01c2937b3892c0bd)]:
+  - @personalhealthtrain/core@2.4.7
+  - @personalhealthtrain/server-core@2.4.7
+  - @personalhealthtrain/server-train-manager@2.4.7
+
 ## 2.4.6
 
 ### Patch Changes
