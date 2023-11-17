@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.4.6
+
+### Patch Changes
+
+- [`81228a63`](https://github.com/PHT-Medic/central/commit/81228a638af50a2a9b5da515ff43ebf22cd0d7dc) Thanks [@tada5hi](https://github.com/tada5hi)! - bump version
+
 ## 2.4.5
 
 ### Patch Changes
