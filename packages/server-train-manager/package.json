@@ -40,7 +40,7 @@
         "winston": "^3.11.0"
     },
     "devDependencies": {
-        "@types/dockerode": "^3.3.22",
+        "@types/dockerode": "^3.3.23",
         "@types/tar-stream": "^2.2.2",
         "@types/uuid": "^9.0.7",
         "ts-node": "^10.9.1"
