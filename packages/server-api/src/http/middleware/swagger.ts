@@ -9,9 +9,11 @@ import path from 'node:path';
 import { swaggerUI } from '@routup/swagger';
 import { loadSync } from 'locter';
 import type { Router } from 'routup';
-import { getWritableDirPath } from '../../config';
+import { getWritableDirPath, useEnv } from '../../config';
 
 export function registerSwaggerMiddleware(router: Router) {
     const document = loadSync(path.join(getWritableDirPath(), 'swagger.json'));
-    router.use('/docs', swaggerUI(document));
+    router.use('/docs', swaggerUI(document, {
+        baseURL: useEnv('apiUrl'),
+    }));
 }
