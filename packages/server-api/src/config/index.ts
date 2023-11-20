@@ -11,4 +11,3 @@ export * from './permissions';
 export * from './api';
 export * from './module';
 export * from './paths';
-export * from './spinner';
