@@ -21,7 +21,7 @@
         "@personalhealthtrain/server-train-manager": "2.4.8",
         "@routup/basic": "^1.1.0",
         "@routup/decorators": "^3.1.0",
-        "@routup/prometheus": "^2.1.0",
+        "@routup/prometheus": "^2.3.0",
         "@routup/rate-limit": "^2.1.0",
         "@routup/swagger": "^2.1.0",
         "@socket.io/redis-emitter": "^5.1.0",
