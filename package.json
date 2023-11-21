@@ -35,17 +35,16 @@
     },
     "scripts": {
         "commit": "npx git-cz",
-        "build": "nx run-many -t build",
-        "test": "nx run-many -t test",
+        "build": "npx nx run-many -t build",
+        "test": "npx nx run-many -t test",
         "lint": "eslint --ext .ts,.vue,.js ./packages/",
         "lint:fix": "npm run lint -- --fix",
         "prepare": "husky install",
-        "prepublishOnly": "npm run build",
         "cli": "npm run cli --workspace=packages/server-api",
         "client-ui": "npm run dev --workspace=packages/client-ui",
         "server-api": "npm run dev --workspace=packages/server-api",
         "server-realtime": "npm run dev --workspace=packages/server-realtime",
         "server-train-manager": "npm run dev --workspace=packages/server-train-manager",
-        "release": "changeset publish"
+        "release": "npx changeset publish"
     }
 }
