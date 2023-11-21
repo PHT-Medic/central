@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.4.8
+
+### Patch Changes
+
+- [`76a59318`](https://github.com/PHT-Medic/central/commit/76a593180f761dad3e09481e1cb7bf272d6f6e8e) Thanks [@tada5hi](https://github.com/tada5hi)! - patch bump
+
 ## 2.4.7
 
 ### Patch Changes
