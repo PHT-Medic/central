@@ -1,19 +1,19 @@
 {
-  "$schema": "https://unpkg.com/@changesets/config@2.3.1/schema.json",
+    "$schema": "https://unpkg.com/@changesets/config@2.3.1/schema.json",
     "changelog": ["@changesets/changelog-github", { "repo": "PHT-Medic/central" }],
-  "commit": false,
-  "fixed": [[
-      "@personalhealthtrain/client-ui",
-      "@personalhealthtrain/client-vue",
-      "@personalhealthtrain/core",
-      "@personalhealthtrain/server-api",
-      "@personalhealthtrain/server-core",
-      "@personalhealthtrain/server-realtime",
-      "@personalhealthtrain/server-train-manager"
-  ]],
-  "linked": [],
-  "access": "public",
-  "baseBranch": "master",
-  "updateInternalDependencies": "patch",
-  "ignore": []
+    "commit": false,
+    "fixed": [[
+        "@personalhealthtrain/client-ui",
+        "@personalhealthtrain/client-vue",
+        "@personalhealthtrain/core",
+        "@personalhealthtrain/server-api",
+        "@personalhealthtrain/server-core",
+        "@personalhealthtrain/server-realtime",
+        "@personalhealthtrain/server-train-manager"
+    ]],
+    "linked": [],
+    "access": "public",
+    "baseBranch": "master",
+    "updateInternalDependencies": "patch",
+    "ignore": []
 }
