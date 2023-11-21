@@ -1,18 +1,5 @@
 # Change Log
 
-## 3.0.0
-
-### Minor Changes
-
-- [`cb50f208`](https://github.com/PHT-Medic/central/commit/cb50f208efa2a59e4b1382d7e478d94eb48b3f5f) Thanks [@tada5hi](https://github.com/tada5hi)! - bump version
-
-### Patch Changes
-
-- Updated dependencies [[`cb50f208`](https://github.com/PHT-Medic/central/commit/cb50f208efa2a59e4b1382d7e478d94eb48b3f5f)]:
-  - @personalhealthtrain/core@3.0.0
-  - @personalhealthtrain/server-core@3.0.0
-  - @personalhealthtrain/server-train-manager@3.0.0
-
 ## 2.4.7
 
 ### Patch Changes
