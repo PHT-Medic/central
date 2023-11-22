@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.4.9
+
+### Patch Changes
+
+- [`e7e2c3d7`](https://github.com/PHT-Medic/central/commit/e7e2c3d735296be1c76d0735f64da18ee781617a) Thanks [@tada5hi](https://github.com/tada5hi)! - log error cause
+
 ## 2.4.8
 
 ### Patch Changes
