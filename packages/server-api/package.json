@@ -56,7 +56,7 @@
         "@types/module-alias": "^2.0.4",
         "@types/mysql": "^2.15.23",
         "@types/supertest": "^2.0.15",
-        "@types/tar": "^6.1.7",
+        "@types/tar": "^6.1.10",
         "@types/tar-stream": "^2.2.2",
         "@types/yargs": "^17.0.29",
         "cross-env": "^7.0.3",
