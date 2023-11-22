@@ -33,6 +33,10 @@ export function registerErrorHandler(router: Router) {
 
         if (isServerError || error.logMessage) {
             useLogger().error(error);
+
+            if (error.cause) {
+                useLogger().error(error.cause);
+            }
         }
 
         if (isServerError) {
