@@ -9,7 +9,7 @@
         "url": "https://tada5hi.net"
     },
     "license": "MIT",
-    "version": "2.4.8",
+    "version": "2.4.9",
     "description": "This package contains the common packages for server applications of the PHT.",
     "scripts": {
         "build": "tsc -p tsconfig.build.json"
@@ -17,7 +17,7 @@
     "dependencies": {
         "@authup/core": "^0.45.7",
         "@ebec/http": "^2.3.0",
-        "@personalhealthtrain/core": "2.4.8",
+        "@personalhealthtrain/core": "2.4.9",
         "@socket.io/redis-emitter": "^5.1.0"
     },
     "devDependencies": {
