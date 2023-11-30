@@ -67,7 +67,7 @@ export default defineNuxtComponent({
                 />
             </div>
             <div class="content-container">
-                <NuxtPage @craeted="handleCreated" />
+                <NuxtPage @created="handleCreated" />
             </div>
         </div>
     </div>
