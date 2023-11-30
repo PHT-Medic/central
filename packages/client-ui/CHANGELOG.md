@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.4.10
+
+### Patch Changes
+
+- [`baa9acbf`](https://github.com/PHT-Medic/central/commit/baa9acbf4a66869471ae1ccf595dae94553dc564) Thanks [@tada5hi](https://github.com/tada5hi)! - fix ui proposal event handler
+
 ## 2.4.9
 
 ### Patch Changes

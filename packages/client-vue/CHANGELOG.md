@@ -1,5 +1,12 @@
 # Change Log
 
+## 2.4.10
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @personalhealthtrain/core@2.4.10
+
 ## 2.4.9
 
 ### Patch Changes
