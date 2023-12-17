@@ -1,0 +1,36 @@
+{
+    "bootstrap-sha": "6bd5505381d9158b369bb757fcb2c447a3423636",
+    "include-component-in-tag": true,
+    "release-type": "node",
+    "bump-minor-pre-major": true,
+    "bump-patch-for-minor-pre-major": true,
+    "packages": {
+        "packages/client-ui": {"component": "client-ui" },
+        "packages/client-vue": {"component": "client-vue" },
+        "packages/core": {"component": "core" },
+        "packages/server-api": {"component": "server-api" },
+        "packages/server-core": {"component": "server-core" },
+        "packages/server-realtime": {"component": "server-realtime" },
+        "packages/server-train-manager": {"component": "server-train-manager" }
+    },
+    "plugins": [
+        {
+            "type": "node-workspace",
+            "updatePeerDependencies": true
+        },
+        {
+            "type": "linked-versions",
+            "groupName": "main",
+            "components": [
+                "client-ui",
+                "client-vue",
+                "core",
+                "server-api",
+                "server-core",
+                "server-realtime",
+                "server-train-manager"
+            ]
+        }
+    ],
+    "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
+}
