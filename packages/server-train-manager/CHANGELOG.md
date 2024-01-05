@@ -1,5 +1,26 @@
 # Change Log
 
+## [2.5.0](https://github.com/PHT-Medic/central/compare/server-train-manager-v2.4.10...server-train-manager-v2.5.0) (2024-01-05)
+
+
+### Features
+
+* migrated to vuecs and authup v1 ([4115633](https://github.com/PHT-Medic/central/commit/411563384824e5d3a134208eef667efad0830b9e))
+
+
+### Bug Fixes
+
+* **deps:** bump @hapic/harbor from 2.3.0 to 2.3.1 ([#1313](https://github.com/PHT-Medic/central/issues/1313)) ([b19c6ca](https://github.com/PHT-Medic/central/commit/b19c6caad95f224d6479e426483450b2aa2d3c97))
+* **deps:** bump dockerode from 4.0.0 to 4.0.2 ([#1297](https://github.com/PHT-Medic/central/issues/1297)) ([71b1f84](https://github.com/PHT-Medic/central/commit/71b1f841650641fbab94f85be4614a3e5f597973))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @personalhealthtrain/core bumped from 2.4.10 to 2.5.0
+    * @personalhealthtrain/server-core bumped from 2.4.10 to 2.5.0
+
 ## 2.4.10
 
 ### Patch Changes

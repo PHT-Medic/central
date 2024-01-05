@@ -1,5 +1,25 @@
 # Change Log
 
+## [2.5.0](https://github.com/PHT-Medic/central/compare/server-realtime-v2.4.10...server-realtime-v2.5.0) (2024-01-05)
+
+
+### Features
+
+* migrated to vuecs and authup v1 ([4115633](https://github.com/PHT-Medic/central/commit/411563384824e5d3a134208eef667efad0830b9e))
+
+
+### Bug Fixes
+
+* **deps:** bump socket.io from 4.7.2 to 4.7.3 ([#1292](https://github.com/PHT-Medic/central/issues/1292)) ([adb3de8](https://github.com/PHT-Medic/central/commit/adb3de8f83450edb4aa2ed9039cbbdb4b16728fe))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @personalhealthtrain/core bumped from 2.4.10 to 2.5.0
+    * @personalhealthtrain/server-core bumped from 2.4.10 to 2.5.0
+
 ## 2.4.10
 
 ### Patch Changes
