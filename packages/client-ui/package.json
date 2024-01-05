@@ -21,7 +21,7 @@
         "@authup/client-vue": "^0.45.7",
         "@authup/core": "^0.45.7",
         "@bootstrap-vue-next/nuxt": "^0.14.10",
-        "@fortawesome/fontawesome-free": "^6.4.0",
+        "@fortawesome/fontawesome-free": "^6.5.1",
         "@nuxtjs/google-fonts": "^3.0.2",
         "@personalhealthtrain/client-vue": "2.4.10",
         "@personalhealthtrain/core": "2.4.10",
