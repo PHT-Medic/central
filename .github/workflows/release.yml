@@ -57,4 +57,4 @@ jobs:
                 with:
                     registryTag: |
                         latest
-                        ${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}.${{ steps.release.outputs.patch }}
+                        ${{ steps.release.outputs['packages/server-api--major'] }}.${{ steps.release.outputs['packages/server-api--minor'] }}.${{ steps.release.outputs['packages/server-api--patch'] }}
