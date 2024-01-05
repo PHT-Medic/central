@@ -28,7 +28,7 @@
         "@personalhealthtrain/core": "2.4.10",
         "@personalhealthtrain/server-core": "2.4.10",
         "amqp-extension": "^2.0.1",
-        "dockerode": "^4.0.0",
+        "dockerode": "^4.0.2",
         "dotenv": "^16.3.1",
         "gunzip-maybe": "^1.4.2",
         "hapic": "^2.3.0",
