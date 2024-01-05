@@ -58,7 +58,7 @@
         "@types/supertest": "^2.0.15",
         "@types/tar": "^6.1.10",
         "@types/tar-stream": "^2.2.2",
-        "@types/yargs": "^17.0.29",
+        "@types/yargs": "^17.0.32",
         "cross-env": "^7.0.3",
         "supertest": "^6.3.3",
         "ts-node": "^10.9.2"
