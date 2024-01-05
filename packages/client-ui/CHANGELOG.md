@@ -1,5 +1,20 @@
 # Change Log
 
+## [2.5.0](https://github.com/PHT-Medic/central/compare/client-ui-v2.4.10...client-ui-v2.5.0) (2024-01-05)
+
+
+### Features
+
+* migrated to vuecs and authup v1 ([4115633](https://github.com/PHT-Medic/central/commit/411563384824e5d3a134208eef667efad0830b9e))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @personalhealthtrain/client-vue bumped from 2.4.10 to 2.5.0
+    * @personalhealthtrain/core bumped from 2.4.10 to 2.5.0
+
 ## 2.4.10
 
 ### Patch Changes

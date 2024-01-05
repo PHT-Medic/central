@@ -1,5 +1,32 @@
 # Change Log
 
+## [2.5.0](https://github.com/PHT-Medic/central/compare/server-api-v2.4.10...server-api-v2.5.0) (2024-01-05)
+
+
+### Features
+
+* migrated to vuecs and authup v1 ([4115633](https://github.com/PHT-Medic/central/commit/411563384824e5d3a134208eef667efad0830b9e))
+
+
+### Bug Fixes
+
+* **deps:** bump @hapic/harbor from 2.3.0 to 2.3.1 ([#1313](https://github.com/PHT-Medic/central/issues/1313)) ([b19c6ca](https://github.com/PHT-Medic/central/commit/b19c6caad95f224d6479e426483450b2aa2d3c97))
+* **deps:** bump @hapic/vault from 2.3.0 to 2.3.1 ([#1300](https://github.com/PHT-Medic/central/issues/1300)) ([d4c3b1e](https://github.com/PHT-Medic/central/commit/d4c3b1e194a9884cd80329f0cca0c287a0367ca9))
+* **deps:** bump @routup/swagger from 2.3.0 to 2.3.1 ([#1308](https://github.com/PHT-Medic/central/issues/1308)) ([df2bf43](https://github.com/PHT-Medic/central/commit/df2bf4347d6bad0ab7e382492fff582b5a27feca))
+* **deps:** bump locter from 1.2.2 to 1.2.3 ([#1317](https://github.com/PHT-Medic/central/issues/1317)) ([8041c01](https://github.com/PHT-Medic/central/commit/8041c01d4db2fb5a13f03ec4a3d756986b3124b9))
+* **deps:** bump reflect-metadata from 0.1.13 to 0.2.1 ([#1324](https://github.com/PHT-Medic/central/issues/1324)) ([83afad5](https://github.com/PHT-Medic/central/commit/83afad5eb6fe6b16221dba4289e67b5ab15d9d3d))
+* **deps:** bump typeorm from 0.3.17 to 0.3.19 ([#1298](https://github.com/PHT-Medic/central/issues/1298)) ([03d2641](https://github.com/PHT-Medic/central/commit/03d2641c69a0e54b1edea8ec8d9e140c537bc37c))
+* **deps:** bump typeorm-extension from 3.1.1 to 3.2.0 ([#1321](https://github.com/PHT-Medic/central/issues/1321)) ([a1003fc](https://github.com/PHT-Medic/central/commit/a1003fc88a6def31ddd75d70533be3947572a60f))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @personalhealthtrain/core bumped from 2.4.10 to 2.5.0
+    * @personalhealthtrain/server-core bumped from 2.4.10 to 2.5.0
+    * @personalhealthtrain/server-train-manager bumped from 2.4.10 to 2.5.0
+
 ## 2.4.10
 
 ### Patch Changes
