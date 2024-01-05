@@ -44,7 +44,7 @@
         "@authup/client-vue": "^0.45.7",
         "@authup/core": "^0.45.7",
         "@personalhealthtrain/core": "2.4.10",
-        "@types/node": "^20.8.10",
+        "@types/node": "^20.10.6",
         "@vitejs/plugin-vue": "^4.4.0",
         "@vue-layout/form-controls": "^3.4.0",
         "@vue-layout/list-controls": "^3.6.1",
