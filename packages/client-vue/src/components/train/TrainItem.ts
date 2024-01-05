@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { Timeago } from '@vue-layout/timeago';
+import { VCTimeago } from '@vuecs/timeago';
 import type { PropType, VNodeArrayChildren, VNodeChild } from 'vue';
 import {
     defineComponent, h, ref,
@@ -16,7 +16,7 @@ import type {
 import {
     PermissionID,
 } from '@personalhealthtrain/core';
-import Link from '../MyLink';
+import { VCLink } from '@vuecs/link';
 import TrainEntity from './TrainEntity';
 import TrainPipeline from './TrainPipeline.vue';
 import TrainStationsProgress from '../train-station/TrainStationsProgress.vue';
@@ -123,7 +123,7 @@ export default defineComponent({
 
                                                 return [
                                                     h('i', { class: 'fa-solid fa-train-tram me-1' }),
-                                                    h(Link, {
+                                                    h(VCLink, {
                                                         to: `/trains/${nameProps.entityId}`,
                                                     }, [
                                                         nameProps.nameDisplay,
@@ -150,7 +150,7 @@ export default defineComponent({
                                             }],
                                         }),
                                     ]),
-                                    h(Link, {
+                                    h(VCLink, {
                                         class: 'btn btn-dark btn-xs ms-1',
                                         type: 'button',
                                         to: `/trains/${slotProps.data.id}`,
@@ -193,7 +193,7 @@ export default defineComponent({
                                 h('small', [
                                     h('span', { class: 'text-muted' }, 'updated'),
                                     ' ',
-                                    h(Timeago, { datetime: slotProps.data.updated_at }),
+                                    h(VCTimeago, { datetime: slotProps.data.updated_at }),
                                 ]),
                             ]),
                         ]),

@@ -5,13 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ListSearch } from '@authup/client-vue';
+import { ASearch } from '@authup/client-vue';
 import type { MasterImage } from '@personalhealthtrain/core';
 import {
     DomainType,
     MasterImageCommand,
 } from '@personalhealthtrain/core';
-import type { ListHeaderSlotProps } from '@vue-layout/list-controls';
+import type { ListHeaderSlotProps } from '@vuecs/list-controls';
 import {
     defineComponent, h, reactive, ref,
 } from 'vue';
@@ -104,7 +104,7 @@ export default defineComponent({
                     ref: itemList,
                     scopedSlots: {
                         [EntityListSlotName.HEADER]: (props: ListHeaderSlotProps<MasterImage>) => [
-                            h(ListSearch, {
+                            h(ASearch, {
                                 load: props.load,
                                 meta: props.meta,
                                 busy: props.busy,

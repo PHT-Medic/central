@@ -5,9 +5,9 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { IdentityProviderList } from '@authup/client-vue';
+import { AIdentityProviders } from '@authup/client-vue';
 import {
-    ListPagination, ListSearch, ListTitle, LoginForm,
+    FPagination, FSearch, FTitle, LoginForm,
 } from '@personalhealthtrain/client-vue';
 import {
     definePageMeta,
@@ -22,10 +22,10 @@ import { LayoutKey, LayoutNavigationID } from '../config/layout';
 export default defineNuxtComponent({
     components: {
         LoginForm,
-        ListPagination,
-        ListSearch,
-        ListTitle,
-        IdentityProviderList,
+        ListPagination: FPagination,
+        ListSearch: FSearch,
+        ListTitle: FTitle,
+        AIdentityProviders,
         MedicineWorker,
     },
     setup() {
@@ -86,7 +86,7 @@ export default defineNuxtComponent({
                 />
             </div>
             <div class="col-6">
-                <IdentityProviderList>
+                <AIdentityProviders>
                     <template #header="props">
                         <ListTitle
                             text="Providers"
@@ -116,7 +116,7 @@ export default defineNuxtComponent({
                             </a>
                         </div>
                     </template>
-                </IdentityProviderList>
+                </AIdentityProviders>
             </div>
         </div>
     </div>

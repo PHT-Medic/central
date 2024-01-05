@@ -7,8 +7,10 @@
 
 import type { Registry, RegistryProject } from '@personalhealthtrain/core';
 import { DomainType, RegistryProjectType, createNanoID } from '@personalhealthtrain/core';
-import { buildFormInput, buildFormSelect, buildFormSubmit } from '@vue-layout/form-controls';
-import type { ListItemSlotProps } from '@vue-layout/list-controls';
+import {
+    buildFormGroup, buildFormInput, buildFormSelect, buildFormSubmit,
+} from '@vuecs/form-controls';
+import type { ListItemSlotProps } from '@vuecs/list-controls';
 import useVuelidate from '@vuelidate/core';
 import {
     helpers, maxLength, minLength, required,
@@ -145,25 +147,29 @@ export default defineComponent({
         });
 
         return () => {
-            const name = buildFormInput({
+            const name = buildFormGroup({
                 validationTranslator: useValidationTranslator(),
                 validationResult: $v.value.name,
                 label: true,
                 labelContent: 'Name',
-                value: form.name,
-                onChange(input) {
-                    form.name = input;
-                },
+                content: buildFormInput({
+                    value: form.name,
+                    onChange(input) {
+                        form.name = input;
+                    },
+                }),
             });
-            const externalName = buildFormInput({
+            const externalName = buildFormGroup({
                 validationTranslator: useValidationTranslator(),
                 validationResult: $v.value.external_name,
                 label: true,
                 labelContent: 'External Name',
-                value: form.external_name,
-                onChange(input) {
-                    form.external_name = input;
-                },
+                content: buildFormInput({
+                    value: form.external_name,
+                    onChange(input) {
+                        form.external_name = input;
+                    },
+                }),
             });
 
             const externalNameHint = h('div', {
@@ -205,16 +211,18 @@ export default defineComponent({
                 ]),
             ]);
 
-            const type = buildFormSelect({
+            const type = buildFormGroup({
                 validationTranslator: useValidationTranslator(),
                 validationResult: $v.value.type,
                 label: true,
                 labelContent: 'Type',
-                value: form.type,
-                options: types,
-                onChange(input) {
-                    form.type = input;
-                },
+                content: buildFormSelect({
+                    value: form.type,
+                    options: types,
+                    onChange(input) {
+                        form.type = input;
+                    },
+                }),
             });
 
             let registry : VNodeArrayChildren = [];

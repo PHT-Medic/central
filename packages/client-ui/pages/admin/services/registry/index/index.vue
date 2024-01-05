@@ -5,14 +5,14 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { Timeago } from '@vue-layout/timeago';
+import { VCTimeago } from '@vuecs/timeago';
 import type { Registry } from '@personalhealthtrain/core';
 import { PermissionID } from '@personalhealthtrain/core';
 import { BSpinner, BTable } from 'bootstrap-vue-next';
 import type { BuildInput } from 'rapiq';
 import { computed, ref } from 'vue';
 import {
-    EntityDelete, ListPagination, ListSearch, ListTitle, RegistryList,
+    EntityDelete, FPagination, FSearch, FTitle, RegistryList,
 } from '@personalhealthtrain/client-vue';
 import { defineNuxtComponent } from '#app';
 import { definePageMeta } from '#imports';
@@ -21,14 +21,14 @@ import { useAuthStore } from '../../../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
-        ListPagination,
-        ListSearch,
-        ListTitle,
+        ListPagination: FPagination,
+        ListSearch: FSearch,
+        ListTitle: FTitle,
         BSpinner,
         BTable,
         EntityDelete,
         RegistryList,
-        Timeago,
+        VCTimeago,
     },
     setup(props, { emit }) {
         definePageMeta({
@@ -124,10 +124,10 @@ export default defineNuxtComponent({
                     />
                 </template>
                 <template #cell(created_at)="data">
-                    <Timeago :datetime="data.item.created_at" />
+                    <VCTimeago :datetime="data.item.created_at" />
                 </template>
                 <template #cell(updated_at)="data">
-                    <Timeago :datetime="data.item.updated_at" />
+                    <VCTimeago :datetime="data.item.updated_at" />
                 </template>
                 <template #table-busy>
                     <div class="text-center text-danger my-2">

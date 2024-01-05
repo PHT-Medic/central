@@ -11,7 +11,7 @@ import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { computed } from 'vue';
 import {
-    ListPagination, ListSearch, ListTitle, TrainList,
+    FPagination, FSearch, FTitle, TrainList,
 } from '@personalhealthtrain/client-vue';
 import { definePageMeta } from '#imports';
 import { defineNuxtComponent } from '#app';
@@ -20,7 +20,7 @@ import { useAuthStore } from '../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
-        ListPagination, ListSearch, ListTitle, TrainList,
+        ListPagination: FPagination, ListSearch: FSearch, ListTitle: FTitle, TrainList,
     },
     setup() {
         definePageMeta({

@@ -27,12 +27,6 @@
     color: #909090;
 }
 
-.form-check-input {
-    position: absolute;
-    margin-top: .2rem;
-    margin-left: -1.25rem;
-}
-
 .form-group label i {
     font-size: .7rem;
 }

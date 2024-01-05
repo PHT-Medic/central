@@ -9,7 +9,7 @@ import { PermissionID } from '@personalhealthtrain/core';
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import {
-    ListPagination, ListSearch, ListTitle, ProposalItem, ProposalList,
+    FPagination, FSearch, FTitle, ProposalItem, ProposalList,
 } from '@personalhealthtrain/client-vue';
 import { LayoutKey, LayoutNavigationID } from '~/config/layout';
 import { defineNuxtComponent, definePageMeta } from '#imports';
@@ -17,7 +17,7 @@ import { useAuthStore } from '~/store/auth';
 
 export default defineNuxtComponent({
     components: {
-        ListPagination, ListSearch, ListTitle, ProposalList, ProposalItem,
+        ListPagination: FPagination, ListSearch: FSearch, ListTitle: FTitle, ProposalList, ProposalItem,
     },
     setup() {
         definePageMeta({

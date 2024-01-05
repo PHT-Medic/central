@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { Timeago } from '@vue-layout/timeago';
+import { VCTimeago } from '@vuecs/timeago';
 import type { TrainStation } from '@personalhealthtrain/core';
 import { PermissionID } from '@personalhealthtrain/core';
 import { BDropdown, BTable } from 'bootstrap-vue-next';
@@ -13,9 +13,9 @@ import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
 import { computed, ref } from 'vue';
 import {
-    ListPagination,
-    ListSearch,
-    ListTitle,
+    FPagination,
+    FSearch,
+    FTitle,
     TrainName,
     TrainStationApprovalCommand,
     TrainStationApprovalStatus,
@@ -29,9 +29,9 @@ import { useAuthStore } from '../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
-        ListPagination,
-        ListSearch,
-        ListTitle,
+        ListPagination: FPagination,
+        ListSearch: FSearch,
+        ListTitle: FTitle,
         TrainName,
         BDropdown,
         BTable,
@@ -39,7 +39,7 @@ export default defineNuxtComponent({
         TrainStationApprovalCommand,
         TrainStationApprovalStatus,
         TrainStationList,
-        Timeago,
+        VCTimeago,
     },
     setup() {
         definePageMeta({
@@ -183,10 +183,10 @@ export default defineNuxtComponent({
                             </train-station-run-status>
                         </template>
                         <template #cell(created_at)="data">
-                            <Timeago :datetime="data.item.created_at" />
+                            <VCTimeago :datetime="data.item.created_at" />
                         </template>
                         <template #cell(updated_at)="data">
-                            <Timeago :datetime="data.item.updated_at" />
+                            <VCTimeago :datetime="data.item.updated_at" />
                         </template>
 
                         <template #cell(options)="data">

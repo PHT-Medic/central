@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { RobotForm } from '@authup/client-vue';
+import { ARobotForm } from '@authup/client-vue';
 import type { Robot } from '@authup/core';
 import { storeToRefs } from 'pinia';
 import type { Ref } from 'vue';
@@ -51,7 +51,7 @@ export default defineNuxtComponent({
         const store = useAuthStore();
         const { realmId } = storeToRefs(store);
 
-        return () => h(RobotForm, {
+        return () => h(ARobotForm, {
             name: ServiceID.REGISTRY,
             realmId: realmId.value,
             entity: entity.value,

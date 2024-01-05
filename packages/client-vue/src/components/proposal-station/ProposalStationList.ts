@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { ListTitle } from '@authup/client-vue';
+import { ATitle } from '@authup/client-vue';
 import type {
     ProposalStation,
 } from '@personalhealthtrain/core';
@@ -184,7 +184,7 @@ export default defineComponent({
 
         setDefaults({
             header: {
-                content: () => h(ListTitle, {
+                content: () => h(ATitle, {
                     text: props.target === DomainType.STATION ?
                         'Stations' :
                         'Trains',

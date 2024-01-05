@@ -7,7 +7,9 @@
 
 import type { Registry } from '@personalhealthtrain/core';
 import { DomainType, Ecosystem } from '@personalhealthtrain/core';
-import { buildFormInput, buildFormSelect, buildFormSubmit } from '@vue-layout/form-controls';
+import {
+    buildFormGroup, buildFormInput, buildFormSelect, buildFormSubmit,
+} from '@vuecs/form-controls';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
 import {
@@ -103,75 +105,85 @@ export default defineComponent({
         });
 
         return () => {
-            const name = buildFormInput({
+            const name = buildFormGroup({
                 validationTranslator: useValidationTranslator(),
                 validationResult: $v.value.name,
                 label: true,
                 labelContent: 'Name',
-                value: form.name,
-                props: {
-                    placeholder: '...',
-                },
-                onChange(input) {
-                    form.name = input;
-                },
+                content: buildFormInput({
+                    value: form.name,
+                    props: {
+                        placeholder: '...',
+                    },
+                    onChange(input) {
+                        form.name = input;
+                    },
+                }),
             });
 
-            const host = buildFormInput({
+            const host = buildFormGroup({
                 validationTranslator: useValidationTranslator(),
                 validationResult: $v.value.host,
                 label: true,
                 labelContent: 'Host',
-                value: form.host,
-                onChange(input) {
-                    form.host = input;
-                },
-                props: {
-                    placeholder: 'e.g. ghcr.io',
-                },
+                content: buildFormInput({
+                    value: form.host,
+                    onChange(input) {
+                        form.host = input;
+                    },
+                    props: {
+                        placeholder: 'e.g. ghcr.io',
+                    },
+                }),
             });
 
-            const ecosystem = buildFormSelect({
+            const ecosystem = buildFormGroup({
                 validationTranslator: useValidationTranslator(),
                 validationResult: $v.value.ecosystem,
                 label: true,
                 labelContent: 'Ecosystem',
-                value: form.ecosystem,
-                onChange(input) {
-                    form.ecosystem = input;
-                },
-                options: ecosystems,
-                props: {
-                    disabled: !!manager.data.value,
-                },
+                content: buildFormSelect({
+                    value: form.ecosystem,
+                    onChange(input) {
+                        form.ecosystem = input;
+                    },
+                    options: ecosystems,
+                    props: {
+                        disabled: !!manager.data.value,
+                    },
+                }),
             });
 
-            const accountName = buildFormInput({
+            const accountName = buildFormGroup({
                 validationTranslator: useValidationTranslator(),
                 validationResult: $v.value.account_name,
                 label: true,
                 labelContent: 'Account Name',
-                value: form.account_name,
-                props: {
-                    placeholder: '...',
-                },
-                onChange(input) {
-                    form.account_name = input;
-                },
+                content: buildFormInput({
+                    value: form.account_name,
+                    props: {
+                        placeholder: '...',
+                    },
+                    onChange(input) {
+                        form.account_name = input;
+                    },
+                }),
             });
 
-            const accountSecret = buildFormInput({
+            const accountSecret = buildFormGroup({
                 validationTranslator: useValidationTranslator(),
                 validationResult: $v.value.account_secret,
                 label: true,
                 labelContent: 'Account Secret',
-                value: form.account_secret,
-                props: {
-                    placeholder: '...',
-                },
-                onChange(input) {
-                    form.account_secret = input;
-                },
+                content: buildFormInput({
+                    value: form.account_secret,
+                    props: {
+                        placeholder: '...',
+                    },
+                    onChange(input) {
+                        form.account_secret = input;
+                    },
+                }),
             });
 
             const submitNode = buildFormSubmit({

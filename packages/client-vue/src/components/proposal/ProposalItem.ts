@@ -4,7 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { Timeago } from '@vue-layout/timeago';
+import { VCTimeago } from '@vuecs/timeago';
 import type {
     PropType, VNode,
 } from 'vue';
@@ -18,11 +18,11 @@ import {
     DomainType,
     PermissionID,
 } from '@personalhealthtrain/core';
+import { VCLink } from '@vuecs/link';
 import {
     EntityListSlotName, hasNormalizedSlot, injectAuthupStore, normalizeSlot,
 } from '../../core';
 import EntityDelete from '../EntityDelete';
-import Link from '../MyLink';
 import ProposalEntity from './ProposalEntity';
 import type { EntityManagerSlotProps } from '../../core';
 
@@ -80,7 +80,7 @@ export default defineComponent({
                 } else {
                     itemActions = [
                         h(
-                            Link,
+                            VCLink,
                             {
                                 to: `/proposals/${props.data.id}`,
                                 disabled: props.busy,
@@ -114,7 +114,7 @@ export default defineComponent({
                                     'div',
                                     [
                                         h(
-                                            Link,
+                                            VCLink,
                                             {
                                                 to: `/proposals/${props.data.id}`,
                                                 class: 'mb-0',
@@ -155,7 +155,7 @@ export default defineComponent({
                                             'updated',
                                         ]),
                                         ' ',
-                                        h(Timeago, {
+                                        h(VCTimeago, {
                                             datetime: props.data.updated_at,
                                         }),
                                     ]),

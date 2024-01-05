@@ -4,7 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { Timeago } from '@vue-layout/timeago';
+import { VCTimeago } from '@vuecs/timeago';
 import type { TrainLog } from '@personalhealthtrain/core';
 import { defineComponent, h, toRefs } from 'vue';
 import type {
@@ -85,7 +85,7 @@ export default defineComponent({
                                 message,
                             ]),
                             h('div', { class: 'ms-auto' }, [
-                                h(Timeago, { datetime: refs.entity.value.created_at }),
+                                h(VCTimeago, { datetime: refs.entity.value.created_at }),
                             ]),
                         ]),
                     ]),

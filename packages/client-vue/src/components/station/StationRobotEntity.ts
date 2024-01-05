@@ -6,7 +6,7 @@
  */
 
 import type { EntityManagerSlotProps } from '@authup/client-vue';
-import { RobotEntity } from '@authup/client-vue';
+import { ARobot } from '@authup/client-vue';
 import type { PropType } from 'vue';
 import { defineComponent, h, reactive } from 'vue';
 import type { Station } from '@personalhealthtrain/core';
@@ -14,7 +14,7 @@ import {
     Ecosystem,
 } from '@personalhealthtrain/core';
 import type { Robot } from '@authup/core';
-import { buildFormInput, buildFormSubmit } from '@vue-layout/form-controls';
+import { buildFormGroup, buildFormInput, buildFormSubmit } from '@vuecs/form-controls';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength } from '@vuelidate/validators';
 import { initFormAttributesFromSource, useValidationTranslator } from '../../core';
@@ -53,7 +53,7 @@ export default defineComponent({
             },
         }, form);
 
-        return () => h(RobotEntity, {
+        return () => h(ARobot, {
             onResolved(entity) {
                 if (entity) {
                     initFormAttributesFromSource(form, entity);
@@ -78,29 +78,33 @@ export default defineComponent({
                     );
                 }
 
-                const id = buildFormInput({
+                const id = buildFormGroup({
                     validationTranslator: useValidationTranslator(),
                     validationResult: $v.value.id,
                     label: true,
                     labelContent: 'ID',
-                    value: form.id,
-                    props: {
-                        disabled: true,
-                    },
+                    content: buildFormInput({
+                        value: form.id,
+                        props: {
+                            disabled: true,
+                        },
+                    }),
                 });
 
-                const secret = buildFormInput({
+                const secret = buildFormGroup({
                     validationTranslator: useValidationTranslator(),
                     validationResult: $v.value.secret,
                     label: true,
                     labelContent: 'Secret',
-                    value: form.secret,
-                    props: {
-                        placeholder: '...',
-                    },
-                    onChange(value) {
-                        form.secret = value;
-                    },
+                    content: buildFormInput({
+                        value: form.secret,
+                        props: {
+                            placeholder: '...',
+                        },
+                        onChange(value) {
+                            form.secret = value;
+                        },
+                    }),
                 });
 
                 const submitForm = buildFormSubmit({

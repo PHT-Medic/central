@@ -6,9 +6,9 @@
  */
 
 import type { MasterImage, MasterImageGroup } from '@personalhealthtrain/core';
-import type { FormSelectOption } from '@vue-layout/form-controls';
-import { buildFormSelect } from '@vue-layout/form-controls';
-import type { ListBodySlotProps } from '@vue-layout/list-controls';
+import type { FormSelectOption } from '@vuecs/form-controls';
+import { buildFormGroup, buildFormSelect } from '@vuecs/form-controls';
+import type { ListBodySlotProps } from '@vuecs/list-controls';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import type { VNodeArrayChildren } from 'vue';
@@ -168,7 +168,7 @@ export default defineComponent({
                                 value: entity.name,
                             }));
 
-                            return buildFormSelect({
+                            return buildFormGroup({
                                 validationTranslator: useValidationTranslator(),
                                 validationResult: $v.value.master_image_id,
                                 label: true,
@@ -178,17 +178,19 @@ export default defineComponent({
                                         h('i', { class: 'fa fa-check text-success ms-1' }) :
                                         h(''),
                                 ],
-                                value: form.master_image_id,
-                                onChange(input) {
-                                    const index = props.data.findIndex((el) => el.id === input);
-                                    if (index !== -1) {
-                                        selectImage(props.data[index]);
-                                        return;
-                                    }
+                                content: buildFormSelect({
+                                    value: form.master_image_id,
+                                    onChange(input) {
+                                        const index = props.data.findIndex((el) => el.id === input);
+                                        if (index !== -1) {
+                                            selectImage(props.data[index]);
+                                            return;
+                                        }
 
-                                    selectImage(null);
-                                },
-                                options,
+                                        selectImage(null);
+                                    },
+                                    options,
+                                }),
                             });
                         },
                     }),
@@ -211,7 +213,7 @@ export default defineComponent({
                                     value: entity.virtual_path,
                                 }));
 
-                                return buildFormSelect({
+                                return buildFormGroup({
                                     validationTranslator: useValidationTranslator(),
                                     validationResult: $v.value.group_virtual_path,
                                     label: true,
@@ -221,17 +223,20 @@ export default defineComponent({
                                             h('i', { class: 'fa fa-check text-success ms-1' }) :
                                             h(''),
                                     ],
-                                    value: form.group_virtual_path,
-                                    onChange(input) {
-                                        const index = props.data.findIndex((el) => el.virtual_path === input);
-                                        if (index !== -1) {
-                                            selectGroup(props.data[index]);
-                                            return;
-                                        }
+                                    content: buildFormSelect({
 
-                                        selectGroup(null);
-                                    },
-                                    options,
+                                        value: form.group_virtual_path,
+                                        onChange(input) {
+                                            const index = props.data.findIndex((el) => el.virtual_path === input);
+                                            if (index !== -1) {
+                                                selectGroup(props.data[index]);
+                                                return;
+                                            }
+
+                                            selectGroup(null);
+                                        },
+                                        options,
+                                    }),
                                 });
                             },
                         }),

@@ -5,14 +5,13 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ListLoadFn } from '@vue-layout/list-controls';
+import type { ListLoadFn } from '@vuecs/list-controls';
 import type { PropType, SlotsType } from 'vue';
 import { defineComponent, h } from 'vue';
-import type { ListSearchSlotProps } from '@authup/client-vue';
-import { buildListSearch } from '@authup/client-vue';
-import type { ListMeta } from '../../core';
+import { ASearch } from '@authup/client-vue';
+import type { ListMeta } from '../../../core';
 
-export const ListSearch = defineComponent({
+export const FSearch = defineComponent({
     props: {
         // todo: add entity-key prop
         icon: {
@@ -35,16 +34,10 @@ export const ListSearch = defineComponent({
         },
     },
     slots: Object as SlotsType<{
-        default: ListSearchSlotProps<any>
+        default: Record<string, any>
     }>,
     setup(props, { slots }) {
-        if (!props.load) {
-            return h('div', [
-                'The "load" property must be defined.',
-            ]);
-        }
-
-        return () => buildListSearch({
+        return () => h(ASearch, {
             slots,
             icon: props.icon,
             iconPosition: props.iconPosition,

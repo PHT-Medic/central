@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { RobotForm } from '@authup/client-vue';
+import { ARobotForm } from '@authup/client-vue';
 import type { Robot } from '@authup/core';
 import type { ServiceID } from '@personalhealthtrain/core';
 import type { PropType, Ref } from 'vue';
@@ -21,7 +21,7 @@ import {
 
 export default defineNuxtComponent({
     components: {
-        RobotForm,
+        ARobotForm,
     },
     props: {
         entityId: {
@@ -70,7 +70,7 @@ export default defineNuxtComponent({
 </script>
 <template>
     <div>
-        <RobotForm
+        <ARobotForm
             v-if="entity"
             :name="entityId"
             :realm-id="entity.realm_id"

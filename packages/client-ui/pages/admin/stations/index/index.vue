@@ -5,15 +5,15 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { Timeago } from '@vue-layout/timeago';
+import { VCTimeago } from '@vuecs/timeago';
 import type { Station } from '@personalhealthtrain/core';
 import { PermissionID } from '@personalhealthtrain/core';
 import { BTable } from 'bootstrap-vue-next';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import {
-    EntityDelete, ListPagination, ListSearch, ListTitle, StationList,
+    EntityDelete, FPagination, FSearch, FTitle, StationList,
 } from '@personalhealthtrain/client-vue';
 import { definePageMeta } from '#imports';
 import { defineNuxtComponent } from '#app';
@@ -22,13 +22,13 @@ import { useAuthStore } from '../../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
-        ListPagination,
-        ListSearch,
-        ListTitle,
+        ListPagination: FPagination,
+        ListSearch: FSearch,
+        ListTitle: FTitle,
         EntityDelete,
         BTable,
         StationList,
-        Timeago,
+        VCTimeago,
     },
     emits: ['deleted'],
     setup(props, { emit }) {
@@ -129,10 +129,10 @@ export default defineNuxtComponent({
                     />
                 </template>
                 <template #cell(created_at)="data">
-                    <Timeago :datetime="data.item.created_at" />
+                    <VCTimeago :datetime="data.item.created_at" />
                 </template>
                 <template #cell(updated_at)="data">
-                    <Timeago :datetime="data.item.updated_at" />
+                    <VCTimeago :datetime="data.item.updated_at" />
                 </template>
             </BTable>
         </template>

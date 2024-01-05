@@ -1,13 +1,13 @@
 <script lang="ts">
-import { UserPermissionAssignmentList } from '@authup/client-vue';
+import { APagination, AUserPermissionAssignments } from '@authup/client-vue';
 import type { User } from '@authup/core';
 import type { PropType } from 'vue';
 import { defineNuxtComponent } from '#app';
-import { resolveComponent } from '#imports';
 
 export default defineNuxtComponent({
     components: {
-        UserPermissionAssignmentList,
+        APagination,
+        AUserPermissionAssignments,
     },
     props: {
         entity: {
@@ -23,5 +23,13 @@ export default defineNuxtComponent({
 });
 </script>
 <template>
-    <UserPermissionAssignmentList :entity-id="entity.id" />
+    <AUserPermissionAssignments :entity-id="entity.id">
+        <template #footer="props">
+            <APagination
+                :busy="props.busy"
+                :meta="props.meta"
+                :load="props.load"
+            />
+        </template>
+    </AUserPermissionAssignments>
 </template>

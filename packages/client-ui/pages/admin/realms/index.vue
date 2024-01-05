@@ -17,6 +17,8 @@ export default defineNuxtComponent({
             ],
         });
 
+        const toast = useToast();
+
         const items = [
             {
                 name: 'overview',
@@ -31,13 +33,12 @@ export default defineNuxtComponent({
         ];
 
         const handleDeleted = (e: Realm) => {
-            const toast = useToast();
-            toast.success({ body: `The realm ${e.name} was successfully deleted.` });
+            toast.show({ variant: 'success', body: `The realm ${e.name} was successfully deleted.` });
         };
 
         const handleFailed = (e: Error) => {
             const toast = useToast();
-            toast.warning({ body: e.message });
+            toast.show({ variant: 'warning', body: e.message });
         };
 
         return {

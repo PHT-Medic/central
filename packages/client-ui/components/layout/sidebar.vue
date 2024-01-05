@@ -5,15 +5,15 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { Countdown } from '@vue-layout/countdown';
-import { NavigationComponents } from '@vue-layout/navigation';
+import { VCCountdown } from '@vuecs/countdown';
+import { VCNavItems } from '@vuecs/navigation';
 import { storeToRefs } from 'pinia';
 import { defineNuxtComponent } from '#app';
 import { computed, useAPI } from '#imports';
 import { useAuthStore } from '../../store/auth';
 
 export default defineNuxtComponent({
-    components: { Countdown, NavigationComponents },
+    components: { VCCountdown, VCNavItems },
     setup() {
         const store = useAuthStore();
         const { loggedIn, accessTokenExpireDate: tokenExpireDate, realmManagement } = storeToRefs(store);
@@ -50,7 +50,7 @@ export default defineNuxtComponent({
 </script>
 <template>
     <div class="page-sidebar">
-        <navigation-components
+        <VCNavItems
             class="sidebar-menu navbar-nav"
             :tier="1"
         />
@@ -61,7 +61,7 @@ export default defineNuxtComponent({
                 class="font-weight-light d-flex flex-column ms-3 me-3 mb-1 mt-auto"
             >
                 <small class="countdown-text">
-                    <Countdown
+                    <VCCountdown
                         :time="tokenExpiresIn"
                     >
                         <template #default="props">
@@ -70,7 +70,7 @@ export default defineNuxtComponent({
                                 {{ props.minutes }} minute(s), {{ props.seconds }} second(s)
                             </span>
                         </template>
-                    </Countdown>
+                    </VCCountdown>
                 </small>
             </div>
 

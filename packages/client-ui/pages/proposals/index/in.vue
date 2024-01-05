@@ -5,7 +5,7 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { Timeago } from '@vue-layout/timeago';
+import { VCTimeago } from '@vuecs/timeago';
 import type { ProposalStation } from '@personalhealthtrain/core';
 import {
     PermissionID,
@@ -17,9 +17,9 @@ import { storeToRefs } from 'pinia';
 import type { Ref } from 'vue';
 import { computed, ref } from 'vue';
 import {
-    ListPagination,
-    ListSearch,
-    ListTitle,
+    FPagination,
+    FSearch,
+    FTitle,
     ProposalInForm,
     ProposalStationApprovalCommand,
     ProposalStationApprovalStatus,
@@ -33,9 +33,9 @@ import { useAuthStore } from '../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
-        ListPagination,
-        ListSearch,
-        ListTitle,
+        ListPagination: FPagination,
+        ListSearch: FSearch,
+        ListTitle: FTitle,
         BDropdown,
         BModal,
         BDropdownDivider,
@@ -46,7 +46,7 @@ export default defineNuxtComponent({
         ProposalStationApprovalCommand,
         ProposalStationApprovalStatus,
         ProposalInForm,
-        Timeago,
+        VCTimeago,
     },
     async setup() {
         definePageMeta({
@@ -201,12 +201,12 @@ export default defineNuxtComponent({
                             {{ data.item.proposal.title }}
                         </template>
                         <template #cell(options)="data">
-                            <nuxt-link
+                            <NuxtLink
                                 class="btn btn-primary btn-xs me-1"
                                 :to="'/proposals/'+data.item.proposal_id+'?refPath=/proposals/in'"
                             >
                                 <i class="fa fa-arrow-right" />
-                            </nuxt-link>
+                            </NuxtLink>
                             <template v-if="canManage">
                                 <b-dropdown
                                     class="dropdown-xs"
@@ -239,10 +239,10 @@ export default defineNuxtComponent({
                             </template>
                         </template>
                         <template #cell(created_at)="data">
-                            <Timeago :datetime="data.item.created_at" />
+                            <VCTimeago :datetime="data.item.created_at" />
                         </template>
                         <template #cell(updated_at)="data">
-                            <Timeago :datetime="data.item.updated_at" />
+                            <VCTimeago :datetime="data.item.updated_at" />
                         </template>
                         <template #table-busy>
                             <div class="text-center text-danger my-2">

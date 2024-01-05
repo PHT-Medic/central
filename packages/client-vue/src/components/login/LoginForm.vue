@@ -4,13 +4,13 @@ import { maxLength, minLength, required } from '@vuelidate/validators';
 import {
     defineComponent, reactive, ref, toRef, watch,
 } from 'vue';
-import { FormInput, FormSubmit } from '@vue-layout/form-controls';
+import { VCFormInput, VCFormSubmit } from '@vuecs/form-controls';
 import { injectAuthupStore, useValidationTranslator } from '../../core';
 
 export default defineComponent({
     components: {
-        FormInput,
-        FormSubmit,
+        VCFormInput,
+        VCFormSubmit,
     },
     props: {
         realmId: {
@@ -32,7 +32,7 @@ export default defineComponent({
         }
 
         watch(realmId, (val) => {
-            form.realm_id = val;
+            form.realm_id = val ?? '';
         });
 
         const vuelidate = useVuelidate({
@@ -85,24 +85,36 @@ export default defineComponent({
 </script>
 <template>
     <form @submit.prevent="submit">
-        <FormInput
-            v-model="form.name"
+        <VCFormGroup
             :validation-result="vuelidate.name"
             :validation-translator="translator"
-            :label="true"
-            :label-content="'Name'"
-        />
+        >
+            <template #label>
+                Name
+            </template>
+            <template #default>
+                <VCFormInput
+                    v-model="form.name"
+                />
+            </template>
+        </VCFormGroup>
 
-        <FormInput
-            v-model="form.password"
-            type="password"
+        <VCFormGroup
             :validation-result="vuelidate.password"
             :validation-translator="translator"
-            :label="true"
-            :label-content="'Password'"
-        />
+        >
+            <template #label>
+                Password
+            </template>
+            <template #default>
+                <VCFormInput
+                    v-model="form.password"
+                    type="password"
+                />
+            </template>
+        </VCFormGroup>
 
-        <FormSubmit
+        <VCFormSubmit
             v-model="busy"
             :validation-result="vuelidate"
             :create-text="'Login'"

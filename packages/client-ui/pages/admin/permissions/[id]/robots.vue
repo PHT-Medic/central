@@ -1,13 +1,14 @@
 <script lang="ts">
 
-import { PermissionRobotAssignmentList } from '@authup/client-vue';
+import { APagination, APermissionRobotAssignments } from '@authup/client-vue';
 import type { Permission } from '@authup/core';
 import type { PropType } from 'vue';
 import { defineNuxtComponent } from '#imports';
 
 export default defineNuxtComponent({
     components: {
-        PermissionRobotAssignmentList,
+        APagination,
+        APermissionRobotAssignments,
     },
     props: {
         entity: {
@@ -24,6 +25,14 @@ export default defineNuxtComponent({
 </script>
 <template>
     <div>
-        <PermissionRobotAssignmentList :entity-id="entity.id" />
+        <APermissionRobotAssignments :entity-id="entity.id">
+            <template #footer="props">
+                <APagination
+                    :busy="props.busy"
+                    :meta="props.meta"
+                    :load="props.load"
+                />
+            </template>
+        </APermissionRobotAssignments>
     </div>
 </template>

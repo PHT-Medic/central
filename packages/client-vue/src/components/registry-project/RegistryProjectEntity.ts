@@ -13,7 +13,7 @@ import {
     ServiceID,
     registryRobotSecretRegex,
 } from '@personalhealthtrain/core';
-import { buildFormInput } from '@vue-layout/form-controls';
+import { buildFormGroup, buildFormInput } from '@vuecs/form-controls';
 import useVuelidate from '@vuelidate/core';
 import {
     helpers,
@@ -112,7 +112,7 @@ export default defineComponent({
                         h('input', {
                             class: 'form-control',
                             type: 'text',
-                            value: manager.data.value.external_name || '',
+                            value: manager.data.value?.external_name || '',
                             disabled: true,
                         }),
                     ]),
@@ -123,23 +123,25 @@ export default defineComponent({
                             h('input', {
                                 class: 'form-control',
                                 type: 'text',
-                                value: manager.data.value.account_name || '',
+                                value: manager.data.value?.account_name || '',
                                 placeholder: '...',
                                 disabled: true,
                             }),
                         ]),
-                        buildFormInput({
+                        buildFormGroup({
                             label: true,
                             labelContent: 'Secret',
-                            props: {
-                                placeholder: '...',
-                            },
-                            value: form.secret,
-                            onChange(value) {
-                                form.secret = value;
-                            },
                             validationResult: vuelidate.value.secret,
                             validationTranslator: useValidationTranslator(),
+                            content: buildFormInput({
+                                props: {
+                                    placeholder: '...',
+                                },
+                                value: form.secret,
+                                onChange(value) {
+                                    form.secret = value;
+                                },
+                            }),
                         }),
                     ]),
 

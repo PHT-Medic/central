@@ -20,10 +20,10 @@ export default defineNuxtComponent({
     },
     emits: ['failed', 'updated'],
     methods: {
-        handleUpdated(e) {
+        handleUpdated(e: Station) {
             this.$emit('updated', e);
         },
-        handleFailed(e) {
+        handleFailed(e: Error) {
             this.$emit('failed', e);
         },
     },

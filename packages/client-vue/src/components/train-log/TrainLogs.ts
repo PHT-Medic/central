@@ -11,7 +11,7 @@ import {
     DomainType,
     buildDomainChannelName,
 } from '@personalhealthtrain/core';
-import type { ListItemSlotProps } from '@vue-layout/list-controls';
+import type { ListItemSlotProps } from '@vuecs/list-controls';
 import {
     defineComponent, h, ref,
 } from 'vue';

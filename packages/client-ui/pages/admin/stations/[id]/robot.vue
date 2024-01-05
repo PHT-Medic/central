@@ -20,7 +20,7 @@ export default defineNuxtComponent({
     },
     emits: ['failed'],
     methods: {
-        handleFailed(e) {
+        handleFailed(e: Error) {
             this.$emit('failed', e);
         },
     },

@@ -17,8 +17,9 @@ import {
     defineComponent, h, onMounted, reactive, ref,
 } from 'vue';
 import {
+    buildFormGroup,
     buildFormInput, buildFormSelect, buildFormSubmit, buildFormTextarea,
-} from '@vue-layout/form-controls';
+} from '@vuecs/form-controls';
 import { createEntityManager, defineEntityManagerEvents, wrapFnWithBusyState } from '../../core';
 
 export default defineComponent({
@@ -175,24 +176,28 @@ export default defineComponent({
         });
 
         return () => {
-            const type = buildFormSelect({
+            const type = buildFormGroup({
                 label: true,
                 labelContent: 'Type',
-                value: form.type,
-                onChange(input: SecretType) {
-                    form.type = input;
-                    handleTypeChanged(input);
-                },
-                options: typeOptions,
+                content: buildFormSelect({
+                    value: form.type,
+                    onChange(input: SecretType) {
+                        form.type = input;
+                        handleTypeChanged(input);
+                    },
+                    options: typeOptions,
+                }),
             });
 
-            const key = buildFormInput({
+            const key = buildFormGroup({
                 label: true,
                 labelContent: 'Name',
-                value: form.key,
-                onChange(input: string) {
-                    form.key = input;
-                },
+                content: buildFormInput({
+                    value: form.key,
+                    onChange(input: string) {
+                        form.key = input;
+                    },
+                }),
             });
 
             const file = h('div', {
@@ -218,16 +223,18 @@ export default defineComponent({
                 ]),
             ]);
 
-            const content = buildFormTextarea({
+            const content = buildFormGroup({
                 label: true,
                 labelContent: 'Content',
-                value: form.content,
-                onChange(input) {
-                    form.content = input;
-                },
-                props: {
-                    rows: 8,
-                },
+                content: buildFormTextarea({
+                    value: form.content,
+                    onChange(input) {
+                        form.content = input;
+                    },
+                    props: {
+                        rows: 8,
+                    },
+                }),
             });
 
             return h('div', [

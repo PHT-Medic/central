@@ -1,27 +1,26 @@
 <script lang="ts">
 
+import { VCTimeago } from '@vuecs/timeago';
 import { BTable } from 'bootstrap-vue-next';
 import type { IdentityProvider } from '@authup/core';
 import { PermissionName, isRealmResourceWritable } from '@authup/core';
-import { EntityDelete, IdentityProviderList } from '@authup/client-vue';
+import {
+    AEntityDelete, AIdentityProviders, APagination, ASearch, ATitle,
+} from '@authup/client-vue';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
-import {
-    ListPagination,
-    ListSearch,
-    ListTitle,
-} from '@personalhealthtrain/client-vue';
 import { defineNuxtComponent } from '#app';
 import { useAuthStore } from '../../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
+        ATitle,
+        APagination,
+        ASearch,
         BTable,
-        IdentityProviderList,
-        EntityDelete,
-        ListSearch,
-        ListTitle,
-        ListPagination,
+        AIdentityProviders,
+        AEntityDelete,
+        VCTimeago,
     },
     emits: ['deleted'],
     setup(props, { emit }) {
@@ -75,21 +74,22 @@ export default defineNuxtComponent({
 });
 </script>
 <template>
-    <IdentityProviderList
+    <AIdentityProviders
         :query="query"
         @deleted="handleDeleted"
     >
         <template #header="props">
-            <ListTitle />
-            <ListSearch
+            <ATitle />
+            <ASearch
                 :load="props.load"
-                :meta="props.meta"
+                :busy="props.busy"
             />
         </template>
         <template #footer="props">
-            <ListPagination
-                :load="props.load"
+            <APagination
+                :busy="props.busy"
                 :meta="props.meta"
+                :load="props.load"
             />
         </template>
         <template #body="props">
@@ -100,6 +100,12 @@ export default defineNuxtComponent({
                 head-variant="'dark'"
                 outlined
             >
+                <template #cell(created_at)="data">
+                    <VCTimeago :datetime="data.item.created_at" />
+                </template>
+                <template #cell(updated_at)="data">
+                    <VCTimeago :datetime="data.item.created_at" />
+                </template>
                 <template #cell(options)="data">
                     <NuxtLink
                         :to="'/admin/identity-providers/'+ data.item.id"
@@ -108,7 +114,7 @@ export default defineNuxtComponent({
                     >
                         <i class="fa-solid fa-bars" />
                     </NuxtLink>
-                    <EntityDelete
+                    <AEntityDelete
                         class="btn btn-xs btn-outline-danger"
                         :entity-id="data.item.id"
                         entity-type="identityProvider"
@@ -119,5 +125,5 @@ export default defineNuxtComponent({
                 </template>
             </BTable>
         </template>
-    </IdentityProviderList>
+    </AIdentityProviders>
 </template>

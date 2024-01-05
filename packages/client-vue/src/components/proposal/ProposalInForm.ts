@@ -7,7 +7,9 @@
 
 import type { ProposalStation } from '@personalhealthtrain/core';
 import { DomainType, ProposalStationApprovalStatus } from '@personalhealthtrain/core';
-import { buildFormInput, buildFormSelect, buildFormSubmit } from '@vue-layout/form-controls';
+import {
+    buildFormGroup, buildFormInput, buildFormSelect, buildFormSubmit,
+} from '@vuecs/form-controls';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
 import {
@@ -75,33 +77,37 @@ export default defineComponent({
         });
 
         return () => {
-            const comment = buildFormInput({
+            const comment = buildFormGroup({
                 validationTranslator: useValidationTranslator(),
                 validationResult: $v.value.comment,
                 label: true,
                 labelContent: 'Comment',
-                value: form.comment,
-                onChange(input) {
-                    form.comment = input;
-                },
-                props: {
-                    placeholder: 'Write a comment why you want to approve or either reject the proposal...',
-                },
+                content: buildFormInput({
+                    value: form.comment,
+                    onChange(input) {
+                        form.comment = input;
+                    },
+                    props: {
+                        placeholder: 'Write a comment why you want to approve or either reject the proposal...',
+                    },
+                }),
             });
 
-            const status = buildFormSelect({
+            const status = buildFormGroup({
                 validationTranslator: useValidationTranslator(),
                 validationResult: $v.value.approval_status,
                 label: true,
                 labelContent: 'Status',
-                value: form.approval_status,
-                onChange(input) {
-                    form.approval_status = input;
-                },
-                options: options.map((option) => ({
-                    id: option,
-                    value: option,
-                })),
+                content: buildFormSelect({
+                    value: form.approval_status,
+                    onChange(input) {
+                        form.approval_status = input;
+                    },
+                    options: options.map((option) => ({
+                        id: option,
+                        value: option,
+                    })),
+                }),
             });
 
             const submitNode = buildFormSubmit({

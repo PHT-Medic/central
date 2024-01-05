@@ -14,8 +14,8 @@ import type { PropType } from 'vue';
 import {
     computed, defineComponent, reactive, ref,
 } from 'vue';
-import type { FormSelectOption } from '@vue-layout/form-controls';
-import { FormInput, FormSelect } from '@vue-layout/form-controls';
+import type { FormSelectOption } from '@vuecs/form-controls';
+import { VCFormInput, VCFormSelect } from '@vuecs/form-controls';
 import {
     createEntityManager, defineEntityManagerEvents, useValidationTranslator, wrapFnWithBusyState,
 } from '../../core';
@@ -24,7 +24,7 @@ import ProposalItem from '../proposal/ProposalItem';
 
 export default defineComponent({
     components: {
-        FormInput, FormSelect, ProposalList, ProposalItem,
+        VCFormInput, VCFormSelect, ProposalList, ProposalItem,
     },
     props: {
         entity: {
@@ -111,24 +111,37 @@ export default defineComponent({
     <form @submit.prevent="add">
         <div class="row">
             <div class="col">
-                <FormInput
-                    v-model="v$.name.$model"
-                    :label="true"
-                    :label-content="'Name'"
+                <VCFormGroup
                     :validation-translator="translator"
                     :validation-result="v$.name"
-                />
+                >
+                    <template #label>
+                        Name
+                    </template>
+                    <template #default>
+                        <VCFormInput
+                            v-model="v$.name.$model"
+                        />
+                    </template>
+                </VCFormGroup>
 
                 <hr>
 
-                <FormSelect
-                    v-model="v$.type.$model"
-                    :label="true"
-                    :label-content="'Type'"
-                    :options="types"
+                <VCFormGroup
                     :validation-translator="translator"
                     :validation-result="v$.type"
-                />
+                >
+                    <template #label>
+                        Type
+                    </template>
+                    <template #default>
+                        <VCFormSelect
+                            v-model="v$.type.$model"
+                            :options="types"
+                        />
+                    </template>
+                </VCFormGroup>
+
                 <div
                     v-if="v$.type.$model"
                     class="alert alert-secondary alert-sm"

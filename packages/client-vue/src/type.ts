@@ -5,14 +5,15 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { PluginBaseOptions } from '@vue-layout/list-controls/core';
+import type { StoreManagerOptions } from '@vuecs/list-controls/core';
 import type { APIClient } from '@personalhealthtrain/core';
 import type { AuthupAPIClient, AuthupStore, SocketManager } from './core';
 
-export type Options = PluginBaseOptions & {
+export type Options = {
     apiClient?: APIClient,
     authupStore?: AuthupStore,
     authupApiClient?: AuthupAPIClient,
     socketManager?: SocketManager,
     components?: boolean | string[],
+    storeManager?: StoreManagerOptions
 };

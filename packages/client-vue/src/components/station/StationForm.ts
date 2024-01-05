@@ -4,7 +4,7 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { RealmList } from '@authup/client-vue';
+import { ARealms } from '@authup/client-vue';
 import type { Registry, Station } from '@personalhealthtrain/core';
 import {
     DomainType,
@@ -12,9 +12,10 @@ import {
     alphaNumHyphenUnderscoreRegex, hexToUTF8, isHex,
 } from '@personalhealthtrain/core';
 import {
+    buildFormGroup,
     buildFormInput, buildFormSelect, buildFormSubmit, buildFormTextarea,
-} from '@vue-layout/form-controls';
-import type { ListBodySlotProps, ListItemSlotProps } from '@vue-layout/list-controls';
+} from '@vuecs/form-controls';
+import type { ListBodySlotProps, ListItemSlotProps } from '@vuecs/list-controls';
 import useVuelidate from '@vuelidate/core';
 import {
     email, helpers, maxLength, minLength, required,
@@ -171,75 +172,84 @@ export default defineComponent({
             if (!isRealmLocked.value) {
                 realm = [
                     h(
-                        RealmList,
+                        ARealms,
                         {},
                         {
-                            [EntityListSlotName.BODY]: (props: ListBodySlotProps<Station>) => buildFormSelect({
+                            [EntityListSlotName.BODY]: (props: ListBodySlotProps<Station>) => buildFormGroup({
                                 validationTranslator: useValidationTranslator(),
                                 validationResult: $v.value.realm_id,
                                 label: true,
                                 labelContent: 'Realms',
-                                value: form.realm_id,
-                                onChange(input) {
-                                    form.realm_id = input;
-                                },
-                                options: props.data.map((item) => ({
-                                    id: item.id,
-                                    value: item.name,
-                                })),
+                                content: buildFormSelect({
+                                    value: form.realm_id,
+                                    onChange(input) {
+                                        form.realm_id = input;
+                                    },
+                                    options: props.data.map((item) => ({
+                                        id: item.id,
+                                        value: item.name,
+                                    })),
+                                }),
                             }),
-
                         },
                     ),
                     h('hr'),
                 ];
             }
 
-            const name = buildFormInput({
+            const name = buildFormGroup({
                 validationTranslator: useValidationTranslator(),
                 validationResult: $v.value.name,
                 label: true,
                 labelContent: 'Name',
-                value: form.name,
-                onChange(input) {
-                    form.name = input;
-                },
+                content: buildFormInput({
+                    value: form.name,
+                    onChange(input) {
+                        form.name = input;
+                    },
+                }),
             });
 
-            const externalName = buildFormInput({
+            const externalName = buildFormGroup({
                 validationTranslator: useValidationTranslator(),
                 validationResult: $v.value.external_name,
                 label: true,
                 labelContent: 'External Name',
-                value: form.external_name,
-                onChange(input) {
-                    form.external_name = input;
-                },
+                content: buildFormInput({
+                    value: form.external_name,
+                    onChange(input) {
+                        form.external_name = input;
+                    },
+                }),
             });
 
-            const emailNode = buildFormInput({
+            const emailNode = buildFormGroup({
                 validationTranslator: useValidationTranslator(),
                 validationResult: $v.value.email,
                 label: true,
                 labelContent: 'E-Mail',
-                value: form.email,
-                onChange(input) {
-                    form.email = input;
-                },
+                content: buildFormInput({
+                    value: form.email,
+                    onChange(input) {
+                        form.email = input;
+                    },
+                }),
             });
 
-            const publicKey = buildFormTextarea({
+            const publicKey = buildFormGroup({
                 validationTranslator: useValidationTranslator(),
                 validationResult: $v.value.public_key,
                 label: true,
                 labelContent: 'PublicKey',
-                value: form.public_key,
-                onChange(input) {
-                    form.public_key = input;
-                },
-                props: {
-                    rows: 6,
-                },
+                content: buildFormTextarea({
+                    value: form.public_key,
+                    onChange(input) {
+                        form.public_key = input;
+                    },
+                    props: {
+                        rows: 6,
+                    },
+                }),
             });
 
             const hidden = h('div', {
@@ -270,22 +280,24 @@ export default defineComponent({
                 ]),
             ]);
 
-            const ecosystem = buildFormSelect({
+            const ecosystem = buildFormGroup({
                 validationTranslator: useValidationTranslator(),
                 validationResult: $v.value.ecosystem,
                 label: true,
                 labelContent: 'Ecosystem',
-                value: form.ecosystem,
-                options: ecosystems,
-                onChange(input) {
-                    form.ecosystem = input;
+                content: buildFormSelect({
+                    value: form.ecosystem,
+                    options: ecosystems,
+                    onChange(input) {
+                        form.ecosystem = input;
 
-                    nextTick(() => {
-                        if (registryNode.value) {
-                            registryNode.value.load();
-                        }
-                    });
-                },
+                        nextTick(() => {
+                            if (registryNode.value) {
+                                registryNode.value.load();
+                            }
+                        });
+                    },
+                }),
             });
 
             let registry : VNodeArrayChildren = [];

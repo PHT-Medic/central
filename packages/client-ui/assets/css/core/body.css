@@ -54,6 +54,10 @@ Content
     flex-direction: column;
 }
 
+.list .list-header {
+    margin-bottom: 0.7rem;
+}
+
 .list .list-body {
     padding-left: 0;
     list-style: none;

@@ -1,17 +1,16 @@
 <script lang="ts">
 
-import { UserForm } from '@authup/client-vue';
+import { AUserForm } from '@authup/client-vue';
 import type { User } from '@authup/core';
 import { storeToRefs } from 'pinia';
-import { useToast } from '#imports';
+import { definePageMeta, useToast } from '#imports';
 import { defineNuxtComponent } from '#app';
-import { definePageMeta } from '#imports';
 import { LayoutKey } from '../../../config/layout';
 import { useAuthStore } from '../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
-        UserForm,
+        AUserForm,
     },
     setup() {
         definePageMeta({
@@ -49,7 +48,7 @@ export default defineNuxtComponent({
             General
         </h6>
 
-        <UserForm
+        <AUserForm
             :can-manage="false"
             :realm-id="userId"
             :entity="user"

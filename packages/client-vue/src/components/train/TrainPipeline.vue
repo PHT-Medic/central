@@ -14,9 +14,9 @@ import {
 } from '@personalhealthtrain/core';
 import type { PropType } from 'vue';
 import { computed, defineComponent } from 'vue';
+import { VCLink } from '@vuecs/link';
 import { injectAuthupStore } from '../../core';
 import Dropdown from '../Dropdown';
-import MyLink from '../MyLink';
 import TrainResultCommand from './command/TrainResultCommand';
 import TrainBuildStatusText from './status/TrainBuildStatusText.vue';
 import TrainBuildCommand from './command/TrainBuildCommand';
@@ -28,7 +28,6 @@ import TrainConfigurationStatusText from './status/TrainConfigurationStatusText.
 export default defineComponent({
     components: {
         Dropdown,
-        MyLink,
         TrainResultCommand,
         TrainConfigurationStatusText,
         TrainResultStatusText,

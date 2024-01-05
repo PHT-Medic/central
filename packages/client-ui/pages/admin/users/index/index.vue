@@ -4,17 +4,16 @@ import type { User } from '@authup/core';
 import {
     PermissionName, isRealmResourceWritable,
 } from '@authup/core';
-import { EntityDelete, UserList } from '@authup/client-vue';
+import { AEntityDelete, AUsers } from '@authup/client-vue';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
-import { ListPagination, ListSearch, ListTitle } from '@personalhealthtrain/client-vue';
+import { FPagination, FSearch, FTitle } from '@personalhealthtrain/client-vue';
 import { defineNuxtComponent } from '#app';
-import { resolveComponent } from '#imports';
 import { useAuthStore } from '../../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
-        ListPagination, ListSearch, ListTitle, BTable, UserList, EntityDelete,
+        FPagination, FSearch, FTitle, BTable, AUsers, AEntityDelete,
     },
     emits: ['deleted'],
     setup(props, { emit }) {
@@ -66,19 +65,19 @@ export default defineNuxtComponent({
 });
 </script>
 <template>
-    <UserList
+    <AUsers
         :query="query"
         @deleted="handleDeleted"
     >
         <template #header="props">
-            <ListTitle />
-            <ListSearch
+            <FTitle />
+            <FSearch
                 :load="props.load"
                 :meta="props.meta"
             />
         </template>
         <template #footer="props">
-            <ListPagination
+            <FPagination
                 :load="props.load"
                 :meta="props.meta"
             />
@@ -99,7 +98,7 @@ export default defineNuxtComponent({
                     >
                         <i class="fa-solid fa-bars" />
                     </NuxtLink>
-                    <EntityDelete
+                    <AEntityDelete
                         class="btn btn-xs btn-outline-danger"
                         :entity-id="data.item.id"
                         entity-type="user"
@@ -110,5 +109,5 @@ export default defineNuxtComponent({
                 </template>
             </BTable>
         </template>
-    </UserList>
+    </AUsers>
 </template>

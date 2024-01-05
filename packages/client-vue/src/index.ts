@@ -5,7 +5,7 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import { applyPluginBaseOptions } from '@vue-layout/list-controls/core';
+import { applyStoreManagerOptions, installStoreManager } from '@vuecs/list-controls/core';
 import type { App, Component, Plugin } from 'vue';
 import './css';
 import * as components from './components';
@@ -36,7 +36,10 @@ export function install(instance: App, options?: Options) : void {
         provideSocketManager(options.socketManager, instance);
     }
 
-    applyPluginBaseOptions(options);
+    const storeManager = installStoreManager(instance);
+    if (options.storeManager) {
+        applyStoreManagerOptions(storeManager, options.storeManager);
+    }
 
     if (options.components) {
         let componentsSelected : undefined | string[];

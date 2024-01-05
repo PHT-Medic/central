@@ -1,21 +1,24 @@
 <script lang="ts">
+import { VCTimeago } from '@vuecs/timeago';
 import { BTable } from 'bootstrap-vue-next';
 import type { Realm } from '@authup/core';
 import { PermissionName, isRealmResourceWritable } from '@authup/core';
-import { EntityDelete, RealmList } from '@authup/client-vue';
+import {
+    AEntityDelete, APagination, ARealms, ASearch, ATitle,
+} from '@authup/client-vue';
 import { storeToRefs } from 'pinia';
-import { ListPagination, ListSearch, ListTitle } from '@personalhealthtrain/client-vue';
-import { defineNuxtComponent } from '#app';
+import { defineNuxtComponent } from '#imports';
 import { useAuthStore } from '../../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
-        ListPagination,
-        ListSearch,
-        ListTitle,
+        ATitle,
+        APagination,
+        ASearch,
         BTable,
-        EntityDelete,
-        RealmList,
+        AEntityDelete,
+        ARealms,
+        VCTimeago,
     },
     emits: ['deleted'],
     setup(props, { emit }) {
@@ -65,20 +68,21 @@ export default defineNuxtComponent({
 });
 </script>
 <template>
-    <RealmList
+    <ARealms
         @deleted="handleDeleted"
     >
         <template #header="props">
-            <ListTitle />
-            <ListSearch
+            <ATitle />
+            <ASearch
                 :load="props.load"
-                :meta="props.meta"
+                :busy="props.busy"
             />
         </template>
         <template #footer="props">
-            <ListPagination
-                :load="props.load"
+            <APagination
+                :busy="props.busy"
                 :meta="props.meta"
+                :load="props.load"
             />
         </template>
         <template #body="props">
@@ -89,6 +93,12 @@ export default defineNuxtComponent({
                 head-variant="'dark'"
                 outlined
             >
+                <template #cell(created_at)="data">
+                    <VCTimeago :datetime="data.item.created_at" />
+                </template>
+                <template #cell(updated_at)="data">
+                    <VCTimeago :datetime="data.item.created_at" />
+                </template>
                 <template #cell(options)="data">
                     <button
                         v-if="realmManagementId !== data.item.id"
@@ -104,7 +114,7 @@ export default defineNuxtComponent({
                     >
                         <i class="fa-solid fa-bars" />
                     </NuxtLink>
-                    <EntityDelete
+                    <AEntityDelete
                         class="btn btn-xs btn-outline-danger"
                         :entity-id="data.item.id"
                         entity-type="realm"
@@ -115,5 +125,5 @@ export default defineNuxtComponent({
                 </template>
             </BTable>
         </template>
-    </RealmList>
+    </ARealms>
 </template>

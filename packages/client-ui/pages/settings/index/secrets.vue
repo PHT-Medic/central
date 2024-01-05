@@ -12,9 +12,9 @@ import { computed, nextTick, ref } from 'vue';
 import type { Ref } from 'vue';
 import {
     EntityDelete,
-    ListPagination,
-    ListSearch,
-    ListTitle,
+    FPagination,
+    FSearch,
+    FTitle,
     UserSecretForm,
     UserSecretList,
 } from '@personalhealthtrain/client-vue';
@@ -24,7 +24,7 @@ import { useAuthStore } from '../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
-        ListPagination, ListSearch, ListTitle, EntityDelete, UserSecretList, UserSecretForm,
+        ListPagination: FPagination, ListSearch: FSearch, ListTitle: FTitle, EntityDelete, UserSecretList, UserSecretForm,
     },
     setup() {
         const toast = useToast();

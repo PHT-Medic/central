@@ -3,17 +3,22 @@
 import { BTable } from 'bootstrap-vue-next';
 import type { Role } from '@authup/core';
 import { PermissionName, isRealmResourceWritable } from '@authup/core';
-import { EntityDelete, RoleList } from '@authup/client-vue';
+import {
+    AEntityDelete, APagination, ARoles, ASearch, ATitle,
+} from '@authup/client-vue';
 import { storeToRefs } from 'pinia';
 import type { BuildInput } from 'rapiq';
-import { ListPagination, ListSearch, ListTitle } from '@personalhealthtrain/client-vue';
-import { defineNuxtComponent } from '#app';
-import { resolveComponent } from '#imports';
+import { defineNuxtComponent } from '#imports';
 import { useAuthStore } from '../../../../store/auth';
 
 export default defineNuxtComponent({
     components: {
-        ListPagination, ListSearch, ListTitle, BTable, RoleList, EntityDelete,
+        ATitle,
+        APagination,
+        ASearch,
+        BTable,
+        ARoles,
+        AEntityDelete,
     },
     emits: ['deleted'],
     setup(props, { emit }) {
@@ -65,21 +70,22 @@ export default defineNuxtComponent({
 });
 </script>
 <template>
-    <RoleList
+    <ARoles
         :query="query"
         @deleted="handleDeleted"
     >
         <template #header="props">
-            <ListTitle />
-            <ListSearch
+            <ATitle />
+            <ASearch
                 :load="props.load"
-                :meta="props.meta"
+                :busy="props.busy"
             />
         </template>
         <template #footer="props">
-            <ListPagination
-                :load="props.load"
+            <APagination
+                :busy="props.busy"
                 :meta="props.meta"
+                :load="props.load"
             />
         </template>
         <template #body="props">
@@ -90,6 +96,12 @@ export default defineNuxtComponent({
                 head-variant="'dark'"
                 outlined
             >
+                <template #cell(created_at)="data">
+                    <VCTimeago :datetime="data.item.created_at" />
+                </template>
+                <template #cell(updated_at)="data">
+                    <VCTimeago :datetime="data.item.created_at" />
+                </template>
                 <template #cell(options)="data">
                     <NuxtLink
                         :to="'/admin/roles/'+ data.item.id"
@@ -98,7 +110,7 @@ export default defineNuxtComponent({
                     >
                         <i class="fa-solid fa-bars" />
                     </NuxtLink>
-                    <EntityDelete
+                    <AEntityDelete
                         class="btn btn-xs btn-outline-danger"
                         :entity-id="data.item.id"
                         entity-type="role"
@@ -109,5 +121,5 @@ export default defineNuxtComponent({
                 </template>
             </BTable>
         </template>
-    </RoleList>
+    </ARoles>
 </template>

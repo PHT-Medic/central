@@ -5,8 +5,8 @@
   view the LICENSE file that was distributed with this source code.
   -->
 <script lang="ts">
-import { Gravatar } from '@vue-layout/gravatar';
-import { NavigationComponents } from '@vue-layout/navigation';
+import { VCGravatar } from '@vuecs/gravatar';
+import { VCNavItems } from '@vuecs/navigation';
 import { BCollapse } from 'bootstrap-vue-next';
 import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
@@ -17,8 +17,8 @@ import { useAuthStore } from '../../store/auth';
 export default defineNuxtComponent({
     components: {
         BCollapse,
-        Gravatar,
-        NavigationComponents,
+        VCGravatar,
+        VCNavItems,
     },
     setup() {
         const store = useAuthStore();
@@ -69,7 +69,7 @@ export default defineNuxtComponent({
                     class="navbar-content navbar-collapse collapse"
                     :class="{'show': displayNav}"
                 >
-                    <navigation-components
+                    <VCNavItems
                         class="navbar-nav"
                         :tier="0"
                     />
@@ -82,7 +82,7 @@ export default defineNuxtComponent({
                                 class="nav-link user-link"
                                 :to="'/users/'+user.id"
                             >
-                                <Gravatar :email="user.email ? user.email : ''" />
+                                <VCGravatar :email="user.email ? user.email : ''" />
                                 <span>{{ user.display_name ? user.display_name : user.name }}</span>
                             </nuxt-link>
                         </li>

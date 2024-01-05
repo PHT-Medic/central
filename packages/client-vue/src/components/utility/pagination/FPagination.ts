@@ -5,35 +5,30 @@
  * view the LICENSE file that was distributed with this source code.
  */
 
-import type { ListLoadFn } from '@vue-layout/list-controls';
 import type { PropType } from 'vue';
 import { defineComponent, h } from 'vue';
-import { buildListPagination } from '@authup/client-vue';
-import type { ListMeta } from '../../core';
+import { APagination } from '@authup/client-vue';
 
-export const ListPagination = defineComponent({
+type PaginationLoadFn = (data?: any) => (Promise<void> | void);
+
+export const FPagination = defineComponent({
     props: {
         total: {
             type: Number,
         },
         meta: {
-            type: Object as PropType<ListMeta<any>>,
+            type: Object,
         },
         busy: {
             type: Boolean,
         },
         load: {
-            type: Function as PropType<ListLoadFn<ListMeta<any>>>,
+            type: Function as PropType<PaginationLoadFn>,
+            required: true,
         },
     },
     setup(props) {
-        if (!props.load) {
-            return h('div', [
-                'The "load" property must be defined.',
-            ]);
-        }
-
-        return () => buildListPagination({
+        return () => h(APagination, {
             busy: props.busy,
             load: props.load,
             meta: props.meta,

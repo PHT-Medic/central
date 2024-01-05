@@ -15,13 +15,13 @@ import MasterImagePicker from '../../master-image/MasterImagePicker';
 import TrainStationList from '../../train-station/TrainStationList';
 import TrainStationAssignAction from '../../train-station/TrainStationAssignAction';
 import { injectAPIClient } from '../../../core';
-import { ListSearch } from '../../list-search';
-import { ListPagination } from '../../list-pagination';
+import { FSearch } from '../../utility/search';
+import { FPagination } from '../../utility/pagination';
 
 export default defineComponent({
     components: {
-        ListPagination,
-        ListSearch,
+        ListPagination: FPagination,
+        ListSearch: FSearch,
         TrainStationAssignAction,
         TrainStationList,
         MasterImagePicker,

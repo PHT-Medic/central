@@ -12,9 +12,9 @@ import type { BuildInput } from 'rapiq';
 import { computed, ref, toRefs } from 'vue';
 import type { PropType, Ref } from 'vue';
 import {
-    EntityDelete, ListPagination,
-    ListSearch,
-    ListTitle,
+    EntityDelete, FPagination,
+    FSearch,
+    FTitle,
     RegistryProjectDetails,
     RegistryProjectList,
 } from '@personalhealthtrain/client-vue';
@@ -24,9 +24,9 @@ import { useAuthStore } from '../../../../../../store/auth';
 
 export default {
     components: {
-        ListPagination,
-        ListSearch,
-        ListTitle,
+        ListPagination: FPagination,
+        ListSearch: FSearch,
+        ListTitle: FTitle,
         BModal,
         BTable,
         EntityDelete,

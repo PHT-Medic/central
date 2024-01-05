@@ -4,8 +4,10 @@
  * For the full copyright and license information,
  * view the LICENSE file that was distributed with this source code.
  */
-import { buildFormInput, buildFormSubmit, buildFormTextarea } from '@vue-layout/form-controls';
-import type { ListHeaderSlotProps, ListItemSlotProps } from '@vue-layout/list-controls';
+import {
+    buildFormGroup, buildFormInput, buildFormSubmit, buildFormTextarea,
+} from '@vuecs/form-controls';
+import type { ListHeaderSlotProps, ListItemSlotProps } from '@vuecs/list-controls';
 import useVuelidate from '@vuelidate/core';
 import { maxLength, minLength, required } from '@vuelidate/validators';
 import {
@@ -33,7 +35,7 @@ import {
 import MasterImagePicker from '../master-image/MasterImagePicker';
 import StationList from '../station/StationList';
 import ProposalStationAssignAction from '../proposal-station/ProposalStationAssignAction';
-import { ListSearch } from '../list-search';
+import { FSearch } from '../utility';
 
 export default defineComponent({
     props: {
@@ -152,15 +154,17 @@ export default defineComponent({
         };
 
         return () => {
-            const title = buildFormInput({
+            const title = buildFormGroup({
                 validationTranslator: useValidationTranslator(),
                 validationResult: $v.value.title,
                 label: true,
                 labelContent: 'Title',
-                value: form.title,
-                onChange(input) {
-                    form.title = input;
-                },
+                content: buildFormInput({
+                    value: form.title,
+                    onChange(input) {
+                        form.title = input;
+                    },
+                }),
             });
 
             const masterImagePicker = h(MasterImagePicker, {
@@ -199,18 +203,20 @@ export default defineComponent({
                 ),
             ]);
 
-            const riskComment = buildFormTextarea({
+            const riskComment = buildFormGroup({
                 validationTranslator: useValidationTranslator(),
                 validationResult: $v.value.risk_comment,
                 label: true,
                 labelContent: 'Risk Comment',
-                value: form.risk_comment,
-                onChange(input) {
-                    form.risk_comment = input;
-                },
-                props: {
-                    rows: 6,
-                },
+                content: buildFormTextarea({
+                    value: form.risk_comment,
+                    onChange(input) {
+                        form.risk_comment = input;
+                    },
+                    props: {
+                        rows: 6,
+                    },
+                }),
             });
 
             const submitNode = buildFormSubmit({
@@ -232,7 +238,7 @@ export default defineComponent({
                 } satisfies ListProps<Station>, {
                     [EntityListSlotName.HEADER]: (props: ListHeaderSlotProps<Station>) => [
                         h('label', 'Stations'),
-                        h(ListSearch, {
+                        h(FSearch, {
                             load: props.load,
                             meta: props.meta,
                         }),
@@ -260,18 +266,20 @@ export default defineComponent({
                 ]),
             ]);
 
-            const data = buildFormTextarea({
+            const data = buildFormGroup({
                 validationTranslator: useValidationTranslator(),
                 validationResult: $v.value.requested_data,
                 label: true,
                 labelContent: 'Data/Parameters',
-                value: form.requested_data,
-                onChange(input) {
-                    form.requested_data = input;
-                },
-                props: {
-                    rows: 6,
-                },
+                content: buildFormTextarea({
+                    value: form.requested_data,
+                    onChange(input) {
+                        form.requested_data = input;
+                    },
+                    props: {
+                        rows: 6,
+                    },
+                }),
             });
 
             return h(

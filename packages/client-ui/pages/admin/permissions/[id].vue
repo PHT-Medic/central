@@ -6,7 +6,7 @@ import { ref } from 'vue';
 import type { Ref } from 'vue';
 import {
     definePageMeta,
-    updateObjectProperties, useAPI, useToast,
+    updateObjectProperties, useAuthupAPI, useToast,
 } from '#imports';
 import {
     createError, defineNuxtComponent, navigateTo, useRoute,
@@ -46,7 +46,7 @@ export default defineNuxtComponent({
         const entity : Ref<Permission> = ref(null) as any;
 
         try {
-            entity.value = await useAPI()
+            entity.value = await useAuthupAPI()
                 .permission
                 .getOne(route.params.id as string);
         } catch (e) {
