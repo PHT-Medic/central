@@ -62,7 +62,7 @@
         "socket.io-client": "^4.7.2",
         "vue": "^3.4.5",
         "vue-tsc": "^1.8.22",
-        "vue3-form-wizard": "^0.2.1"
+        "vue3-form-wizard": "^0.2.3"
     },
     "peerDependencies": {
         "@authup/client-vue": ">=0.40.3 <1.0.0",
@@ -80,7 +80,7 @@
         "smob": "^1.4.x",
         "socket.io-client": "^4.7.2",
         "vue": "^3.3.x",
-        "vue3-form-wizard": "^0.2.1"
+        "vue3-form-wizard": "^0.2.3"
     },
     "publishConfig": {
         "access": "public"
