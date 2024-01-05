@@ -53,7 +53,7 @@ jobs:
                     - 6379:6379
 
             authup:
-                image: tada5hi/authup
+                image: authup/authup
                 env:
                     NODE_ENV: test
                     ROBOT_ENABLED: true
