@@ -61,7 +61,7 @@
         "@types/yargs": "^17.0.29",
         "cross-env": "^7.0.3",
         "supertest": "^6.3.3",
-        "ts-node": "^10.9.1"
+        "ts-node": "^10.9.2"
     },
     "scripts": {
         "dev": "npm run cli -- start",
