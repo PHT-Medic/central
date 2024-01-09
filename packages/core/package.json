@@ -27,12 +27,12 @@
     "license": "MIT",
     "devDependencies": {
         "@authup/core": "^1.0.0-beta.0",
-        "hapic": "^2.3.0",
+        "hapic": "^2.5.0",
         "rapiq": "^0.9.0"
     },
     "peerDependencies": {
         "@authup/core": "^1.0.0-beta.0",
-        "hapic": "^2.3.0",
+        "hapic": "^2.5.0",
         "rapiq": ">=0.9 <1.0.0"
     },
     "dependencies": {
