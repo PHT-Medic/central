@@ -1,5 +1,22 @@
 # Change Log
 
+## [2.5.1](https://github.com/PHT-Medic/central/compare/server-realtime-v2.5.0...server-realtime-v2.5.1) (2024-01-10)
+
+
+### Bug Fixes
+
+* **deps:** bump @authup/core from 1.0.0-beta.0 to 1.0.0-beta.1 ([#1331](https://github.com/PHT-Medic/central/issues/1331)) ([a85f624](https://github.com/PHT-Medic/central/commit/a85f624240efdfaa67556527a6256ea12755d91c))
+* **deps:** bump @authup/server-adapter from 1.0.0-beta.0 to 1.0.0-beta.1 ([#1334](https://github.com/PHT-Medic/central/issues/1334)) ([58d7efc](https://github.com/PHT-Medic/central/commit/58d7efc43b0265225eab39830cc3e4ecce526b16))
+* **deps:** bump hapic from 2.4.0 to 2.5.0 ([#1333](https://github.com/PHT-Medic/central/issues/1333)) ([7fdcd6a](https://github.com/PHT-Medic/central/commit/7fdcd6a29fffdaf534201de98723690503464b35))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @personalhealthtrain/core bumped from 2.5.0 to 2.5.1
+    * @personalhealthtrain/server-core bumped from 2.5.0 to 2.5.1
+
 ## [2.5.0](https://github.com/PHT-Medic/central/compare/server-realtime-v2.4.10...server-realtime-v2.5.0) (2024-01-05)
 
 
