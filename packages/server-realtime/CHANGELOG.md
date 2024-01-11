@@ -1,5 +1,20 @@
 # Change Log
 
+## [2.5.2](https://github.com/PHT-Medic/central/compare/server-realtime-v2.5.1...server-realtime-v2.5.2) (2024-01-11)
+
+
+### Miscellaneous Chores
+
+* **server-realtime:** Synchronize main versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @personalhealthtrain/core bumped from 2.5.1 to 2.5.2
+    * @personalhealthtrain/server-core bumped from 2.5.1 to 2.5.2
+
 ## [2.5.1](https://github.com/PHT-Medic/central/compare/server-realtime-v2.5.0...server-realtime-v2.5.1) (2024-01-10)
 
 

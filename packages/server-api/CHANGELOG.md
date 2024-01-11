@@ -1,5 +1,25 @@
 # Change Log
 
+## [2.5.2](https://github.com/PHT-Medic/central/compare/server-api-v2.5.1...server-api-v2.5.2) (2024-01-11)
+
+
+### Bug Fixes
+
+* **deps:** bump @routup/basic from 1.3.0 to 1.3.1 ([#1345](https://github.com/PHT-Medic/central/issues/1345)) ([bf2b355](https://github.com/PHT-Medic/central/commit/bf2b355a9908c81ab81bd86d78b9817c4d7804c3))
+* **deps:** bump @routup/decorators from 3.3.0 to 3.3.1 ([#1343](https://github.com/PHT-Medic/central/issues/1343)) ([0a89f85](https://github.com/PHT-Medic/central/commit/0a89f85153bd7eb2c286a67b2a182d261d350100))
+* **deps:** bump @routup/swagger from 2.3.1 to 2.3.2 ([#1342](https://github.com/PHT-Medic/central/issues/1342)) ([b734d3b](https://github.com/PHT-Medic/central/commit/b734d3b13d60400e5b5046ed4394dc2e16dfa7ae))
+* **deps:** bump @routup/swagger from 2.3.2 to 2.3.3 ([#1350](https://github.com/PHT-Medic/central/issues/1350)) ([4361a8e](https://github.com/PHT-Medic/central/commit/4361a8e9ca9b9dae23a250d15c1d68716ad13d07))
+* **deps:** bump typeorm-extension from 3.2.0 to 3.3.0 ([#1349](https://github.com/PHT-Medic/central/issues/1349)) ([a9b8f3e](https://github.com/PHT-Medic/central/commit/a9b8f3ec17fd8c42b9f36cd0d43d905ac949dae8))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @personalhealthtrain/core bumped from 2.5.1 to 2.5.2
+    * @personalhealthtrain/server-core bumped from 2.5.1 to 2.5.2
+    * @personalhealthtrain/server-train-manager bumped from 2.5.1 to 2.5.2
+
 ## [2.5.1](https://github.com/PHT-Medic/central/compare/server-api-v2.5.0...server-api-v2.5.1) (2024-01-10)
 
 

@@ -1,5 +1,12 @@
 # Change Log
 
+## [2.5.2](https://github.com/PHT-Medic/central/compare/core-v2.5.1...core-v2.5.2) (2024-01-11)
+
+
+### Miscellaneous Chores
+
+* **core:** Synchronize main versions
+
 ## [2.5.1](https://github.com/PHT-Medic/central/compare/core-v2.5.0...core-v2.5.1) (2024-01-10)
 
 

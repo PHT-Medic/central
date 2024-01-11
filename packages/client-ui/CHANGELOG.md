@@ -1,5 +1,20 @@
 # Change Log
 
+## [2.5.2](https://github.com/PHT-Medic/central/compare/client-ui-v2.5.1...client-ui-v2.5.2) (2024-01-11)
+
+
+### Miscellaneous Chores
+
+* **client-ui:** Synchronize main versions
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * devDependencies
+    * @personalhealthtrain/client-vue bumped from 2.5.1 to 2.5.2
+    * @personalhealthtrain/core bumped from 2.5.1 to 2.5.2
+
 ## [2.5.1](https://github.com/PHT-Medic/central/compare/client-ui-v2.5.0...client-ui-v2.5.1) (2024-01-10)
 
 

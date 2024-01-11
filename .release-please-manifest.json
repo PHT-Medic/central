@@ -1,9 +1,9 @@
 {
-    "packages/client-ui": "2.5.1",
-    "packages/client-vue": "2.5.1",
-    "packages/core": "2.5.1",
-    "packages/server-api": "2.5.1",
-    "packages/server-core": "2.5.1",
-    "packages/server-realtime": "2.5.1",
-    "packages/server-train-manager": "2.5.1"
+    "packages/client-ui": "2.5.2",
+    "packages/client-vue": "2.5.2",
+    "packages/core": "2.5.2",
+    "packages/server-api": "2.5.2",
+    "packages/server-core": "2.5.2",
+    "packages/server-realtime": "2.5.2",
+    "packages/server-train-manager": "2.5.2"
 }
