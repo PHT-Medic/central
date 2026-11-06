@@ -48,9 +48,9 @@ jobs:
 
             -   name: Publish
                 if: steps.release.outputs.releases_created == 'true'
-                run: npx workspaces-publish
-                env:
-                    NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+                uses: tada5hi/monoship@v2.2.1
+                with:
+                    token: ${{ secrets.NPM_TOKEN }}
 
             -   uses: tada5hi/action-docker-image-publish@v3
                 if: steps.release.outputs.releases_created == 'true'
